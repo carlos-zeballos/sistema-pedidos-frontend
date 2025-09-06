@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'https://sistema-pedidos-restaurante.onrender.com';
 
 console.log('🔗 API URL:', API_BASE_URL);
 

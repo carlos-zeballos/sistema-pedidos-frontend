@@ -129,3 +129,4 @@ const finalHasNewItems = hasNewItems || hasItemsAddedLater;
 4. **Confirmar** que aparecen las alertas correctas
 5. **Verificar** que el cronómetro funciona en ambos casos
 
+

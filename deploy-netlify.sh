@@ -104,3 +104,4 @@ echo "4. ¡Tu sitio estará disponible!"
 echo ""
 print_status "Para más detalles, revisa el archivo INSTRUCCIONES-NETLIFY.md"
 
+
