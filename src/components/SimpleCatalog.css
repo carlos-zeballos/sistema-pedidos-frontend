@@ -1,0 +1,326 @@
+/* ===== CATÁLOGO SIMPLIFICADO ===== */
+.simple-catalog {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.catalog-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.catalog-header h1 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.catalog-header p {
+  color: #7f8c8d;
+  font-size: 16px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: #3498db;
+  padding: 50px;
+}
+
+.error-message {
+  background-color: #e74c3c;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+.tab {
+  padding: 12px 24px;
+  border: none;
+  background: #ecf0f1;
+  color: #7f8c8d;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  background: #d5dbdb;
+  color: #2c3e50;
+}
+
+.tab.active {
+  background: #3498db;
+  color: white;
+}
+
+.tab-content {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  min-height: 400px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.section-header h2 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+.create-button {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  display: inline-block;
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.create-button:hover {
+  background: #229954;
+}
+
+.items-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.item-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  transition: box-shadow 0.3s ease;
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.item-card h3 {
+  color: #2c3e50;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.item-card p {
+  color: #6c757d;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h2 {
+  color: #2c3e50;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  height: 80px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.save-button {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.save-button:hover {
+  background: #229954;
+}
+
+.modal-actions button:last-child {
+  background: #95a5a6;
+  color: white;
+}
+
+.modal-actions button:last-child:hover {
+  background: #7f8c8d;
+}
+
+/* ===== FIN CATÁLOGO SIMPLIFICADO ===== */
+
+/* Catálogo simplificado activado: 2025-08-31T11:45:03.230Z */
+
+/* ===== BOTONES DE EDITAR Y BORRAR - 2025-08-31T12:05:24.538Z ===== */
+.item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.edit-button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  display: inline-block;
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  z-index: 1000;
+  min-width: 80px;
+}
+
+.edit-button:hover {
+  background: #2980b9;
+}
+
+.delete-button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  display: inline-block;
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  z-index: 1000;
+  min-width: 80px;
+}
+
+.delete-button:hover {
+  background: #c0392b;
+}
+
+.item-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  transition: box-shadow 0.3s ease;
+  position: relative;
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.item-card:hover .item-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== FIN BOTONES DE EDITAR Y BORRAR ===== */
+
+/* ===== ESTADOS VACÍOS - 2025-08-31T12:11:30.088Z ===== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #7f8c8d;
+  font-size: 16px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.empty-state p {
+  margin: 0;
+  font-style: italic;
+}
+
+/* ===== FIN ESTADOS VACÍOS ===== */
