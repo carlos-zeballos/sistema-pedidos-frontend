@@ -1,0 +1,2 @@
+/api/*  https://sistema-pedidos-restaurante.onrender.com/:splat  200
+/*      /index.html  200
