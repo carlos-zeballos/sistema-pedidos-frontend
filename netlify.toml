@@ -1,10 +1,11 @@
 [build]
-  command = "npm run build"
+  command = "CI=false npm run build"
   publish = "build"
 
 [build.environment]
   REACT_APP_API_URL = "https://sistema-pedidos-restaurante.onrender.com"
   NODE_VERSION = "18"
+  CI = "false"
 
 [[redirects]]
   from = "/*"
