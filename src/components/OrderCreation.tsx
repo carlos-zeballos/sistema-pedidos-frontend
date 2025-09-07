@@ -301,26 +301,38 @@ const OrderCreation: React.FC = () => {
   };
 
   const addToCart = (item: Product | ProductOrCombo) => {
+    console.log('🛒 addToCart llamado con:', {
+      name: item.name,
+      id: item.id,
+      hasComboComponent: 'ComboComponent' in item,
+      item: item
+    });
+    
     // Determinar si es un producto o combo
     const isCombo = 'ComboComponent' in item;
+    console.log('🔍 Detectado como combo:', isCombo);
     
     if (isCombo) {
+      console.log('🍱 Abriendo modal de combo para:', item.name);
       // Para combos, abrir el modal de personalización
       setSelectedCombo(item);
       setComboModalOpen(true);
       return;
     }
     
+    console.log('📦 Agregando producto individual al carrito:', item.name);
     // Para productos normales, agregar directamente al carrito
     const existingItem = cart.find(cartItem => cartItem.product.id === item.id);
     
     if (existingItem) {
+      console.log('📦 Producto ya existe en carrito, incrementando cantidad');
       setCart(cart.map(cartItem => 
         cartItem.product.id === item.id 
           ? { ...cartItem, quantity: cartItem.quantity + 1 }
           : cartItem
       ));
     } else {
+      console.log('📦 Producto nuevo, agregando al carrito');
       const cartItem: CartItem = {
         product: {
           ...item,
@@ -330,6 +342,7 @@ const OrderCreation: React.FC = () => {
         notes: ''
       };
       setCart([...cart, cartItem]);
+      console.log('✅ Producto agregado al carrito:', cartItem);
     }
   };
 
@@ -600,6 +613,15 @@ const OrderCreation: React.FC = () => {
                 const isCombo = 'ComboComponent' in item;
                 const price = getSafePrice(item);
                 const isAvailable = item.isAvailable || false;
+                
+                console.log('🎨 Renderizando item:', {
+                  name: item.name,
+                  id: item.id,
+                  isCombo: isCombo,
+                  price: price,
+                  isAvailable: isAvailable,
+                  hasComboComponent: 'ComboComponent' in item
+                });
                 
                 return (
                   <div key={item.id} className={`product-card ${isCombo ? 'combo-card' : ''}`}>
