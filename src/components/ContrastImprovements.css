@@ -1,0 +1,215 @@
+/* ===== MEJORAS DE CONTRASTE PARA MÁXIMA LEGIBILIDAD ===== */
+
+/* Asegurar que todos los elementos con fondo blanco tengan texto oscuro */
+.white-background {
+  color: #1f2937 !important; /* Gris muy oscuro para máximo contraste */
+}
+
+/* Asegurar que todos los elementos con fondo oscuro tengan texto claro */
+.dark-background {
+  color: #ffffff !important; /* Blanco para máximo contraste */
+}
+
+/* Mejoras específicas para elementos que podrían tener problemas */
+
+/* Títulos en fondos blancos */
+h1, h2, h3, h4, h5, h6 {
+  color: #1f2937 !important; /* Gris muy oscuro */
+}
+
+/* Texto de párrafos en fondos blancos */
+p, span, div {
+  color: #374151 !important; /* Gris oscuro */
+}
+
+/* Enlaces en fondos blancos */
+a {
+  color: #1e40af !important; /* Azul oscuro */
+}
+
+a:hover {
+  color: #1d4ed8 !important; /* Azul más oscuro */
+}
+
+/* Botones con mejor contraste */
+.btn-high-contrast {
+  background: #1f2937 !important;
+  color: #ffffff !important;
+  border: 2px solid #1f2937 !important;
+}
+
+.btn-high-contrast:hover {
+  background: #374151 !important;
+  border-color: #374151 !important;
+}
+
+/* Inputs con mejor contraste */
+input, textarea, select {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border: 2px solid #d1d5db !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Labels con mejor contraste */
+label {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+/* Mensajes de error con mejor contraste */
+.error-message {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* Mensajes de éxito con mejor contraste */
+.success-message {
+  background: #f0fdf4 !important;
+  color: #16a34a !important;
+  border: 1px solid #bbf7d0 !important;
+}
+
+/* Mensajes de advertencia con mejor contraste */
+.warning-message {
+  background: #fffbeb !important;
+  color: #d97706 !important;
+  border: 1px solid #fed7aa !important;
+}
+
+/* Información con mejor contraste */
+.info-message {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+/* Mejoras para elementos específicos que podrían tener problemas */
+
+/* Productos en catálogo */
+.product-card h3,
+.product-card .product-name {
+  color: #1f2937 !important;
+}
+
+.product-card p,
+.product-card .product-description {
+  color: #374151 !important;
+}
+
+.product-card .product-price {
+  color: #059669 !important; /* Verde para precios */
+  font-weight: 700 !important;
+}
+
+/* Combos */
+.combo-card h3,
+.combo-card .combo-name {
+  color: #1f2937 !important;
+}
+
+.combo-card p,
+.combo-card .combo-description {
+  color: #374151 !important;
+}
+
+.combo-card .combo-price {
+  color: #059669 !important; /* Verde para precios */
+  font-weight: 700 !important;
+}
+
+/* Carrito */
+.cart-item .item-name {
+  color: #1f2937 !important;
+}
+
+.cart-item .item-price {
+  color: #059669 !important; /* Verde para precios */
+  font-weight: 700 !important;
+}
+
+/* Formularios */
+.form-group label {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border: 2px solid #d1d5db !important;
+}
+
+/* Botones de acción */
+.btn-primary {
+  background: #1e40af !important;
+  color: #ffffff !important;
+  border: 2px solid #1e40af !important;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+.btn-secondary {
+  background: #6b7280 !important;
+  color: #ffffff !important;
+  border: 2px solid #6b7280 !important;
+}
+
+.btn-secondary:hover {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
+}
+
+.btn-success {
+  background: #059669 !important;
+  color: #ffffff !important;
+  border: 2px solid #059669 !important;
+}
+
+.btn-success:hover {
+  background: #047857 !important;
+  border-color: #047857 !important;
+}
+
+.btn-danger {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: 2px solid #dc2626 !important;
+}
+
+.btn-danger:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+
+/* Mejoras para accesibilidad */
+.high-contrast-mode {
+  filter: contrast(1.2) brightness(1.1);
+}
+
+/* Asegurar que todos los elementos tengan suficiente contraste */
+* {
+  text-shadow: none !important; /* Remover sombras que puedan reducir contraste */
+}
+
+/* Mejoras para elementos con fondo degradado */
+.gradient-background {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Mejoras para elementos con fondo de imagen */
+.image-background {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+}

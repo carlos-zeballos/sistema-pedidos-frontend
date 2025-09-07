@@ -267,23 +267,26 @@
 
 .product-name {
   font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #111827 !important; /* Gris más oscuro para mejor contraste */
   margin-bottom: 0.5rem;
+  text-shadow: none;
 }
 
 .product-description {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #374151 !important; /* Gris más oscuro para mejor contraste */
   margin-bottom: 0.75rem;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .product-price {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #3b82f6;
+  color: #059669 !important; /* Verde para precios - mejor contraste */
   margin-bottom: 0.75rem;
+  text-shadow: none;
 }
 
 .add-to-cart-btn {

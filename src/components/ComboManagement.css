@@ -235,8 +235,9 @@
 .combo-header-card h3 {
   margin: 0;
   font-size: 1.4rem;
-  color: #2d3748;
-  font-weight: 600;
+  color: #111827 !important; /* Gris más oscuro para mejor contraste */
+  font-weight: 700;
+  text-shadow: none;
 }
 
 .combo-code {

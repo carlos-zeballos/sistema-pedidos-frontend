@@ -17,6 +17,7 @@ import TablesManagement from './components/TablesManagement';
 import ConnectionTest from './components/ConnectionTest';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import './App.css';
+import './components/ContrastImprovements.css';
 
 // Componente para rutas protegidas
 const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole?: string }> = ({ 

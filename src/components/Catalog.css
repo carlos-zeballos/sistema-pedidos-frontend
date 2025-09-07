@@ -318,16 +318,18 @@ html, body {
 
 .product-name {
   font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--text-dark);
+  font-weight: 700;
+  color: #111827 !important; /* Gris más oscuro para mejor contraste */
   margin-bottom: 10px;
+  text-shadow: none;
 }
 
 .product-description {
-  color: var(--text-light);
+  color: #374151 !important; /* Gris más oscuro para mejor contraste */
   font-size: 0.9rem;
   line-height: 1.4;
   margin-bottom: 15px;
+  font-weight: 500;
 }
 
 .product-category {
