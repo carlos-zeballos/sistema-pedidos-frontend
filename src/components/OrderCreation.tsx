@@ -128,6 +128,21 @@ const OrderCreation: React.FC = () => {
         console.log('❌ No se encontraron productos');
       }
       
+      // Log detallado de combos antes de establecer
+      if (combosData && combosData.length > 0) {
+        console.log('🍱 Combos recibidos del backend:', combosData);
+        combosData.forEach((combo: any, index: number) => {
+          console.log(`🍱 Combo ${index + 1}:`, {
+            id: combo.id,
+            name: combo.name,
+            basePrice: combo.basePrice,
+            hasComboComponent: !!combo.ComboComponent,
+            comboComponentCount: combo.ComboComponent?.length || 0,
+            comboComponent: combo.ComboComponent
+          });
+        });
+      }
+      
       setProducts(productsData || []);
       setCombos(combosData || []);
       setCategories(categoriesData || []);

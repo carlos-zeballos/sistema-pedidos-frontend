@@ -92,12 +92,27 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
     return null;
   }
   
-  // Si no hay componentes, mostrar mensaje de error
+  // Si no hay componentes, permitir agregar el combo directamente
   if (!hasComponents) {
-    console.log('❌ Modal no se renderiza - combo sin componentes:', { 
+    console.log('⚠️ Combo sin componentes - permitiendo agregar directamente:', { 
       hasComponents,
       componentsCount: combo?.components?.length || combo?.ComboComponent?.length || 0
     });
+    
+    const handleAddSimpleCombo = () => {
+      const customizedCombo: CustomizedCombo = {
+        combo,
+        selectedComponents: {},
+        selectedSauces: [{ name: 'ACEVICHADA', quantity: 1 }], // Salsa por defecto
+        normalChopsticks: 1,
+        assistedChopsticks: 0
+      };
+      
+      console.log('🍱 Agregando combo simple:', customizedCombo);
+      onAddToCart(customizedCombo);
+      onClose();
+    };
+    
     return (
       <div className="modal-overlay">
         <div className="modal-content">
@@ -106,15 +121,23 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
             <button className="close-btn" onClick={onClose}>×</button>
           </div>
           <div className="modal-body">
-            <div style={{ textAlign: 'center', padding: '20px', color: '#ff6600' }}>
-              <h3>⚠️ Combo sin componentes</h3>
-              <p>Este combo no tiene componentes configurados.</p>
-              <p>Por favor, contacta al administrador.</p>
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <h3>🍱 Combo Simple</h3>
+              <p>Este combo no requiere personalización.</p>
+              <p><strong>Precio: ${combo.basePrice || combo.price || 0}</strong></p>
+              <p>Se agregará con salsa Acevichada por defecto.</p>
             </div>
           </div>
           <div className="modal-footer">
             <button className="btn-secondary" onClick={onClose}>
-              Cerrar
+              Cancelar
+            </button>
+            <button 
+              className="btn-primary" 
+              onClick={handleAddSimpleCombo}
+              style={{ background: '#ff6600', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px' }}
+            >
+              🛒 Agregar al Carrito
             </button>
           </div>
         </div>
@@ -270,6 +293,12 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
     if (totalSauces < 1) {
       console.log('❌ Se requiere al menos 1 salsa');
       return false;
+    }
+    
+    // Si no hay componentes requeridos, solo validar salsas
+    if (requiredComponents.length === 0) {
+      console.log('✅ Combo sin componentes requeridos, solo validando salsas');
+      return totalSauces >= 1;
     }
     
     console.log('✅ Formulario válido');
