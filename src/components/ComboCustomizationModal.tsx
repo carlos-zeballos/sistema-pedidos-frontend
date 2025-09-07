@@ -468,7 +468,8 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
                  })}
                </div>
              </div>
-           ))}
+           );
+         })}
 
 
 
