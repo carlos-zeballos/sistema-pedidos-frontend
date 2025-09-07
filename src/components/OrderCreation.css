@@ -641,6 +641,17 @@
   color: #1f2937;
 }
 
+.chopsticks-info {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-left: 4px solid #3b82f6;
+  margin-top: 1rem;
+}
+
 /* Sección de Notas */
 .order-notes-section {
   margin-bottom: 1rem;

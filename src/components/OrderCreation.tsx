@@ -54,6 +54,10 @@ const OrderCreation: React.FC = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [orderNotes, setOrderNotes] = useState('');
   const [selectedSauces, setSelectedSauces] = useState<string[]>([]);
+  const [chopsticksCount, setChopsticksCount] = useState({
+    normal: 0,
+    training: 0
+  });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -213,6 +217,18 @@ const OrderCreation: React.FC = () => {
         ? prev.filter(s => s !== sauce)
         : [...prev, sauce]
     );
+  };
+
+  // Funciones para manejar palitos
+  const updateChopsticksCount = (type: 'normal' | 'training', delta: number) => {
+    setChopsticksCount(prev => ({
+      ...prev,
+      [type]: Math.max(0, prev[type] + delta)
+    }));
+  };
+
+  const getTotalChopsticks = () => {
+    return chopsticksCount.normal + chopsticksCount.training;
   };
 
 
@@ -389,6 +405,18 @@ const OrderCreation: React.FC = () => {
       // Agregar salsas seleccionadas
       if (selectedSauces.length > 0) {
         completeOrderNotes += `\n🍶 SALSAS: ${selectedSauces.join(', ')}`;
+      }
+      
+      // Agregar palitos seleccionados
+      if (getTotalChopsticks() > 0) {
+        const chopsticksDetails = [];
+        if (chopsticksCount.normal > 0) {
+          chopsticksDetails.push(`${chopsticksCount.normal} normales`);
+        }
+        if (chopsticksCount.training > 0) {
+          chopsticksDetails.push(`${chopsticksCount.training} de entrenamiento`);
+        }
+        completeOrderNotes += `\n🥢 PALITOS: ${chopsticksDetails.join(', ')}`;
       }
       
       
@@ -724,6 +752,62 @@ const OrderCreation: React.FC = () => {
                   {getRequiredSaucesCount() > 0 && (
                     <p className="sauces-info">
                       💡 Se requieren {getRequiredSaucesCount()} salsa(s) para los items del carrito
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Selección de Palitos - Solo para productos individuales */}
+              {hasProducts() && (
+                <div className="chopsticks-section">
+                  <h4>🥢 ELIGE LOS PALITOS:</h4>
+                  <div className="chopsticks-controls">
+                    <div className="chopstick-type">
+                      <span>Palitos Normales:</span>
+                      <div className="chopstick-counter">
+                        <button
+                          type="button"
+                          className="counter-btn"
+                          onClick={() => updateChopsticksCount('normal', -1)}
+                          disabled={chopsticksCount.normal === 0}
+                        >
+                          -
+                        </button>
+                        <span className="counter-value">{chopsticksCount.normal}</span>
+                        <button
+                          type="button"
+                          className="counter-btn"
+                          onClick={() => updateChopsticksCount('normal', 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div className="chopstick-type">
+                      <span>Palitos de Entrenamiento:</span>
+                      <div className="chopstick-counter">
+                        <button
+                          type="button"
+                          className="counter-btn"
+                          onClick={() => updateChopsticksCount('training', -1)}
+                          disabled={chopsticksCount.training === 0}
+                        >
+                          -
+                        </button>
+                        <span className="counter-value">{chopsticksCount.training}</span>
+                        <button
+                          type="button"
+                          className="counter-btn"
+                          onClick={() => updateChopsticksCount('training', 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  {getTotalChopsticks() > 0 && (
+                    <p className="chopsticks-info">
+                      💡 Total de palitos seleccionados: {getTotalChopsticks()}
                     </p>
                   )}
                 </div>
