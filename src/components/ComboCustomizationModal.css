@@ -205,10 +205,11 @@
 
 .component-name {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   margin-bottom: 6px;
-  color: #ffffff;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 .component-description {
@@ -265,10 +266,11 @@
 }
 
 .sauce-name {
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  color: #ffffff !important;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 /* Chopsticks Section */
@@ -312,28 +314,52 @@
 }
 
 .counter-btn {
-  background: #e0c088;
+  background: linear-gradient(135deg, #e0c088 0%, #d4af37 100%);
   color: #1a1a1a;
-  border: none;
-  width: 30px;
-  height: 30px;
+  border: 2px solid #ffffff;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   cursor: pointer;
   font-weight: bold;
+  font-size: 18px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.counter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.counter-btn:hover::before {
+  left: 100%;
 }
 
 .counter-btn:hover {
-  background: #d4af37;
+  background: linear-gradient(135deg, #d4af37 0%, #e0c088 100%);
   transform: scale(1.1);
 }
 
 .counter-value {
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 1.1rem;
-  min-width: 30px;
+  color: #e0c088;
+  font-weight: bold;
+  font-size: 18px;
+  min-width: 28px;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  background: rgba(224, 192, 136, 0.1);
+  border-radius: 8px;
+  padding: 4px 8px;
+  border: 1px solid rgba(224, 192, 136, 0.3);
 }
 
 /* Notes Section */
@@ -523,19 +549,36 @@
 
 .quantity-btn {
   background: linear-gradient(135deg, #e0c088 0%, #d4af37 100%);
-  border: none;
+  border: 2px solid #ffffff;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-weight: bold;
   color: #1a1a1a;
-  transition: all 0.2s ease;
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-size: 18px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.quantity-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.quantity-btn:hover::before {
+  left: 100%;
 }
 
 .quantity-btn:hover:not(:disabled) {
@@ -550,12 +593,16 @@
 }
 
 .quantity-display {
-  min-width: 24px;
+  min-width: 28px;
   text-align: center;
   font-weight: bold;
   color: #e0c088;
-  font-size: 16px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-size: 18px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  background: rgba(224, 192, 136, 0.1);
+  border-radius: 8px;
+  padding: 4px 8px;
+  border: 1px solid rgba(224, 192, 136, 0.3);
 }
 
 /* Update component option layout */
