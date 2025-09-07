@@ -84,20 +84,52 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
   const hasComponents = ((combo?.components?.length || 0) > 0) || 
                        ((combo?.ComboComponent?.length || 0) > 0);
   
-  if (!isOpen || !combo || !hasComponents) {
-    console.log('❌ Modal no se renderiza:', { 
+  if (!isOpen || !combo) {
+    console.log('❌ Modal no se renderiza - falta combo o no está abierto:', { 
       isOpen, 
-      combo: !!combo, 
+      combo: !!combo
+    });
+    return null;
+  }
+  
+  // Si no hay componentes, mostrar mensaje de error
+  if (!hasComponents) {
+    console.log('❌ Modal no se renderiza - combo sin componentes:', { 
       hasComponents,
       componentsCount: combo?.components?.length || combo?.ComboComponent?.length || 0
     });
-    return null;
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h2>🍱 {combo.name}</h2>
+            <button className="close-btn" onClick={onClose}>×</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ textAlign: 'center', padding: '20px', color: '#ff6600' }}>
+              <h3>⚠️ Combo sin componentes</h3>
+              <p>Este combo no tiene componentes configurados.</p>
+              <p>Por favor, contacta al administrador.</p>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   console.log('✅ Modal se renderiza correctamente');
   console.log('🍱 Componentes del combo (nuevos):', combo.components);
   console.log('🍱 Componentes del combo (antiguos):', combo.ComboComponent);
   console.log('🔢 MaxSelections del combo:', combo.maxSelections);
+  
+  // Obtener componentes de manera robusta
+  const components = combo.components || combo.ComboComponent || [];
+  console.log('📦 Componentes finales a renderizar:', components);
   console.log('📊 Combo completo:', combo);
 
   // Group components by type - manejar tanto componentes nuevos como antiguos
@@ -204,8 +236,43 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
   };
 
   const isFormValid = () => {
-    // TEMPORAL: Siempre retornar true para debugging
-    console.log('🔍 DEBUG - isFormValid ejecutándose - SIEMPRE RETORNANDO TRUE');
+    console.log('🔍 Validando formulario...');
+    
+    // Verificar que hay un combo seleccionado
+    if (!combo) {
+      console.log('❌ No hay combo seleccionado');
+      return false;
+    }
+    
+    // Verificar que el combo tiene componentes
+    const hasComponents = (combo.components?.length || 0) > 0 || (combo.ComboComponent?.length || 0) > 0;
+    if (!hasComponents) {
+      console.log('❌ El combo no tiene componentes');
+      return false;
+    }
+    
+    // Verificar que se han seleccionado componentes requeridos
+    const components = combo.components || combo.ComboComponent || [];
+    const requiredComponents = components.filter((comp: any) => comp.isRequired);
+    
+    for (const requiredComp of requiredComponents) {
+      const selectedForType = selectedComponents[requiredComp.type] || [];
+      const totalSelected = selectedForType.reduce((sum, item) => sum + item.quantity, 0);
+      
+      if (totalSelected < 1) {
+        console.log(`❌ Componente requerido no seleccionado: ${requiredComp.type}`);
+        return false;
+      }
+    }
+    
+    // Verificar que se han seleccionado salsas (mínimo 1)
+    const totalSauces = selectedSauces.reduce((sum, sauce) => sum + sauce.quantity, 0);
+    if (totalSauces < 1) {
+      console.log('❌ Se requiere al menos 1 salsa');
+      return false;
+    }
+    
+    console.log('✅ Formulario válido');
     return true;
   };
 
