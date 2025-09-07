@@ -66,6 +66,70 @@
   color: #ffffff;
 }
 
+/* Search Section */
+.search-section {
+  margin-bottom: 25px;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 40px;
+  background: #2d2d2d;
+  border: 2px solid #e0c088;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  background: #3a3a3a;
+}
+
+.search-input::placeholder {
+  color: #a0a0a0;
+  font-weight: 400;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  background: #e0c088;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #1a1a1a;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  background: #d4af37;
+  transform: scale(1.1);
+}
+
+.search-results {
+  color: #e0c088;
+  font-weight: 600;
+}
+
 /* Combo Description */
 .combo-description {
   background: rgba(224, 192, 136, 0.1);
@@ -140,17 +204,19 @@
 }
 
 .component-name {
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 5px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
   color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .component-description {
-  font-size: 0.8rem;
-  color: #cccccc;
+  font-size: 0.9rem;
+  color: #e0e0e0;
   margin-bottom: 8px;
-  line-height: 1.3;
+  line-height: 1.4;
+  font-weight: 400;
 }
 
 .component-price {
@@ -200,7 +266,9 @@
 
 .sauce-name {
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Chopsticks Section */
@@ -457,8 +525,8 @@
   background: linear-gradient(135deg, #e0c088 0%, #d4af37 100%);
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -466,7 +534,8 @@
   font-weight: bold;
   color: #1a1a1a;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .quantity-btn:hover:not(:disabled) {
@@ -481,11 +550,12 @@
 }
 
 .quantity-display {
-  min-width: 20px;
+  min-width: 24px;
   text-align: center;
   font-weight: bold;
   color: #e0c088;
-  font-size: 14px;
+  font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Update component option layout */

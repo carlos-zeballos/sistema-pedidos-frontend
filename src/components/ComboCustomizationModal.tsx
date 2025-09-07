@@ -45,7 +45,7 @@ export interface CustomizedCombo {
 }
 
 const AVAILABLE_SAUCES = [
-  'ACEVICHADA', 'TARE', 'SOJU GARY', 'WASABI', 'SUPAI', 'LONCCA', 'MARACUYA'
+  'ACEVICHADA', 'TARE', 'SOJU', 'GARY', 'WASABI', 'SUPAI', 'LONCCA', 'MARACUYA'
 ];
 
 const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
@@ -58,6 +58,7 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
   const [selectedSauces, setSelectedSauces] = useState<{ name: string; quantity: number }[]>([]);
   const [normalChopsticks, setNormalChopsticks] = useState(0);
   const [assistedChopsticks, setAssistedChopsticks] = useState(0);
+  const [searchFilter, setSearchFilter] = useState('');
 
   // Reset form when combo changes
   useEffect(() => {
@@ -68,11 +69,23 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
       setSelectedSauces([]);
       setNormalChopsticks(0);
       setAssistedChopsticks(0);
+      setSearchFilter('');
       console.log('✅ Formulario reseteado');
     } else {
       console.log('❌ No hay combo');
     }
   }, [combo]);
+
+  // Función para filtrar componentes por búsqueda
+  const getFilteredComponents = (components: any[]) => {
+    if (!searchFilter.trim()) return components;
+    
+    const filter = searchFilter.toLowerCase().trim();
+    return components.filter(comp => 
+      comp.name.toLowerCase().includes(filter) ||
+      (comp.description && comp.description.toLowerCase().includes(filter))
+    );
+  };
 
   console.log('🔄 Renderizando modal, estado:', { 
     isOpen, 
@@ -357,21 +370,49 @@ const ComboCustomizationModal: React.FC<ComboCustomizationModalProps> = ({
             </div>
           )}
 
-                     {/* Componentes del Combo */}
-           {Object.entries(componentsByType)
-             .filter(([type]) => type !== 'COMPLEMENTO') // Filtrar complementos
-             .map(([type, components]: [string, ComboComponent[]]) => (
-             <div key={type} className="component-section">
-               <h3>{getComponentTypeLabel(type)}</h3>
-               <p className="selection-info">
-                 Elige hasta {combo.maxSelections || 1} sabores de {components.length} opciones
-                 {(() => {
-                   const totalSelected = (selectedComponents[type] || []).reduce((sum, item) => sum + item.quantity, 0);
-                   return totalSelected > 0 ? ` (${totalSelected}/${combo.maxSelections || 1} seleccionados)` : '';
-                 })()}
-               </p>
-               <div className="components-grid">
-                 {components.map((component: ComboComponent) => {
+          {/* Campo de búsqueda */}
+          <div className="search-section">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="🔍 Buscar por nombre (ej: ace, cal, furai...)"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="search-input"
+              />
+              {searchFilter && (
+                <button 
+                  className="clear-search-btn"
+                  onClick={() => setSearchFilter('')}
+                  title="Limpiar búsqueda"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Componentes del Combo */}
+          {Object.entries(componentsByType)
+            .filter(([type]) => type !== 'COMPLEMENTO') // Filtrar complementos
+            .map(([type, components]: [string, ComboComponent[]]) => {
+              const filteredComponents = getFilteredComponents(components);
+              
+              return (
+                <div key={type} className="component-section">
+                  <h3>{getComponentTypeLabel(type)}</h3>
+                  <p className="selection-info">
+                    Elige hasta {combo.maxSelections || 1} sabores de {components.length} opciones
+                    {searchFilter && (
+                      <span className="search-results"> ({filteredComponents.length} resultados)</span>
+                    )}
+                    {(() => {
+                      const totalSelected = (selectedComponents[type] || []).reduce((sum, item) => sum + item.quantity, 0);
+                      return totalSelected > 0 ? ` (${totalSelected}/${combo.maxSelections || 1} seleccionados)` : '';
+                    })()}
+                  </p>
+                  <div className="components-grid">
+                    {filteredComponents.map((component: ComboComponent) => {
                    const selectedItem = selectedComponents[type]?.find(item => item.name === component.name);
                    const isSelected = !!selectedItem;
                    const quantity = selectedItem?.quantity || 0;
