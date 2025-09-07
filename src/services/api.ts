@@ -7,8 +7,6 @@ console.log('🔗 API URL:', API_BASE_URL);
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000, // Aumentar timeout a 30 segundos
-  retry: 3, // Número de reintentos
-  retryDelay: 1000, // Delay entre reintentos
 });
 
 // Interceptor para logging y autenticación
@@ -30,8 +28,9 @@ api.interceptors.request.use(
 );
 
 // Función para reintentar requests
-const retryRequest = async (error: any, retryCount = 0) => {
+const retryRequest = async (error: any) => {
   const maxRetries = 3;
+  const retryCount = error.config?.__retryCount || 0;
   const retryDelay = 1000 * (retryCount + 1); // Delay incremental
   
   if (retryCount < maxRetries && (
@@ -40,6 +39,9 @@ const retryRequest = async (error: any, retryCount = 0) => {
     error.response?.status >= 500 // Server errors
   )) {
     console.log(`🔄 Reintentando request (${retryCount + 1}/${maxRetries}) en ${retryDelay}ms...`);
+    
+    // Marcar el request para evitar loops infinitos
+    error.config.__retryCount = retryCount + 1;
     
     await new Promise(resolve => setTimeout(resolve, retryDelay));
     
