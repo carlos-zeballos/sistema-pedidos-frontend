@@ -250,13 +250,18 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 8px;
+  padding: 12px;
   border-radius: 8px;
-  transition: background-color 0.3s ease;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(224, 192, 136, 0.3);
+  transition: all 0.3s ease;
 }
 
 .sauce-option:hover {
-  background: rgba(224, 192, 136, 0.1);
+  background: rgba(224, 192, 136, 0.2);
+  border-color: rgba(224, 192, 136, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .sauce-option input[type="checkbox"] {
