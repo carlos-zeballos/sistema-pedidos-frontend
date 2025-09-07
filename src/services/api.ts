@@ -6,7 +6,9 @@ console.log('🔗 API URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Aumentar timeout a 30 segundos
+  retry: 3, // Número de reintentos
+  retryDelay: 1000, // Delay entre reintentos
 });
 
 // Interceptor para logging y autenticación
@@ -27,25 +29,56 @@ api.interceptors.request.use(
   }
 );
 
+// Función para reintentar requests
+const retryRequest = async (error: any, retryCount = 0) => {
+  const maxRetries = 3;
+  const retryDelay = 1000 * (retryCount + 1); // Delay incremental
+  
+  if (retryCount < maxRetries && (
+    error.code === 'ECONNABORTED' || // Timeout
+    error.code === 'ERR_NETWORK' || // Network error
+    error.response?.status >= 500 // Server errors
+  )) {
+    console.log(`🔄 Reintentando request (${retryCount + 1}/${maxRetries}) en ${retryDelay}ms...`);
+    
+    await new Promise(resolve => setTimeout(resolve, retryDelay));
+    
+    // Reintentar el request original
+    return api.request(error.config);
+  }
+  
+  return Promise.reject(error);
+};
+
 api.interceptors.response.use(
   (response) => {
     console.log('📥 Response:', response.status, response.data);
     return response;
   },
-  (error) => {
+  async (error) => {
     console.error('❌ Response Error:', error.response?.status, error.response?.data);
+    console.error('❌ Error details:', {
+      message: error.message,
+      code: error.code,
+      config: error.config?.url
+    });
     
-    // Si el error es 401 (no autorizado), limpiar el token pero no redirigir automáticamente
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Solo redirigir si no estamos ya en la página de login
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+    // Intentar reintentar el request
+    try {
+      return await retryRequest(error);
+    } catch (retryError) {
+      // Si el error es 401 (no autorizado), limpiar el token pero no redirigir automáticamente
+      if (retryError.response?.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Solo redirigir si no estamos ya en la página de login
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
+      
+      return Promise.reject(retryError);
     }
-    
-    return Promise.reject(error);
   }
 );
 

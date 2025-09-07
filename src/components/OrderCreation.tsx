@@ -149,7 +149,26 @@ const OrderCreation: React.FC = () => {
       setSpaces(spacesData || []);
     } catch (error: any) {
       console.error('❌ Error loading data:', error);
-      setError(error.message || 'Error al cargar los datos');
+      
+      // Manejar diferentes tipos de errores
+      if (error.code === 'ECONNABORTED') {
+        setError('⏱️ Tiempo de espera agotado. El servidor está respondiendo lentamente.');
+      } else if (error.code === 'ERR_NETWORK') {
+        setError('🌐 Error de conexión. Verifica tu conexión a internet.');
+      } else if (error.response?.status === 502) {
+        setError('🔧 El servidor está temporalmente fuera de servicio. Intenta nuevamente en unos minutos.');
+      } else if (error.response?.status >= 500) {
+        setError('⚠️ Error del servidor. Intenta nuevamente más tarde.');
+      } else {
+        setError(error.message || 'Error al cargar los datos');
+      }
+      
+      // No recargar la página automáticamente
+      console.log('🔄 Los datos se recargarán automáticamente en 10 segundos...');
+      setTimeout(() => {
+        console.log('🔄 Recargando datos automáticamente...');
+        loadData();
+      }, 10000);
     } finally {
       setLoading(false);
     }
