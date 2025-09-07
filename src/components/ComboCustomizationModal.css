@@ -15,14 +15,14 @@
 
 /* Modal Container */
 .combo-modal {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: #000000;
   border-radius: 20px;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  border: 2px solid #e0c088;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  border: 3px solid #e0c088;
 }
 
 /* Modal Header */
@@ -150,6 +150,10 @@
 /* Component Sections */
 .component-section {
   margin-bottom: 30px;
+  padding: 20px;
+  background: #111111;
+  border-radius: 15px;
+  border: 2px solid #e0c088;
 }
 
 .component-section h3 {
@@ -176,8 +180,8 @@
 }
 
 .component-option {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid #444;
+  background: #222222;
+  border: 2px solid #e0c088;
   border-radius: 10px;
   padding: 15px;
   cursor: pointer;
@@ -186,15 +190,16 @@
 }
 
 .component-option:hover:not(.disabled) {
-  border-color: #e0c088;
-  background: rgba(224, 192, 136, 0.1);
+  border-color: #ffffff;
+  background: #333333;
   transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(224, 192, 136, 0.5);
 }
 
 .component-option.selected {
-  border-color: #e0c088;
-  background: rgba(224, 192, 136, 0.2);
-  box-shadow: 0 5px 15px rgba(224, 192, 136, 0.3);
+  border-color: #ffffff;
+  background: #444444;
+  box-shadow: 0 5px 15px rgba(224, 192, 136, 0.5);
 }
 
 .component-option.disabled {
@@ -252,16 +257,16 @@
   cursor: pointer;
   padding: 12px;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(224, 192, 136, 0.3);
+  background: #222222;
+  border: 2px solid #e0c088;
   transition: all 0.3s ease;
 }
 
 .sauce-option:hover {
-  background: rgba(224, 192, 136, 0.2);
-  border-color: rgba(224, 192, 136, 0.6);
+  background: #333333;
+  border-color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(224, 192, 136, 0.5);
 }
 
 .sauce-option input[type="checkbox"] {
