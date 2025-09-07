@@ -554,8 +554,10 @@
 }
 
 .sauce-name {
-  color: #374151;
-  font-size: 0.875rem;
+  color: #111827 !important; /* Gris muy oscuro para máximo contraste */
+  font-size: 1rem !important; /* Tamaño más grande */
+  font-weight: 600 !important; /* Peso más fuerte */
+  text-shadow: none;
 }
 
 .sauces-info {
@@ -600,9 +602,10 @@
 }
 
 .chopstick-type span {
-  font-weight: 600;
-  color: #374151;
-  font-size: 0.875rem;
+  font-weight: 700 !important; /* Peso más fuerte */
+  color: #111827 !important; /* Gris muy oscuro para máximo contraste */
+  font-size: 1rem !important; /* Tamaño más grande */
+  text-shadow: none;
 }
 
 .chopstick-counter {
@@ -612,23 +615,25 @@
 }
 
 .counter-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #d1d5db;
-  background: white;
-  border-radius: 6px;
+  width: 36px !important; /* Más grande */
+  height: 36px !important; /* Más grande */
+  border: 2px solid #1f2937 !important; /* Borde más oscuro */
+  background: #f8fafc !important; /* Fondo ligeramente gris */
+  border-radius: 8px !important; /* Bordes más redondeados */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-weight: 700;
-  color: #374151;
+  color: #111827 !important; /* Texto más oscuro */
   transition: all 0.2s ease;
+  font-size: 1.1rem !important; /* Texto más grande */
 }
 
 .counter-btn:hover:not(:disabled) {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: #e5e7eb !important; /* Fondo más oscuro al hover */
+  border-color: #111827 !important; /* Borde más oscuro al hover */
+  transform: scale(1.05); /* Ligero aumento de tamaño */
 }
 
 .counter-btn:disabled {
@@ -637,11 +642,15 @@
 }
 
 .counter-value {
-  min-width: 40px;
+  min-width: 44px !important; /* Más ancho */
   text-align: center;
   font-weight: 700;
-  font-size: 1rem;
-  color: #1f2937;
+  font-size: 1.2rem !important; /* Texto más grande */
+  color: #111827 !important; /* Texto más oscuro */
+  background: #f8fafc !important; /* Fondo ligeramente gris */
+  border: 1px solid #d1d5db !important; /* Borde sutil */
+  border-radius: 6px !important; /* Bordes redondeados */
+  padding: 4px 8px !important; /* Padding interno */
 }
 
 .chopsticks-info {
