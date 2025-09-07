@@ -68,9 +68,9 @@ api.interceptors.response.use(
     // Intentar reintentar el request
     try {
       return await retryRequest(error);
-    } catch (retryError) {
+    } catch (retryError: any) {
       // Si el error es 401 (no autorizado), limpiar el token pero no redirigir automáticamente
-      if (retryError.response?.status === 401) {
+      if (retryError?.response?.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         // Solo redirigir si no estamos ya en la página de login
