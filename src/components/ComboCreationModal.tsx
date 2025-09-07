@@ -59,10 +59,14 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
   onSuccess,
   editingCombo
 }) => {
+  console.log('🎭 ComboCreationModal renderizado:', { 
+    isOpen, 
+    editingCombo: editingCombo ? `${editingCombo.name} (${editingCombo.id})` : 'null' 
+  });
   const [formData, setFormData] = useState<ComboFormData>({
-    code: 'COMBO_' + Date.now().toString().slice(-6),
-    name: 'Nuevo Combo',
-    basePrice: 25.90,
+    code: '',
+    name: '',
+    basePrice: 0,
     categoryId: '',
     description: '',
     image: '',
@@ -85,6 +89,24 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
     if (isOpen) {
       console.log('📊 Cargando datos básicos...');
       loadData();
+      
+      // Si no hay editingCombo, resetear el formulario para nuevo combo
+      if (!editingCombo) {
+        console.log('🆕 Reseteando formulario para nuevo combo');
+        setFormData({
+          code: 'COMBO_' + Date.now().toString().slice(-6),
+          name: 'Nuevo Combo',
+          basePrice: 25.90,
+          categoryId: '',
+          description: '',
+          image: '',
+          isEnabled: true,
+          isAvailable: true,
+          preparationTime: 20,
+          maxSelections: 4
+        });
+        setComponents([]);
+      }
     }
   }, [isOpen]);
 
@@ -141,8 +163,11 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
       console.log('📝 Estableciendo formData:', newFormData);
       setFormData(newFormData);
 
-      if (fullComboData.components && fullComboData.components.length > 0) {
-        const mappedComponents: ComboComponentForm[] = fullComboData.components.map((comp: any) => ({
+      // Buscar componentes en ambas estructuras posibles
+      const comboComponents = fullComboData.components || fullComboData.ComboComponent || [];
+      
+      if (comboComponents.length > 0) {
+        const mappedComponents: ComboComponentForm[] = comboComponents.map((comp: any) => ({
           id: comp.id,
           productId: comp.productId || '',
           name: comp.name,

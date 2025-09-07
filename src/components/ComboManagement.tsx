@@ -1005,9 +1005,14 @@ const ComboManagement: React.FC = () => {
       {/* Nuevo Modal de Creación de Combos */}
       <ComboCreationModal
         isOpen={showForm}
-        onClose={() => setShowForm(false)}
+        onClose={() => {
+          console.log('🚪 Cerrando modal, reseteando editingCombo');
+          setEditingCombo(null);
+          setShowForm(false);
+        }}
         onSuccess={() => {
           loadData();
+          setEditingCombo(null);
           setShowForm(false);
         }}
         editingCombo={editingCombo}

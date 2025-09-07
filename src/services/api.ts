@@ -169,8 +169,14 @@ export const catalogService = {
     return response.data;
   },
   getComboById: async (id: string) => {
-    const response = await api.get(`/catalog/combos/${id}`);
-    return response.data;
+    // Usar endpoint público que no requiere autenticación
+    const response = await api.get(`/catalog/public/combos`);
+    const combos = response.data;
+    const combo = combos.find((c: any) => c.id === id);
+    if (!combo) {
+      throw new Error(`Combo con ID ${id} no encontrado`);
+    }
+    return combo;
   },
   getComboComponents: async (comboId: string) => {
     const response = await api.get(`/catalog/combos/${comboId}/components`);
