@@ -81,13 +81,20 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
 
 
   useEffect(() => {
+    console.log('🔄 useEffect [isOpen] ejecutándose:', { isOpen, editingCombo: !!editingCombo });
     if (isOpen) {
+      console.log('📊 Cargando datos básicos...');
       loadData();
-      if (editingCombo) {
-        loadComboData();
-      }
     }
-  }, [isOpen, editingCombo]);
+  }, [isOpen]);
+
+  useEffect(() => {
+    console.log('🔄 useEffect [editingCombo] ejecutándose:', { isOpen, editingCombo: !!editingCombo });
+    if (isOpen && editingCombo) {
+      console.log('📋 Cargando datos del combo para editar...');
+      loadComboData();
+    }
+  }, [editingCombo]);
 
   const loadData = async () => {
     try {
@@ -107,12 +114,18 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
   };
 
   const loadComboData = async () => {
-    if (!editingCombo) return;
+    if (!editingCombo) {
+      console.log('❌ No hay editingCombo para cargar');
+      return;
+    }
+    
+    console.log('🔄 Cargando datos del combo para editar:', editingCombo);
     
     try {
       const fullComboData = await catalogService.getComboById(editingCombo.id);
+      console.log('📋 Datos completos del combo obtenidos:', fullComboData);
       
-      setFormData({
+      const newFormData = {
         code: fullComboData.code,
         name: fullComboData.name,
         basePrice: fullComboData.basePrice,
@@ -123,7 +136,10 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
         isAvailable: fullComboData.isAvailable,
         preparationTime: fullComboData.preparationTime,
         maxSelections: fullComboData.maxSelections || 4
-      });
+      };
+      
+      console.log('📝 Estableciendo formData:', newFormData);
+      setFormData(newFormData);
 
       if (fullComboData.components && fullComboData.components.length > 0) {
         const mappedComponents: ComboComponentForm[] = fullComboData.components.map((comp: any) => ({
@@ -138,11 +154,16 @@ const ComboCreationModal: React.FC<ComboCreationModalProps> = ({
           maxSelections: comp.maxSelections || 1,
           ord: comp.ord || 1
         }));
+        console.log('🧩 Estableciendo componentes:', mappedComponents);
         setComponents(mappedComponents);
       } else {
+        console.log('🧩 No hay componentes, estableciendo array vacío');
         setComponents([]);
       }
+      
+      console.log('✅ Datos del combo cargados exitosamente');
     } catch (error: any) {
+      console.error('❌ Error al cargar los datos del combo:', error);
       setError('Error al cargar los datos del combo: ' + error.message);
     }
   };
