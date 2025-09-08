@@ -137,14 +137,19 @@ const ComboManagement: React.FC = () => {
     loadData();
     loadAvailableProducts();
     
-    // Actualizar datos cada 30 segundos
+    // Actualizar datos cada 30 segundos SOLO si no hay formulario abierto
     const interval = setInterval(() => {
-      console.log('🔄 ComboManagement - Actualización automática de datos...');
-      loadData();
+      // Solo actualizar si no hay formulario abierto para evitar perder progreso
+      if (!showForm && !showComponentForm) {
+        console.log('🔄 ComboManagement - Actualización automática de datos...');
+        loadData();
+      } else {
+        console.log('⏸️ ComboManagement - Actualización pausada (formulario abierto)');
+      }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [showForm, showComponentForm]);
 
   const loadAvailableProducts = async () => {
     try {
@@ -289,7 +294,11 @@ const ComboManagement: React.FC = () => {
       // Limpiar formulario y recargar datos
       resetForm();
       setShowForm(false);
-      await loadData();
+      
+      // Recargar datos después de un pequeño delay para asegurar que se guardó
+      setTimeout(async () => {
+        await loadData();
+      }, 500);
       
       // Limpiar mensaje de éxito después de 3 segundos
       setTimeout(() => setSuccess(''), 3000);

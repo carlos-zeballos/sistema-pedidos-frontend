@@ -151,137 +151,97 @@ const KitchenView: React.FC = () => {
       const customization = JSON.parse(jsonMatch[0]);
       
       return (
-        <div className="combo-customization-details">
+        <div className="combo-customization-natural">
           {/* Sabores seleccionados */}
           {customization.selectedComponents?.SABOR && customization.selectedComponents.SABOR.length > 0 && (
-            <div className="customization-section">
-              <span className="section-icon">🍣</span>
-              <span className="section-title">Sabores:</span>
-              <div className="selected-items">
-                {customization.selectedComponents.SABOR.map((sabor: any, idx: number) => {
-                  // Manejar tanto la estructura antigua (string) como la nueva (object con quantity)
+            <div className="customization-note">
+              <span className="note-icon">🍣</span>
+              <span className="note-text">
+                <strong>Sabores:</strong> {customization.selectedComponents.SABOR.map((sabor: any, idx: number) => {
                   const name = typeof sabor === 'string' ? sabor : sabor.name;
                   const quantity = typeof sabor === 'object' && sabor.quantity ? sabor.quantity : 1;
-                  
-                  return (
-                    <span key={idx} className="selected-item sabor">
-                      {quantity > 1 ? `${quantity}x ` : ''}{name}
-                    </span>
-                  );
-                })}
-              </div>
+                  return `${quantity > 1 ? `${quantity}x ` : ''}${name}`;
+                }).join(', ')}
+              </span>
             </div>
           )}
           
           {/* Complementos seleccionados */}
           {customization.selectedComponents?.COMPLEMENTO && customization.selectedComponents.COMPLEMENTO.length > 0 && (
-            <div className="customization-section">
-              <span className="section-icon">🥗</span>
-              <span className="section-title">Complementos:</span>
-              <div className="selected-items">
-                {customization.selectedComponents.COMPLEMENTO.map((comp: string, idx: number) => (
-                  <span key={idx} className="selected-item complemento">
-                    {comp}
-                  </span>
-                ))}
-              </div>
+            <div className="customization-note">
+              <span className="note-icon">🥗</span>
+              <span className="note-text">
+                <strong>Complementos:</strong> {customization.selectedComponents.COMPLEMENTO.join(', ')}
+              </span>
             </div>
           )}
           
           {/* Bebidas seleccionadas */}
           {customization.selectedComponents?.BEBIDA && customization.selectedComponents.BEBIDA.length > 0 && (
-            <div className="customization-section">
-              <span className="section-icon">🥤</span>
-              <span className="section-title">Bebidas:</span>
-              <div className="selected-items">
-                {customization.selectedComponents.BEBIDA.map((bebida: string, idx: number) => (
-                  <span key={idx} className="selected-item bebida">
-                    {bebida}
-                  </span>
-                ))}
-              </div>
+            <div className="customization-note">
+              <span className="note-icon">🥤</span>
+              <span className="note-text">
+                <strong>Bebidas:</strong> {customization.selectedComponents.BEBIDA.join(', ')}
+              </span>
             </div>
           )}
           
           {/* Postres seleccionados */}
           {customization.selectedComponents?.POSTRE && customization.selectedComponents.POSTRE.length > 0 && (
-            <div className="customization-section">
-              <span className="section-icon">🍰</span>
-              <span className="section-title">Postres:</span>
-              <div className="selected-items">
-                {customization.selectedComponents.POSTRE.map((postre: string, idx: number) => (
-                  <span key={idx} className="selected-item postre">
-                    {postre}
-                  </span>
-                ))}
-              </div>
+            <div className="customization-note">
+              <span className="note-icon">🍰</span>
+              <span className="note-text">
+                <strong>Postres:</strong> {customization.selectedComponents.POSTRE.join(', ')}
+              </span>
             </div>
           )}
           
           {/* Salsas seleccionadas */}
           {customization.selectedComponents?.SALSA && customization.selectedComponents.SALSA.length > 0 && (
-            <div className="customization-section">
-              <span className="section-icon">🥢</span>
-              <span className="section-title">Salsas:</span>
-              <div className="selected-items">
-                {customization.selectedComponents.SALSA.map((salsa: string, idx: number) => (
-                  <span key={idx} className="selected-item salsa">
-                    {salsa}
-                  </span>
-                ))}
-              </div>
+            <div className="customization-note">
+              <span className="note-icon">🥢</span>
+              <span className="note-text">
+                <strong>Salsas:</strong> {customization.selectedComponents.SALSA.join(', ')}
+              </span>
             </div>
           )}
           
           {/* Salsas adicionales */}
           {customization.selectedSauces && customization.selectedSauces.length > 0 && (
-            <div className="customization-section">
-              <span className="section-icon">🍶</span>
-              <span className="section-title">Salsas Adicionales:</span>
-              <div className="selected-items">
-                {customization.selectedSauces.map((salsa: any, idx: number) => {
-                  // Manejar tanto la estructura antigua (string) como la nueva (object con quantity)
+            <div className="customization-note">
+              <span className="note-icon">🍶</span>
+              <span className="note-text">
+                <strong>Salsas Adicionales:</strong> {customization.selectedSauces.map((salsa: any) => {
                   const name = typeof salsa === 'string' ? salsa : salsa.name;
                   const quantity = typeof salsa === 'object' && salsa.quantity ? salsa.quantity : 1;
-                  
-                  return (
-                    <span key={idx} className="selected-item salsa-adicional">
-                      {quantity > 1 ? `${quantity}x ` : ''}{name}
-                    </span>
-                  );
-                })}
-              </div>
+                  return `${quantity > 1 ? `${quantity}x ` : ''}${name}`;
+                }).join(', ')}
+              </span>
             </div>
           )}
           
           {/* Palitos */}
           {(customization.normalChopsticks > 0 || customization.assistedChopsticks > 0) && (
-            <div className="customization-section">
-              <span className="section-icon">🥢</span>
-              <span className="section-title">Palitos:</span>
-              <div className="selected-items">
-                {customization.normalChopsticks > 0 && (
-                  <span className="selected-item palitos">
-                    {customization.normalChopsticks} normales
-                  </span>
-                )}
-                {customization.assistedChopsticks > 0 && (
-                  <span className="selected-item palitos">
-                    {customization.assistedChopsticks} con ayuda
-                  </span>
-                )}
-              </div>
+            <div className="customization-note">
+              <span className="note-icon">🥢</span>
+              <span className="note-text">
+                <strong>Palitos:</strong> {
+                  [
+                    customization.normalChopsticks > 0 ? `${customization.normalChopsticks} normales` : '',
+                    customization.assistedChopsticks > 0 ? `${customization.assistedChopsticks} con ayuda` : ''
+                  ].filter(Boolean).join(', ')
+                }
+              </span>
             </div>
           )}
           
           {/* Notas especiales */}
           {customization.specialNotes && (
-            <div className="customization-section">
-              <span className="section-icon">📝</span>
-              <span className="section-title">Notas Especiales:</span>
-              <div className="notes-text">
-                {customization.specialNotes}
-              </div>
+            <div className="customization-note">
+              <span className="note-icon">📝</span>
+              <span className="note-text">
+                <strong>Notas Especiales:</strong> {customization.specialNotes}
+              </span>
             </div>
           )}
         </div>
@@ -440,10 +400,19 @@ const KitchenView: React.FC = () => {
 
 
 
-      {/* Órdenes en Preparación */}
-      <div className="orders-section">
-        <h2>👨‍🍳 Órdenes en Preparación ({inProgressOrders.length})</h2>
-        <div className="orders-grid">
+      {/* Vista de Cocina Tipo Ticket - Grid Organizado */}
+      <div className="kitchen-tickets-section">
+        <div className="kitchen-header-tickets">
+          <h2>🎫 Tickets de Cocina - Vista Organizada</h2>
+          <div className="tickets-summary">
+            <span className="ticket-count active">{inProgressOrders.length} En Preparación</span>
+            <span className="ticket-count ready">{readyOrders.length} Listas</span>
+            <span className="ticket-count delivered">{deliveredOrders.length} Entregadas</span>
+          </div>
+        </div>
+        
+        {/* Grid de Tickets */}
+        <div className="kitchen-tickets-grid">
           {inProgressOrders.map(order => {
             // Debug: verificar items de la orden
             console.log(`Orden ${order.orderNumber} - Items:`, order.items);
@@ -578,84 +547,71 @@ const KitchenView: React.FC = () => {
               Math.floor((currentTime.getTime() - new Date(newItemsTime).getTime()) / 1000) : 0;
             
             return (
-              <div key={order.id} className={`order-card in-progress ${finalHasNewItems ? 'has-new-items' : ''}`}>
-                <div className="order-header">
-                  <div className="order-info">
-                    <h3>Orden #{order.orderNumber}</h3>
-                    <div className="order-meta">
-                      <p className="table-info">🏠 Espacio: {order.space?.name || 'Sin espacio asignado'}</p>
-                      <p className="customer-info">👤 Cliente: {order.customerName || 'Sin nombre'}</p>
-                      <p className="time-info">🕐 Creada: {formatTime(order.createdAt)}</p>
-                      {/* Mostrar tiempo desde items nuevos */}
-                      {finalHasNewItems && (
-                        <p className="new-items-info">🆕 <strong>Items nuevos agregados hace {Math.floor(timeSinceNewItems / 60)}m {timeSinceNewItems % 60}s</strong></p>
-                      )}
-                    </div>
+              <div key={order.id} className={`kitchen-ticket ${finalHasNewItems ? 'has-new-items' : ''} ${timerClass}`}>
+                {/* Header del Ticket */}
+                <div className="ticket-header">
+                  <div className="ticket-number">
+                    <span className="ticket-label">TICKET</span>
+                    <span className="ticket-id">#{order.orderNumber}</span>
                   </div>
-                  <div className="order-status">
-                    <span className={`status-badge ${getStatusColor(order.status)}`}>
+                  <div className="ticket-status">
+                    <span className={`status-indicator ${getStatusColor(order.status)}`}>
                       {getStatusDisplayName(order.status)}
                     </span>
-                    {/* Badge para items nuevos */}
                     {finalHasNewItems && (
-                      <span className="new-items-badge">
-                        🆕 NUEVOS ITEMS
-                      </span>
+                      <span className="new-items-indicator">🆕 NUEVO</span>
                     )}
                   </div>
                 </div>
 
-                {/* TEMPORIZADOR VISUAL - CRONÓMETRO EN TIEMPO REAL */}
-                <div className={`order-timer ${timerClass}`}>
-                  <div className="timer-display">
-                    <span className="timer-icon">⏱️</span>
-                    <span className="timer-text">
-                      {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
-                    </span>
-                    <span className="timer-status">
-                      {timerMessage}
-                    </span>
-                    <span className="timer-live-indicator">🔄</span>
-                  </div>
-                  
-                  {/* Indicador de que el cronómetro está funcionando */}
-                  <div className="timer-debug-info">
-                    <small>⏰ Cronómetro activo - Actualizado: {currentTime.toLocaleTimeString()}</small>
-                  </div>
-                  
-                  {/* Indicador de tiempo de inicio */}
-                  <div className="timer-start-info">
-                    <span className="start-label">⏰ Orden creada:</span>
-                    <span className="start-time">{formatTime(startTime)}</span>
-                    <span className="elapsed-time">
-                      ({hours > 0 ? `${hours}h ` : ''}{minutes > 0 ? `${minutes}m ` : ''}{seconds}s transcurridos)
-                    </span>
-                  </div>
-                  
-                  <div className="timer-progress">
-                    <div 
-                      className="timer-bar" 
-                      style={{ 
-                        width: `${Math.min((elapsedSeconds / 1800) * 100, 100)}%` // 1800s = 30 min máximo
-                      }}
-                    ></div>
-                    <div className="timer-labels">
-                      <span className="timer-label">00:00:00</span>
-                      <span className="timer-label">00:15:00</span>
-                      <span className="timer-label">00:20:00</span>
-                      <span className="timer-label">00:30:00</span>
+                {/* Información Principal del Ticket */}
+                <div className="ticket-main-info">
+                  <div className="ticket-meta">
+                    <div className="meta-item">
+                      <span className="meta-label">🏠 MESA:</span>
+                      <span className="meta-value">{order.space?.name || 'Sin asignar'}</span>
                     </div>
+                    <div className="meta-item">
+                      <span className="meta-label">👤 CLIENTE:</span>
+                      <span className="meta-value">{order.customerName || 'Sin nombre'}</span>
+                    </div>
+                    <div className="meta-item">
+                      <span className="meta-label">🕐 HORA:</span>
+                      <span className="meta-value">{formatTime(order.createdAt)}</span>
+                    </div>
+                    {finalHasNewItems && (
+                      <div className="meta-item urgent">
+                        <span className="meta-label">🆕 ACTUALIZADO:</span>
+                        <span className="meta-value">{Math.floor(timeSinceNewItems / 60)}m {timeSinceNewItems % 60}s</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* DETALLE COMPLETO DEL PEDIDO PARA COCINA */}
-                <div className="order-details-kitchen">
-                  <div className="kitchen-order-header">
-                    <h4>🍽️ PEDIDO PARA COCINAR:</h4>
-                    <div className="order-summary">
-                      <span className="order-total">Total: ${(order.totalAmount || 0).toFixed(2)}</span>
-                      <span className="order-items-count">{order.items?.length || 0} items</span>
-                    </div>
+                {/* Temporizador del Ticket */}
+                <div className={`ticket-timer ${timerClass}`}>
+                  <div className="timer-display">
+                    <span className="timer-icon">⏱️</span>
+                    <span className="timer-time">
+                      {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+                    </span>
+                    <span className="timer-message">{timerMessage}</span>
+                  </div>
+                  <div className="timer-progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ 
+                        width: `${Math.min((elapsedSeconds / 1800) * 100, 100)}%`
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Items del Ticket */}
+                <div className="ticket-items">
+                  <div className="ticket-items-header">
+                    <span className="items-title">🍽️ PEDIDO</span>
+                    <span className="items-total">${(order.totalAmount || 0).toFixed(2)}</span>
                   </div>
 
                                   {/* ALERTA DE ACTUALIZACIÓN - Solo mostrar si hay items nuevos */}
@@ -682,104 +638,84 @@ const KitchenView: React.FC = () => {
                   </div>
                 )}
                   
-                  <div className="order-items-kitchen">
+                  <div className="ticket-items-list">
                     {order.items && Array.isArray(order.items) && order.items.length > 0 ? (
-                      <>
-                        {/* Mostrar todos los items de la orden */}
-                        {order.items.map((item, index) => {
-                          // Validar que el item tenga todas las propiedades necesarias
-                          if (!item || typeof item !== 'object') {
-                            console.warn('Item inválido:', item);
-                            return null;
-                          }
-                          
-                          // Determinar si es un item nuevo basado en su timestamp de creación
-                          const isNewItem = item.createdAt && order.createdAt && 
-                            new Date(item.createdAt).getTime() > new Date(order.createdAt).getTime() + 5000;
-                          
-                          return (
-                            <div key={item.id || `item-${index}`} className={`kitchen-item ${isNewItem ? 'new-item' : ''}`}>
-                              <div className="item-header">
-                                {isNewItem && <span className="new-item-badge">🆕 NUEVO</span>}
-                                <span className="item-quantity-badge">{(item.quantity || 1)}x</span>
-                                <span className="item-name-kitchen">{item.name || 'Item sin nombre'}</span>
-                                <span className="item-price-kitchen">${(item.totalPrice || 0).toFixed(2)}</span>
-                              </div>
-                              
-                              {/* Mostrar componentes si es un combo */}
-                              {item.components && Array.isArray(item.components) && item.components.length > 0 && (
-                                <div className="item-components">
-                                  <span className="components-label">📦 Incluye:</span>
-                                  {item.components.map((comp, idx) => {
-                                    if (!comp || typeof comp !== 'object') {
-                                      console.warn('Componente inválido:', comp);
-                                      return null;
-                                    }
-                                    
-                                    return (
-                                      <span key={idx} className="component-item">
-                                        • {comp.name || 'Componente sin nombre'} - ${(comp.price || 0).toFixed(2)}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                              
-                              {/* Mostrar personalización del combo si existe */}
-                              {item.notes && item.notes.includes('selectedComponents') && (
-                                <div className="combo-customization">
-                                  {renderComboCustomization(item.notes)}
-                                </div>
-                              )}
-                              
-                              {/* Notas del item */}
-                              {item.notes && (
-                                <div className="item-notes-kitchen">
-                                  <span className="notes-icon">📝</span>
-                                  <span className="notes-text">{item.notes}</span>
-                                </div>
-                              )}
+                      order.items.map((item, index) => {
+                        if (!item || typeof item !== 'object') {
+                          return null;
+                        }
+                        
+                        const isNewItem = item.createdAt && order.createdAt && 
+                          new Date(item.createdAt).getTime() > new Date(order.createdAt).getTime() + 5000;
+                        
+                        return (
+                          <div key={item.id || `item-${index}`} className={`ticket-item ${isNewItem ? 'new-item' : ''}`}>
+                            <div className="item-line">
+                              {isNewItem && <span className="new-badge">🆕</span>}
+                              <span className="item-qty">{item.quantity || 1}x</span>
+                              <span className="item-name">{item.name || 'Item sin nombre'}</span>
+                              <span className="item-price">${(item.totalPrice || 0).toFixed(2)}</span>
                             </div>
-                          );
-                        }).filter(Boolean)}
-                      </>
+                            
+                            {/* Componentes del combo */}
+                            {item.components && Array.isArray(item.components) && item.components.length > 0 && (
+                              <div className="item-components">
+                                {item.components.map((comp, idx) => (
+                                  <div key={idx} className="component-line">
+                                    <span className="component-dash">•</span>
+                                    <span className="component-name">{comp.name || 'Componente sin nombre'}</span>
+                                    <span className="component-price">${(comp.price || 0).toFixed(2)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* Personalización del combo */}
+                            {item.notes && item.notes.includes('selectedComponents') && (
+                              <div className="item-customization">
+                                {renderComboCustomization(item.notes)}
+                              </div>
+                            )}
+                            
+                            {/* Notas del item */}
+                            {item.notes && !item.notes.includes('selectedComponents') && (
+                              <div className="item-notes">
+                                <span className="notes-icon">📝</span>
+                                <span className="notes-text">{item.notes}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }).filter(Boolean)
                     ) : (
-                      <div className="no-items-message">
+                      <div className="no-items">
                         <span>⚠️ No hay items en esta orden</span>
-                        <div className="debug-info">
-                          <small>Debug: order.items = {JSON.stringify(order.items)}</small>
-                        </div>
                       </div>
                     )}
                   </div>
                   
                   {/* Notas generales de la orden */}
                   {order.notes && (
-                    <div className="order-general-notes">
+                    <div className="ticket-notes">
                       <span className="notes-icon">📋</span>
-                      <span className="notes-text"><strong>Notas de la orden:</strong> {order.notes}</span>
+                      <span className="notes-text">{order.notes}</span>
                     </div>
                   )}
                 </div>
 
-                {order.notes && (
-                  <div className="order-notes">
-                    <p><strong>Notas:</strong> {order.notes}</p>
-                  </div>
-                )}
-
-                <div className="order-actions">
+                {/* Botones de Acción del Ticket */}
+                <div className="ticket-actions">
                   <button
                     onClick={() => updateOrderStatus(order.id, getNextStatus(order.status))}
-                    className="btn btn-success"
+                    className="ticket-btn ready-btn"
                   >
-                    {getActionButtonText(order.status)}
+                    ✅ {getActionButtonText(order.status)}
                   </button>
                   <button
                     onClick={() => openUpdateModal(order)}
-                    className="btn btn-info"
+                    className="ticket-btn update-btn"
                   >
-                    Actualizar Pedido
+                    ✏️ ACTUALIZAR
                   </button>
                 </div>
               </div>

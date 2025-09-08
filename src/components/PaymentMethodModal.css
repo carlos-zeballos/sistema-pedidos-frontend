@@ -458,5 +458,67 @@
   }
 }
 
+/* Estilos para modificación de precio */
+.amount-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
+.amount-input {
+  width: 120px;
+  padding: 8px 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: right;
+  color: #059669;
+  background: white;
+  transition: all 0.2s;
+}
 
+.amount-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.amount-input.modified {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.reset-amount-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.reset-amount-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.original-amount {
+  background: #fef3c7;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.original-amount .summary-value.original {
+  color: #92400e;
+  text-decoration: line-through;
+}

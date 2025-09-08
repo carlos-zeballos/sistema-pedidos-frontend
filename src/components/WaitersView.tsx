@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { orderService, catalogService } from '../services/api';
+import { orderService, catalogService, tableService } from '../services/api';
 import { Order, Product } from '../types';
 import ComboCustomizationModal, { CustomizedCombo } from './ComboCustomizationModal';
 import PaymentMethodModal from './PaymentMethodModal';
+import DeliveryPaymentModal from './DeliveryPaymentModal';
 import './WaitersView.css';
 
 const WaitersView: React.FC = () => {
@@ -19,6 +20,8 @@ const WaitersView: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [itemNotes, setItemNotes] = useState('');
   const [itemType, setItemType] = useState<'product' | 'combo'>('product');
+  const [updateModalTab, setUpdateModalTab] = useState<'add' | 'modify' | 'remove'>('add');
+  const [selectedItemToModify, setSelectedItemToModify] = useState<any>(null);
   
   // Estado para el modal de personalización de combos
   const [comboModalOpen, setComboModalOpen] = useState(false);
@@ -26,6 +29,7 @@ const WaitersView: React.FC = () => {
   
   // Estado para el modal de métodos de pago
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [deliveryPaymentModalOpen, setDeliveryPaymentModalOpen] = useState(false);
   const [orderToPay, setOrderToPay] = useState<Order | null>(null);
 
   useEffect(() => {
@@ -72,7 +76,36 @@ const WaitersView: React.FC = () => {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      await orderService.updateOrderStatus(orderId, newStatus as any);
+      // Si se está cancelando la orden, liberar el espacio automáticamente
+      if (newStatus === 'CANCELADO') {
+        // Encontrar la orden para obtener información del espacio
+        const order = orders.find(o => o.id === orderId);
+        if (order && order.space) {
+          console.log(`🔄 Cancelando orden #${order.orderNumber} y liberando espacio ${order.space.name}`);
+          
+          // Actualizar el estado de la orden
+          await orderService.updateOrderStatus(orderId, newStatus as any);
+          
+          // Liberar el espacio (marcar como disponible)
+          try {
+            await tableService.updateSpaceStatus(order.space.id, 'DISPONIBLE');
+            console.log(`✅ Espacio ${order.space.name} liberado automáticamente`);
+          } catch (spaceError) {
+            console.error('Error liberando espacio:', spaceError);
+            // No mostrar error al usuario, solo log
+          }
+          
+          alert(`¡Orden #${order.orderNumber} cancelada! Espacio ${order.space.name} liberado automáticamente.`);
+        } else {
+          // Si no hay información del espacio, solo actualizar la orden
+          await orderService.updateOrderStatus(orderId, newStatus as any);
+          alert(`¡Orden #${orderId} cancelada!`);
+        }
+      } else {
+        // Para otros estados, solo actualizar la orden
+        await orderService.updateOrderStatus(orderId, newStatus as any);
+      }
+      
       await loadOrders(); // Recargar órdenes
     } catch (err: any) {
       console.error('Error updating order status:', err);
@@ -100,11 +133,17 @@ const WaitersView: React.FC = () => {
     setQuantity(1);
     setItemNotes('');
     setItemType('product');
+    setUpdateModalTab('add');
+    setSelectedItemToModify(null);
   };
 
   const openPaymentModal = (order: Order) => {
     setOrderToPay(order);
-    setPaymentModalOpen(true);
+    if (order.isDelivery && order.deliveryCost && order.deliveryCost > 0) {
+      setDeliveryPaymentModalOpen(true);
+    } else {
+      setPaymentModalOpen(true);
+    }
   };
 
 
@@ -112,6 +151,40 @@ const WaitersView: React.FC = () => {
   const closeUpdateModal = () => {
     setShowUpdateModal(false);
     setSelectedOrder(null);
+    setSelectedProduct('');
+    setSelectedCombo('');
+    setQuantity(1);
+    setItemNotes('');
+    setItemType('product');
+    setUpdateModalTab('add');
+    setSelectedItemToModify(null);
+  };
+
+  const removeItemFromOrder = async (itemId: string) => {
+    if (!selectedOrder) return;
+    
+    try {
+      await orderService.removeItemFromOrder(selectedOrder.id, itemId);
+      alert('✅ Item eliminado de la orden');
+      await loadOrders();
+    } catch (err: any) {
+      console.error('Error removing item:', err);
+      alert('Error al eliminar el item: ' + (err.message || 'Error desconocido'));
+    }
+  };
+
+  const modifyItemInOrder = async (itemId: string, modifications: any) => {
+    if (!selectedOrder) return;
+    
+    try {
+      await orderService.modifyItemInOrder(selectedOrder.id, itemId, modifications);
+      alert('✅ Item modificado exitosamente');
+      setSelectedItemToModify(null);
+      await loadOrders();
+    } catch (err: any) {
+      console.error('Error modifying item:', err);
+      alert('Error al modificar el item: ' + (err.message || 'Error desconocido'));
+    }
   };
 
   // Función para manejar cuando se completa la personalización del combo
@@ -229,13 +302,23 @@ const WaitersView: React.FC = () => {
   const markOrderAsPaid = async (order: Order) => {
     if (window.confirm(`¿Confirmar pago de la orden #${order.orderNumber}? Esto liberará la mesa ${order.space?.name}.`)) {
       try {
+        console.log(`💰 Marcando orden #${order.orderNumber} como pagada y liberando espacio ${order.space?.name}`);
+        
         // Cambiar estado de la orden a PAGADO
         await orderService.updateOrderStatus(order.id, 'PAGADO');
         
-        // Implementar la liberación de la mesa
-        // Por ahora, solo actualizamos el estado de la orden
+        // Liberar el espacio (marcar como disponible)
+        if (order.space) {
+          try {
+            await tableService.updateSpaceStatus(order.space.id, 'DISPONIBLE');
+            console.log(`✅ Espacio ${order.space.name} liberado automáticamente`);
+          } catch (spaceError) {
+            console.error('Error liberando espacio:', spaceError);
+            // No mostrar error al usuario, solo log
+          }
+        }
         
-        alert(`¡Orden #${order.orderNumber} marcada como pagada! Mesa ${order.space?.name} liberada.`);
+        alert(`¡Orden #${order.orderNumber} marcada como pagada! Mesa ${order.space?.name} liberada automáticamente.`);
         await loadOrders(); // Recargar órdenes
       } catch (err: any) {
         console.error('Error marking order as paid:', err);
@@ -249,11 +332,17 @@ const WaitersView: React.FC = () => {
     setOrderToPay(null);
   };
 
+  const closeDeliveryPaymentModal = () => {
+    setDeliveryPaymentModalOpen(false);
+    setOrderToPay(null);
+  };
+
   const handlePaymentComplete = async () => {
     // Recargar las órdenes después del pago
     await loadOrders();
-    // Cerrar el modal
+    // Cerrar ambos modales
     closePaymentModal();
+    closeDeliveryPaymentModal();
   };
 
   const formatTime = (dateString: string | Date) => {
@@ -318,6 +407,28 @@ const WaitersView: React.FC = () => {
       console.log('Error parsing notes JSON:', error);
       return notes;
     }
+  };
+
+  // Función para extraer información de palitos de las notas de la orden
+  const extractChopsticksInfo = (notes: string | null) => {
+    if (!notes) return null;
+    
+    const palitosMatch = notes.match(/🥢 PALITOS: (.+?)(?:\n|$)/);
+    if (palitosMatch) {
+      return palitosMatch[1];
+    }
+    return null;
+  };
+
+  // Función para extraer información de salsas de las notas de la orden
+  const extractSaucesInfo = (notes: string | null) => {
+    if (!notes) return null;
+    
+    const salsasMatch = notes.match(/🍶 SALSAS: (.+?)(?:\n|$)/);
+    if (salsasMatch) {
+      return salsasMatch[1];
+    }
+    return null;
   };
 
   const getStatusColor = (status: string) => {
@@ -470,6 +581,26 @@ const WaitersView: React.FC = () => {
                   ))}
                 </div>
 
+                {/* Información de palitos y salsas destacada */}
+                {(extractChopsticksInfo(order.notes) || extractSaucesInfo(order.notes)) && (
+                  <div className="order-extras">
+                    {extractChopsticksInfo(order.notes) && (
+                      <div className="extra-info chopsticks-info">
+                        <span className="extra-icon">🥢</span>
+                        <span className="extra-label">Palitos:</span>
+                        <span className="extra-value">{extractChopsticksInfo(order.notes)}</span>
+                      </div>
+                    )}
+                    {extractSaucesInfo(order.notes) && (
+                      <div className="extra-info sauces-info">
+                        <span className="extra-icon">🍶</span>
+                        <span className="extra-label">Salsas:</span>
+                        <span className="extra-value">{extractSaucesInfo(order.notes)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {order.notes && (
                   <div className="order-notes">
                     <p><strong>Notas:</strong> {order.notes}</p>
@@ -532,6 +663,26 @@ const WaitersView: React.FC = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Información de palitos y salsas destacada */}
+              {(extractChopsticksInfo(order.notes) || extractSaucesInfo(order.notes)) && (
+                <div className="order-extras">
+                  {extractChopsticksInfo(order.notes) && (
+                    <div className="extra-info chopsticks-info">
+                      <span className="extra-icon">🥢</span>
+                      <span className="extra-label">Palitos:</span>
+                      <span className="extra-value">{extractChopsticksInfo(order.notes)}</span>
+                    </div>
+                  )}
+                  {extractSaucesInfo(order.notes) && (
+                    <div className="extra-info sauces-info">
+                      <span className="extra-icon">🍶</span>
+                      <span className="extra-label">Salsas:</span>
+                      <span className="extra-value">{extractSaucesInfo(order.notes)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {order.notes && (
                 <div className="order-notes">
@@ -631,88 +782,243 @@ const WaitersView: React.FC = () => {
       {/* Modal para actualizar pedido */}
       {showUpdateModal && selectedOrder && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content enhanced-update-modal">
             <div className="modal-header">
-              <h3>Actualizar Pedido #{selectedOrder.orderNumber}</h3>
+              <h3>🔄 Actualizar Pedido #{selectedOrder.orderNumber}</h3>
               <button onClick={closeUpdateModal} className="modal-close">✕</button>
             </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>Tipo de Item:</label>
-                <select 
-                  value={itemType} 
-                  onChange={(e) => {
-                    setItemType(e.target.value as 'product' | 'combo');
-                    setSelectedProduct('');
-                    setSelectedCombo('');
-                  }}
-                  className="form-control"
-                >
-                  <option value="product">Producto Individual</option>
-                  <option value="combo">Combo</option>
-                </select>
-              </div>
+            
+            {/* Pestañas del modal */}
+            <div className="modal-tabs">
+              <button 
+                className={`tab-btn ${updateModalTab === 'add' ? 'active' : ''}`}
+                onClick={() => setUpdateModalTab('add')}
+              >
+                ➕ Agregar Items
+              </button>
+              <button 
+                className={`tab-btn ${updateModalTab === 'modify' ? 'active' : ''}`}
+                onClick={() => setUpdateModalTab('modify')}
+              >
+                ✏️ Modificar Items
+              </button>
+              <button 
+                className={`tab-btn ${updateModalTab === 'remove' ? 'active' : ''}`}
+                onClick={() => setUpdateModalTab('remove')}
+              >
+                🗑️ Eliminar Items
+              </button>
+            </div>
 
-              {itemType === 'product' ? (
-                <div className="form-group">
-                  <label>Producto:</label>
-                  <select 
-                    value={selectedProduct} 
-                    onChange={(e) => setSelectedProduct(e.target.value)}
-                    className="form-control"
-                  >
-                    <option value="">Selecciona un producto</option>
-                    {products.map(product => (
-                      <option key={product.id} value={product.id}>
-                        {product.name} - ${product.price || 0}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ) : (
-                <div className="form-group">
-                  <label>Combo:</label>
-                  <select 
-                    value={selectedCombo} 
-                    onChange={(e) => setSelectedCombo(e.target.value)}
-                    className="form-control"
-                  >
-                    <option value="">Selecciona un combo</option>
-                    {combos.map(combo => (
-                      <option key={combo.id} value={combo.id}>
-                        {combo.name} - ${combo.basePrice || combo.price || 0}
-                      </option>
-                    ))}
-                  </select>
+            <div className="modal-body">
+              {/* Pestaña: Agregar Items */}
+              {updateModalTab === 'add' && (
+                <div className="tab-content">
+                  <div className="form-group">
+                    <label>Tipo de Item:</label>
+                    <select 
+                      value={itemType} 
+                      onChange={(e) => {
+                        setItemType(e.target.value as 'product' | 'combo');
+                        setSelectedProduct('');
+                        setSelectedCombo('');
+                      }}
+                      className="form-control"
+                    >
+                      <option value="product">Producto Individual</option>
+                      <option value="combo">Combo</option>
+                    </select>
+                  </div>
+
+                  {itemType === 'product' ? (
+                    <div className="form-group">
+                      <label>Producto:</label>
+                      <select 
+                        value={selectedProduct} 
+                        onChange={(e) => setSelectedProduct(e.target.value)}
+                        className="form-control"
+                      >
+                        <option value="">Selecciona un producto</option>
+                        {products.map(product => (
+                          <option key={product.id} value={product.id}>
+                            {product.name} - ${product.price || 0}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="form-group">
+                      <label>Combo:</label>
+                      <select 
+                        value={selectedCombo} 
+                        onChange={(e) => setSelectedCombo(e.target.value)}
+                        className="form-control"
+                      >
+                        <option value="">Selecciona un combo</option>
+                        {combos.map(combo => (
+                          <option key={combo.id} value={combo.id}>
+                            {combo.name} - ${combo.basePrice || combo.price || 0}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
+                  <div className="form-group">
+                    <label>Cantidad:</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                      className="form-control"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Notas:</label>
+                    <textarea
+                      value={itemNotes}
+                      onChange={(e) => setItemNotes(e.target.value)}
+                      className="form-control"
+                      placeholder="Notas especiales para este item..."
+                    />
+                  </div>
                 </div>
               )}
-              <div className="form-group">
-                <label>Cantidad:</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="form-control"
-                />
-              </div>
-              <div className="form-group">
-                <label>Notas:</label>
-                <textarea
-                  value={itemNotes}
-                  onChange={(e) => setItemNotes(e.target.value)}
-                  className="form-control"
-                  placeholder="Notas especiales para este item..."
-                />
-              </div>
+
+              {/* Pestaña: Modificar Items */}
+              {updateModalTab === 'modify' && (
+                <div className="tab-content">
+                  <div className="current-items-section">
+                    <h4>📋 Items Actuales de la Orden</h4>
+                    <div className="items-list">
+                      {selectedOrder.items?.map((item, index) => (
+                        <div key={item.id || index} className="item-card">
+                          <div className="item-info">
+                            <div className="item-header">
+                              <span className="item-name">{item.name}</span>
+                              <span className="item-price">${(item.totalPrice || 0).toFixed(2)}</span>
+                            </div>
+                            <div className="item-details">
+                              <span className="item-qty">Cantidad: {item.quantity}</span>
+                              {item.notes && (
+                                <span className="item-notes">Notas: {item.notes}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="item-actions">
+                            <button
+                              onClick={() => setSelectedItemToModify(item)}
+                              className="btn btn-sm btn-warning"
+                            >
+                              ✏️ Modificar
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Formulario de modificación */}
+                  {selectedItemToModify && (
+                    <div className="modify-form">
+                      <h4>✏️ Modificar: {selectedItemToModify.name}</h4>
+                      <div className="form-group">
+                        <label>Nueva Cantidad:</label>
+                        <input
+                          type="number"
+                          min="1"
+                          defaultValue={selectedItemToModify.quantity}
+                          className="form-control"
+                          id="modify-quantity"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Nuevas Notas:</label>
+                        <textarea
+                          defaultValue={selectedItemToModify.notes || ''}
+                          className="form-control"
+                          placeholder="Nuevas notas para este item..."
+                          id="modify-notes"
+                        />
+                      </div>
+                      <div className="form-actions">
+                        <button
+                          onClick={() => {
+                            const newQuantity = parseInt((document.getElementById('modify-quantity') as HTMLInputElement)?.value || '1');
+                            const newNotes = (document.getElementById('modify-notes') as HTMLTextAreaElement)?.value || '';
+                            
+                            modifyItemInOrder(selectedItemToModify.id, {
+                              quantity: newQuantity,
+                              notes: newNotes
+                            });
+                          }}
+                          className="btn btn-primary"
+                        >
+                          💾 Guardar Cambios
+                        </button>
+                        <button
+                          onClick={() => setSelectedItemToModify(null)}
+                          className="btn btn-secondary"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Pestaña: Eliminar Items */}
+              {updateModalTab === 'remove' && (
+                <div className="tab-content">
+                  <div className="current-items-section">
+                    <h4>🗑️ Eliminar Items de la Orden</h4>
+                    <div className="items-list">
+                      {selectedOrder.items?.map((item, index) => (
+                        <div key={item.id || index} className="item-card">
+                          <div className="item-info">
+                            <div className="item-header">
+                              <span className="item-name">{item.name}</span>
+                              <span className="item-price">${(item.totalPrice || 0).toFixed(2)}</span>
+                            </div>
+                            <div className="item-details">
+                              <span className="item-qty">Cantidad: {item.quantity}</span>
+                              {item.notes && (
+                                <span className="item-notes">Notas: {item.notes}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="item-actions">
+                            <button
+                              onClick={() => {
+                                if (confirm(`¿Estás seguro de eliminar "${item.name}" de la orden?`)) {
+                                  removeItemFromOrder(item.id);
+                                }
+                              }}
+                              className="btn btn-sm btn-danger"
+                            >
+                              🗑️ Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+
             <div className="modal-footer">
               <button onClick={closeUpdateModal} className="btn btn-secondary">
-                Cancelar
+                Cerrar
               </button>
-              <button onClick={addItemToOrder} className="btn btn-primary">
-                Agregar Item
-              </button>
+              {updateModalTab === 'add' && (
+                <button onClick={addItemToOrder} className="btn btn-primary">
+                  ➕ Agregar Item
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -742,6 +1048,16 @@ const WaitersView: React.FC = () => {
         <PaymentMethodModal
           isOpen={paymentModalOpen}
           onClose={closePaymentModal}
+          onPaymentComplete={handlePaymentComplete}
+          order={orderToPay}
+        />
+      )}
+
+      {/* Modal de pago con delivery */}
+      {orderToPay && (
+        <DeliveryPaymentModal
+          isOpen={deliveryPaymentModalOpen}
+          onClose={closeDeliveryPaymentModal}
           onPaymentComplete={handlePaymentComplete}
           order={orderToPay}
         />

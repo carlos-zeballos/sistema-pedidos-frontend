@@ -27,12 +27,16 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
   const [notes, setNotes] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [modifiedAmount, setModifiedAmount] = useState<number>(0);
+  const [isAmountModified, setIsAmountModified] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       loadPaymentMethods();
+      setModifiedAmount(order.totalAmount || 0);
+      setIsAmountModified(false);
     }
-  }, [isOpen]);
+  }, [isOpen, order.totalAmount]);
 
   const loadPaymentMethods = async () => {
     try {
@@ -60,7 +64,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       await paymentService.registerPayment({
         orderId: order.id,
         paymentMethodId: selectedMethod,
-        amount: order.totalAmount || 0,
+        amount: modifiedAmount,
         notes: notes.trim() || undefined
       });
 
@@ -112,7 +116,31 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
               )}
               <div className="order-detail total">
                 <span className="label">Total a Pagar:</span>
-                <span className="value amount">${(order.totalAmount || 0).toFixed(2)}</span>
+                <div className="amount-input-container">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={modifiedAmount}
+                    onChange={(e) => {
+                      const newAmount = parseFloat(e.target.value) || 0;
+                      setModifiedAmount(newAmount);
+                      setIsAmountModified(newAmount !== (order.totalAmount || 0));
+                    }}
+                    className={`amount-input ${isAmountModified ? 'modified' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModifiedAmount(order.totalAmount || 0);
+                      setIsAmountModified(false);
+                    }}
+                    className="reset-amount-btn"
+                    title="Restaurar precio original"
+                  >
+                    ↺
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -167,11 +195,17 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                 </div>
                                  <div className="summary-row">
                    <span>Monto:</span>
-                   <span className="summary-value amount">${(order.totalAmount || 0).toFixed(2)}</span>
+                   <span className="summary-value amount">${modifiedAmount.toFixed(2)}</span>
                  </div>
+                 {isAmountModified && (
+                   <div className="summary-row original-amount">
+                     <span>Precio Original:</span>
+                     <span className="summary-value original">${(order.totalAmount || 0).toFixed(2)}</span>
+                   </div>
+                 )}
                  <div className="summary-row total-row">
                    <span>Total:</span>
-                   <span className="summary-value total-amount">${(order.totalAmount || 0).toFixed(2)}</span>
+                   <span className="summary-value total-amount">${modifiedAmount.toFixed(2)}</span>
                  </div>
               </div>
             </div>

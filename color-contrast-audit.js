@@ -147,3 +147,4 @@ console.log('3. Usar colores con suficiente contraste (mínimo 4.5:1)');
 console.log('4. Probar en diferentes condiciones de luz');
 
 console.log('\n✅ AUDITORÍA COMPLETADA');
+

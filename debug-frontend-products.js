@@ -106,3 +106,4 @@ console.log('1. Los datos no se están cargando correctamente');
 console.log('2. Los botones no están funcionando');
 console.log('3. Hay un error en el renderizado');
 console.log('4. Los productos están siendo filtrados incorrectamente');
+

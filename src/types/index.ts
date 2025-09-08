@@ -126,6 +126,11 @@ export interface Order {
   createdAt: Date;
   updatedAt: Date;
   items?: OrderItem[];
+  // Campos de delivery
+  deliveryCost?: number;
+  isDelivery?: boolean;
+  orderPaymentMethodId?: string;
+  deliveryPaymentMethodId?: string;
 }
 
 export interface OrderItem {

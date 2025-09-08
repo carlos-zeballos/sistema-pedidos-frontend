@@ -130,3 +130,4 @@ const finalHasNewItems = hasNewItems || hasItemsAddedLater;
 5. **Verificar** que el cronómetro funciona en ambos casos
 
 
+

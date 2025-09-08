@@ -1,0 +1,522 @@
+/* Modal de pago con delivery */
+.delivery-payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.delivery-payment-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.delivery-payment-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.delivery-payment-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.delivery-payment-modal-content {
+  padding: 24px;
+}
+
+/* Secciones del modal */
+.order-info-section,
+.cost-breakdown-section,
+.payment-methods-section,
+.notes-section,
+.payment-summary {
+  margin-bottom: 24px;
+}
+
+.order-info-section h3,
+.cost-breakdown-section h3,
+.payment-methods-section h3,
+.notes-section h3,
+.payment-summary h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Información de la orden */
+.order-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.order-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-detail .label {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.order-detail .value {
+  font-weight: 600;
+  color: #111827;
+}
+
+.delivery-info .value {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.delivery-badge {
+  background: #dc2626 !important;
+  color: white !important;
+  font-weight: 700;
+}
+
+/* Desglose de costos */
+.cost-breakdown {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.cost-item:last-child {
+  border-bottom: none;
+}
+
+.cost-label {
+  font-weight: 500;
+  color: #0369a1;
+}
+
+.cost-value {
+  font-weight: 600;
+  color: #0c4a6e;
+}
+
+.delivery-cost {
+  background: #fef3c7;
+  margin: 0 -16px;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.delivery-cost .cost-label {
+  color: #92400e;
+}
+
+.delivery-cost .cost-value {
+  color: #92400e;
+}
+
+.total-cost {
+  background: #dcfce7;
+  margin: 8px -16px -16px -16px;
+  padding: 12px 16px;
+  border-radius: 0 0 8px 8px;
+  border-top: 2px solid #16a34a;
+  font-size: 1.1rem;
+}
+
+.total-cost .cost-label {
+  color: #166534;
+  font-weight: 700;
+}
+
+.total-cost .cost-value {
+  color: #166534;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Métodos de pago */
+.payment-method-group {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.payment-method-group h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.payment-method-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.payment-method-option:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+  transform: translateY(-1px);
+}
+
+.payment-method-option.selected {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.method-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  min-width: 24px;
+}
+
+.method-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.method-name {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.method-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.selection-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.payment-method-option.selected .selection-indicator {
+  opacity: 1;
+}
+
+/* Notas */
+.notes-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Resumen del pago */
+.payment-summary {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.summary-row:not(:last-child) {
+  border-bottom: 1px solid #dcfce7;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #166534;
+}
+
+.summary-value.amount {
+  color: #059669;
+}
+
+.total-row {
+  background: #dcfce7;
+  margin: 8px -16px -16px -16px;
+  padding: 12px 16px;
+  border-radius: 0 0 8px 8px;
+  border-top: 2px solid #16a34a;
+  font-size: 1.1rem;
+}
+
+.total-row .summary-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.total-amount {
+  color: #166534 !important;
+}
+
+/* Mensaje de error */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+.error-text {
+  font-weight: 500;
+}
+
+/* Botones de acción */
+.delivery-payment-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .delivery-payment-modal {
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+  }
+  
+  .delivery-payment-modal-content {
+    padding: 16px;
+  }
+  
+  .order-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-methods-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .delivery-payment-modal-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+
+/* Estilos para modificación de precio en delivery */
+.amount-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.amount-input {
+  width: 100px;
+  padding: 6px 8px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: right;
+  color: #059669;
+  background: white;
+  transition: all 0.2s;
+}
+
+.amount-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.amount-input.modified {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.reset-amount-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.reset-amount-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.original-amount {
+  background: #fef3c7;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.original-amount .summary-value.original {
+  color: #92400e;
+  text-decoration: line-through;
+}

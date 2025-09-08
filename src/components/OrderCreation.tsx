@@ -53,6 +53,9 @@ const OrderCreation: React.FC = () => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [orderNotes, setOrderNotes] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [deliveryCost, setDeliveryCost] = useState(0);
+  const [isDelivery, setIsDelivery] = useState(false);
   const [selectedSauces, setSelectedSauces] = useState<string[]>([]);
   const [chopsticksCount, setChopsticksCount] = useState({
     normal: 0,
@@ -74,6 +77,25 @@ const OrderCreation: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Efecto para detectar si el espacio seleccionado es de delivery
+  useEffect(() => {
+    if (selectedSpace) {
+      const spaceIsDelivery = selectedSpace.type === 'DELIVERY' || 
+                             selectedSpace.name.toLowerCase().includes('delivery') ||
+                             selectedSpace.code.toLowerCase().includes('d');
+      
+      setIsDelivery(spaceIsDelivery);
+      if (spaceIsDelivery) {
+        setDeliveryCost(5.00); // Costo por defecto de delivery
+      } else {
+        setDeliveryCost(0);
+      }
+    } else {
+      setIsDelivery(false);
+      setDeliveryCost(0);
+    }
+  }, [selectedSpace]);
 
   const loadData = async () => {
     try {
@@ -291,9 +313,17 @@ const OrderCreation: React.FC = () => {
     allItemsCount: allItems.length 
   });
   
-  const filteredItems = selectedCategory
-    ? allItems.filter(item => item.categoryId === selectedCategory)
-    : allItems;
+  const filteredItems = allItems.filter(item => {
+    // Filtro por categoría
+    const matchesCategory = !selectedCategory || item.categoryId === selectedCategory;
+    
+    // Filtro por término de búsqueda
+    const matchesSearch = !searchTerm || 
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    return matchesCategory && matchesSearch;
+  });
     
   console.log('🔍 Filtrado de items:', { 
     selectedCategory, 
@@ -430,6 +460,8 @@ const OrderCreation: React.FC = () => {
         subtotal: totalAmount,
         tax: 0,
         discount: 0,
+        deliveryCost: deliveryCost,
+        isDelivery: isDelivery,
         items: cart.map(item => {
           const isCombo = item.product.id.startsWith('combo-');
           const price = item.product.price || 0;
@@ -630,6 +662,35 @@ const OrderCreation: React.FC = () => {
             ))}
           </div>
 
+          {/* Campo de Búsqueda */}
+          <div className="search-filter">
+            <div className="search-input-container">
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Buscar productos por nombre o descripción..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  className="clear-search-btn"
+                  onClick={() => setSearchTerm('')}
+                  title="Limpiar búsqueda"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            {searchTerm && (
+              <div className="search-results-info">
+                {filteredItems.length} producto(s) encontrado(s) para "{searchTerm}"
+              </div>
+            )}
+          </div>
+
           {/* Grid de Productos y Combos */}
           <div className="products-grid">
             {filteredItems.length === 0 ? (
@@ -725,7 +786,22 @@ const OrderCreation: React.FC = () => {
               
               <div className="cart-total">
                 <h4>Total de la Orden</h4>
-                <div className="total-amount">${getTotalPrice().toFixed(2)}</div>
+                <div className="total-breakdown">
+                  <div className="subtotal-line">
+                    <span>Subtotal:</span>
+                    <span>${getTotalPrice().toFixed(2)}</span>
+                  </div>
+                  {isDelivery && deliveryCost > 0 && (
+                    <div className="delivery-line">
+                      <span>🚚 Delivery:</span>
+                      <span>${deliveryCost.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="total-line">
+                    <span>Total:</span>
+                    <span>${(getTotalPrice() + deliveryCost).toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}

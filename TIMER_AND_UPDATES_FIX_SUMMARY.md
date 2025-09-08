@@ -174,3 +174,4 @@ const { error: updateError } = await this.supabaseService
 El sistema ahora funciona exactamente como se requería: **cronómetro en tiempo real con cambio de colores** y **detección rápida de actualizaciones desde mozos**.
 
 
+

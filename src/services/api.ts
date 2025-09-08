@@ -241,6 +241,21 @@ export const orderService = {
     const response = await api.put(`/orders/test/${id}/status`, { status, assignedTo });
     return response.data;
   },
+  updateOrderPaymentMethods: async (id: string, orderPaymentMethodId: string, deliveryPaymentMethodId?: string) => {
+    const response = await api.put(`/orders/${id}/payment-methods`, { 
+      orderPaymentMethodId, 
+      deliveryPaymentMethodId 
+    });
+    return response.data;
+  },
+  removeItemFromOrder: async (orderId: string, itemId: string) => {
+    const response = await api.delete(`/orders/${orderId}/items/${itemId}`);
+    return response.data;
+  },
+  modifyItemInOrder: async (orderId: string, itemId: string, modifications: any) => {
+    const response = await api.put(`/orders/${orderId}/items/${itemId}`, modifications);
+    return response.data;
+  },
   deleteOrder: async (id: string) => {
     const response = await api.delete(`/orders/${id}`);
     return response.data;
