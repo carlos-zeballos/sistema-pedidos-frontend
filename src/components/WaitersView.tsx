@@ -993,7 +993,7 @@ const WaitersView: React.FC = () => {
                           <div className="item-actions">
                             <button
                               onClick={() => {
-                                if (confirm(`¿Estás seguro de eliminar "${item.name}" de la orden?`)) {
+                                if (window.confirm(`¿Estás seguro de eliminar "${item.name}" de la orden?`)) {
                                   removeItemFromOrder(item.id);
                                 }
                               }}
