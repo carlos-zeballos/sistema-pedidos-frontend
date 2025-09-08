@@ -582,20 +582,20 @@ const WaitersView: React.FC = () => {
                 </div>
 
                 {/* Información de palitos y salsas destacada */}
-                {(extractChopsticksInfo(order.notes) || extractSaucesInfo(order.notes)) && (
+                {(extractChopsticksInfo(order.notes || null) || extractSaucesInfo(order.notes || null)) && (
                   <div className="order-extras">
-                    {extractChopsticksInfo(order.notes) && (
+                    {extractChopsticksInfo(order.notes || null) && (
                       <div className="extra-info chopsticks-info">
                         <span className="extra-icon">🥢</span>
                         <span className="extra-label">Palitos:</span>
-                        <span className="extra-value">{extractChopsticksInfo(order.notes)}</span>
+                        <span className="extra-value">{extractChopsticksInfo(order.notes || null)}</span>
                       </div>
                     )}
-                    {extractSaucesInfo(order.notes) && (
+                    {extractSaucesInfo(order.notes || null) && (
                       <div className="extra-info sauces-info">
                         <span className="extra-icon">🍶</span>
                         <span className="extra-label">Salsas:</span>
-                        <span className="extra-value">{extractSaucesInfo(order.notes)}</span>
+                        <span className="extra-value">{extractSaucesInfo(order.notes || null)}</span>
                       </div>
                     )}
                   </div>
