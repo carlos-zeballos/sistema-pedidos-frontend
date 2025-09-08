@@ -482,14 +482,6 @@ const WaitersView: React.FC = () => {
   );
   const readyOrders = orders.filter(order => order.status === 'LISTO');
   const deliveredOrders = orders.filter(order => order.status === 'ENTREGADO');
-  
-  // Solo mostrar órdenes pagadas del día actual
-  const today = new Date().toISOString().split('T')[0];
-  const paidOrders = orders.filter(order => {
-    if (order.status !== 'PAGADO') return false;
-    const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
-    return orderDate === today;
-  });
 
   return (
     <div className="waiters-container">
@@ -534,10 +526,6 @@ const WaitersView: React.FC = () => {
         <div className="stat-card">
           <span className="stat-number">{deliveredOrders.length}</span>
           <span className="stat-label">Entregadas</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-number">{paidOrders.length}</span>
-          <span className="stat-label">Pagadas</span>
         </div>
       </div>
 
@@ -733,51 +721,6 @@ const WaitersView: React.FC = () => {
         </div>
       </div>
 
-      {/* Órdenes Pagadas del Día */}
-      {paidOrders.length > 0 && (
-        <div className="orders-section">
-          <h2>💰 Órdenes Pagadas Hoy ({paidOrders.length})</h2>
-          <div className="orders-grid">
-            {paidOrders.map(order => (
-              <div key={order.id} className="order-card paid">
-                <div className="order-header">
-                  <div className="order-info">
-                    <h3>Orden #{order.orderNumber}</h3>
-                    <p className="table-info">Espacio: {order.space?.name}</p>
-                    <p className="customer-info">Cliente: {order.customerName}</p>
-                    <p className="time-info">
-                      {formatDate(order.createdAt)} - {formatTime(order.createdAt)}
-                    </p>
-                  </div>
-                  <div className="order-status">
-                    <span className={`status-badge ${getStatusColor(order.status)}`}>
-                      {getStatusDisplayName(order.status)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="order-items">
-                  {order.items?.map(item => (
-                    <div key={item.id} className="order-item">
-                      <div className="item-info">
-                        <span className="item-quantity">{item.quantity}x</span>
-                        <span className="item-name">{item.name}</span>
-                      </div>
-                      <div className="item-price">
-                        ${(item.totalPrice || 0).toFixed(2)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="order-total">
-                  <strong>Total: ${(order.totalAmount || 0).toFixed(2)}</strong>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Modal para actualizar pedido */}
       {showUpdateModal && selectedOrder && (
