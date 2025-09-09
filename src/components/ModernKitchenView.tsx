@@ -30,7 +30,7 @@ const ModernKitchenView: React.FC = () => {
   
   // Estados de la UI
   const [activeTab, setActiveTab] = useState<OrderStatus>('EN_PREPARACION');
-  const [selectedOrder, setSelectedOrder] = useState<KitchenOrder | null>(null);
+  const [selectedOrder] = useState<KitchenOrder | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   
   // Contadores por estado
@@ -171,13 +171,6 @@ const ModernKitchenView: React.FC = () => {
     }
   };
 
-  // Obtener color del header según tiempo
-  const getHeaderColor = (order: KitchenOrder): string => {
-    if (order.isDelivery) return 'grey';
-    if (order.timeStatus === 'CRITICO') return 'red';
-    if (order.timeStatus === 'ATENCION') return 'orange';
-    return 'white';
-  };
 
   // Obtener texto del estado de tiempo
   const getTimeStatusText = (order: KitchenOrder): string => {
@@ -186,42 +179,6 @@ const ModernKitchenView: React.FC = () => {
     return 'EN TIEMPO <15';
   };
 
-  // Cambiar estado de un item
-  const toggleItemStatus = async (orderId: string, itemId: string, currentStatus: ItemStatus) => {
-    try {
-      let newStatus: ItemStatus;
-      
-      switch (currentStatus) {
-        case 'PENDIENTE':
-          newStatus = 'TRABAJANDO';
-          break;
-        case 'TRABAJANDO':
-          newStatus = 'FINALIZADO';
-          break;
-        default:
-          return;
-      }
-      
-      // Actualizar estado local
-      const updateOrderItems = (order: KitchenOrder) => {
-        if (order.id !== orderId) return order;
-        
-        const updatedItems = order.items.map(item => 
-          item.id === itemId ? { ...item, displayStatus: newStatus } : item
-        );
-        
-        return { ...order, items: updatedItems };
-      };
-      
-      setOrders(prev => prev.map(updateOrderItems));
-      
-      // Sincronizar con backend
-      console.log(`🔄 Item ${itemId} cambiado a ${newStatus}`);
-      
-    } catch (err) {
-      console.error('❌ Error actualizando item:', err);
-    }
-  };
 
   // Marcar orden como lista
   const markOrderAsReady = async (orderId: string) => {
@@ -302,229 +259,156 @@ const ModernKitchenView: React.FC = () => {
 
   return (
     <div className="kds-container">
-      {/* Header Principal - Versión Dinámica */}
       <div className="kds-header">
-        <div className="header-content">
-          <div className="header-left">
-            <h1>Vista de Cocina - KDS</h1>
-            <h2>Comandas en COCINA</h2>
-            <div style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
-              ✨ Versión Dinámica con Efectos Visuales ✨
-            </div>
-          </div>
-          <div className="header-right">
-            <div className="filters-section">
-              Filtros: Estación (Fría, Caliente, Bebidas), Canal (Salón, Delivery, Pickup)
-            </div>
-          </div>
+        <h1 className="kds-title">Comandas en COCINA</h1>
+        <div className="status-tabs-container">
+          <button
+            className={`status-tab ${activeTab === 'EN_PREPARACION' ? 'active' : ''}`}
+            onClick={() => setActiveTab('EN_PREPARACION')}
+          >
+            En preparación
+            <span className="counter">{counters.EN_PREPARACION}</span>
+          </button>
+          <button
+            className={`status-tab ${activeTab === 'LISTO' ? 'active' : ''}`}
+            onClick={() => setActiveTab('LISTO')}
+          >
+            Listas
+            <span className="counter">{counters.LISTO}</span>
+          </button>
+          <button
+            className={`status-tab ${activeTab === 'ENTREGADO' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ENTREGADO')}
+          >
+            Entregadas
+            <span className="counter">{counters.ENTREGADO}</span>
+          </button>
         </div>
       </div>
 
-      {/* Tabs de Estado */}
-      <div className="status-tabs">
-        <button
-          className={`status-tab ${activeTab === 'EN_PREPARACION' ? 'active' : ''}`}
-          onClick={() => setActiveTab('EN_PREPARACION')}
-        >
-          {counters.EN_PREPARACION} En preparación
-        </button>
-        <button
-          className={`status-tab ${activeTab === 'LISTO' ? 'active' : ''}`}
-          onClick={() => setActiveTab('LISTO')}
-        >
-          {counters.LISTO} Listas
-        </button>
-        <button
-          className={`status-tab ${activeTab === 'ENTREGADO' ? 'active' : ''}`}
-          onClick={() => setActiveTab('ENTREGADO')}
-        >
-          {counters.ENTREGADO} Entregadas
-        </button>
-      </div>
-
-      {/* Grid Dinámico de Tickets */}
       <div className="tickets-grid">
         {filteredOrders.map(order => (
-          <div key={order.id} className="kitchen-ticket">
-            {/* Header del Ticket */}
-            <div className={`ticket-header ${getHeaderColor(order)}`}>
-              <div className="ticket-info">
-                <div className="ticket-number">Orden # {order.orderNumber}</div>
-                <div className="ticket-table">- Mesa {order.space?.name || 'N/A'}</div>
-              </div>
-              <div className="ticket-status">
-                {(() => {
-                  if (order.status === 'PENDIENTE' || order.status === 'EN_PREPARACION') {
-                    return 'EN PREPARACIÓN';
-                  }
-                  if (order.status === 'LISTO') {
-                    return 'LISTA';
-                  }
-                  return 'ENTREGADA';
-                })()}
-              </div>
-              <div className="ticket-timer">
-                {formatElapsedTime(order.elapsedMinutes)}
+          <div key={order.id} className={`kitchen-ticket ${getTimeStatusClass(order.elapsedMinutes)}`}>
+            {/* Header Azul */}
+            <div className="ticket-header-blue">
+              <div className="ticket-header-content">
+                <div>
+                  <div className="ticket-label">TICKET</div>
+                  <div className="ticket-code">#{order.orderCode}</div>
+                </div>
+                <div className="ticket-status-badge">
+                  {(() => {
+                    if (order.status === 'PENDIENTE' || order.status === 'EN_PREPARACION') {
+                      return 'EN PREPARACIÓN';
+                    }
+                    if (order.status === 'LISTO') {
+                      return 'LISTA';
+                    }
+                    return 'ENTREGADA';
+                  })()}
+                </div>
               </div>
             </div>
 
-            {/* Body del Ticket */}
-            <div className="ticket-body">
-              {/* Información de Mesa y Cliente */}
+            {/* Información de la Orden */}
+            <div className="order-info-section">
               <div className="order-details">
-                <div className="detail-row">
-                  <span className="detail-label">M Mesa:</span>
-                  <span className="detail-value">{order.space?.name || 'N/A'}</span>
+                <div className="order-detail">
+                  <span className="detail-icon">🏠</span>
+                  <span className="detail-label">MESA:</span>
+                  <span className="detail-value">Mesa {order.space?.name || 'N/A'}</span>
                 </div>
-                {order.customerName && (
-                  <div className="detail-row">
-                    <span className="detail-label">Cliente:</span>
-                    <span className="detail-value">{order.customerName}</span>
+                <div className="order-detail">
+                  <span className="detail-icon">👤</span>
+                  <span className="detail-label">CLIENTE:</span>
+                  <span className="detail-value">{order.customerName || 'N/A'}</span>
+                </div>
+              </div>
+              <div className="order-detail">
+                <span className="detail-icon">🕐</span>
+                <span className="detail-label">HORA:</span>
+                <span className="detail-value">{new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            </div>
+
+            {/* Timer y Urgencia */}
+            <div className="timer-section">
+              <div className="timer-info">
+                <span className="timer-icon">⏱️</span>
+                <span className="timer-display">{formatElapsedTime(order.elapsedMinutes)}</span>
+              </div>
+              <div className="urgency-info">
+                <div className={`urgency-dot ${getTimeStatusClass(order.elapsedMinutes)}`}></div>
+                <span className="urgency-text">{getTimeStatusText(order)}</span>
+              </div>
+            </div>
+
+            {/* Resumen del Pedido */}
+            <div className="order-summary">
+              <div className="pedido-label">
+                <span className="pedido-icon">📋</span>
+                <span>PEDIDO</span>
+              </div>
+              {order.totalAmount && (
+                <span className="order-total">${order.totalAmount.toFixed(2)}</span>
+              )}
+            </div>
+            {/* Items del Pedido */}
+            <div className="order-items">
+              {order.items.map(item => (
+                <div key={item.id} className="item-box">
+                  <div className="item-header">
+                    <span className="item-quantity">{item.quantity}x</span>
+                    <span className="item-name">{item.name}</span>
+                    <span className="item-price">${(item.unitPrice || 0).toFixed(2)}</span>
                   </div>
-                )}
-                <div className="detail-row">
-                  <span className="detail-label">Hora:</span>
-                  <span className="detail-value">{new Date(order.createdAt).toLocaleTimeString('es-ES', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}</span>
-                </div>
-              </div>
 
-              {/* Indicador de Tiempo */}
-              <div className="time-indicator">
-                <div className={`time-badge ${order.timeStatus.toLowerCase()}`}>
-                  {getTimeStatusText(order)}
-                </div>
-              </div>
-
-              {/* Sección de Pedido */}
-              <div className="order-section">
-                <div className="section-header">
-                  <h3>PEDIDO</h3>
-                  {order.totalAmount && (
-                    <span className="order-total">${order.totalAmount.toFixed(2)}</span>
+                  {/* Notas y Modificadores */}
+                  {(item.notes || (item.modifiers && item.modifiers.length > 0)) && (
+                    <div className="item-notes">
+                      <div className="notes-header">
+                        <span className="notes-icon">📝</span>
+                      </div>
+                      <div className="notes-text">
+                        {item.notes && <div>{item.notes}</div>}
+                        {item.modifiers && item.modifiers.length > 0 && (
+                          <div>
+                            {item.modifiers.map((modifier) => (
+                              <span key={modifier}>
+                                {modifier}
+                                {item.modifiers.indexOf(modifier) < item.modifiers.length - 1 ? ', ' : ''}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
-                
-                <div className="items-list">
-                  {order.items.map(item => (
-                    <div key={item.id} className="order-item">
-                      <button 
-                        className={`item-button ${item.displayStatus.toLowerCase()}`}
-                        onClick={() => toggleItemStatus(order.id, item.id, item.displayStatus)}
-                        type="button"
-                      >
-                        <span className="item-quantity">{item.quantity}x</span>
-                        <span className="item-name">{item.name}</span>
-                        {item.hasAllergy && <span className="allergy-alert">ALERGIA</span>}
-                      </button>
-                      
-                      {/* Información del Producto */}
-                      {item.product && (
-                        <div className="item-info">
-                          <div className="info-row">
-                            <span className="info-label">Tipo:</span>
-                            <span className="info-value">{item.product.type}</span>
-                          </div>
-                          {item.product.category && (
-                            <div className="info-row">
-                              <span className="info-label">Categoría:</span>
-                              <span className="info-value">{item.product.category.name}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Información del Combo */}
-                      {item.combo && (
-                        <div className="item-info">
-                          <div className="info-row">
-                            <span className="info-label">Combo:</span>
-                            <span className="info-value">{item.combo.name}</span>
-                          </div>
-                          <div className="info-row">
-                            <span className="info-label">Precio Base:</span>
-                            <span className="info-value">${(item.combo.basePrice || 0).toFixed(2)}</span>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Precios */}
-                      <div className="item-prices">
-                        <div className="price-row">
-                          <span className="price-label">Precio Unit:</span>
-                          <span className="price-value">${(item.unitPrice || 0).toFixed(2)}</span>
-                        </div>
-                        <div className="price-row">
-                          <span className="price-label">Total:</span>
-                          <span className="price-value">${(item.totalPrice || 0).toFixed(2)}</span>
-                        </div>
-                      </div>
-                      
-                      {/* Modificadores */}
-                      {item.modifiers && item.modifiers.length > 0 && (
-                        <div className="item-modifiers">
-                          {item.modifiers.map((modifier) => (
-                            <div key={modifier} className="modifier-item">{modifier}</div>
-                          ))}
-                        </div>
-                      )}
-                      
-                      {/* Notas */}
-                      {item.notes && (
-                        <div className="item-notes">
-                          <span className="notes-text">{item.notes}</span>
-                        </div>
-                      )}
-                      
-                      {/* Componentes del Combo */}
-                      {item.components && item.components.length > 0 && (
-                        <div className="combo-components">
-                          <div className="components-header">Componentes del Combo:</div>
-                          {item.components.map((component) => (
-                            <div key={component.id} className="component-item">
-                              <span className="component-name">{component.name}</span>
-                              <span className="component-price">${(component.price || 0).toFixed(2)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Footer con Botones */}
-            <div className="ticket-footer">
-              {activeTab === 'EN_PREPARACION' && (
-                <button 
-                  className="action-button primary"
-                  onClick={() => markOrderAsReady(order.id)}
-                >
-                  Marcar como listo
-                </button>
-              )}
-              {activeTab === 'LISTO' && (
-                <button 
-                  className="action-button primary"
-                  onClick={() => markOrderAsDelivered(order.id)}
-                >
-                  Entregar
-                </button>
-              )}
-              <button 
-                className="action-button secondary"
+            {/* Botones de Acción */}
+            <div className="action-buttons">
+              <button
+                className="action-button ready"
                 onClick={() => {
-                  setSelectedOrder(order);
-                  setShowUpdateModal(true);
+                  if (activeTab === 'EN_PREPARACION') {
+                    markOrderAsReady(order.id);
+                  } else if (activeTab === 'LISTO') {
+                    markOrderAsDelivered(order.id);
+                  }
                 }}
               >
-                Actualizar
+                <span className="button-icon">✓</span>
+                MARCAR COMO LISTO
               </button>
-              <button className="action-button secondary">
-                Reimprimir
+              <button
+                className="action-button update"
+                onClick={() => handleRefresh()}
+              >
+                <span className="button-icon">✏️</span>
+                ACTUALIZAR
               </button>
             </div>
           </div>
