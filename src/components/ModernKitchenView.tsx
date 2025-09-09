@@ -302,49 +302,55 @@ const ModernKitchenView: React.FC = () => {
 
   return (
     <div className="modern-kitchen-view">
-      {/* Header */}
-      <div className="kitchen-header">
-        <h1>Comandas en COCINA</h1>
-        <div className="filters-info">
-          <span>Filtros: Estación (Fría, Caliente, Bebidas), Canal (Salón, Delivery, Pickup)</span>
+      {/* Header Principal */}
+      <div className="kitchen-main-header">
+        <div className="header-left">
+          <h1>Vista de Cocina - KDS</h1>
+          <h2>Comandas en COCINA</h2>
+        </div>
+        <div className="header-right">
+          <div className="filters-info">
+            Filtros: Estación (Fría, Caliente, Bebidas), Canal (Salón, Delivery, Pickup)
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="status-tabs">
+      {/* Tabs como en la imagen */}
+      <div className="status-tabs-container">
         <button
-          className={`tab-button ${activeTab === 'EN_PREPARACION' ? 'active' : ''}`}
+          className={`status-tab ${activeTab === 'EN_PREPARACION' ? 'active' : ''}`}
           onClick={() => setActiveTab('EN_PREPARACION')}
         >
           {counters.EN_PREPARACION} En preparación
         </button>
         <button
-          className={`tab-button ${activeTab === 'LISTO' ? 'active' : ''}`}
+          className={`status-tab ${activeTab === 'LISTO' ? 'active' : ''}`}
           onClick={() => setActiveTab('LISTO')}
         >
           {counters.LISTO} Listas
         </button>
         <button
-          className={`tab-button ${activeTab === 'ENTREGADO' ? 'active' : ''}`}
+          className={`status-tab ${activeTab === 'ENTREGADO' ? 'active' : ''}`}
           onClick={() => setActiveTab('ENTREGADO')}
         >
           {counters.ENTREGADO} Entregadas
         </button>
       </div>
 
-      {/* Grid de órdenes */}
+      {/* Grid de órdenes como en la imagen */}
       <div className="orders-grid">
         {filteredOrders.map(order => (
-          <div key={order.id} className="order-ticket">
-            {/* Header */}
-            <div className={`ticket-header ${getHeaderColor(order)}`}>
-              <div className="ticket-code">
-                #{order.orderNumber}
+          <div key={order.id} className="kitchen-ticket">
+            {/* Header rojo como en la imagen */}
+            <div className={`ticket-header-red ${getHeaderColor(order)}`}>
+              <div className="ticket-header-content">
+                <div className="order-number">Orden # {order.orderNumber}</div>
+                <div className="table-info">- Mesa {order.space?.name || 'N/A'}</div>
               </div>
-              <div className="ticket-status">
+              <div className="ticket-status-badge">
                 {(() => {
                   if (order.status === 'PENDIENTE' || order.status === 'EN_PREPARACION') {
-                    return 'EN PREPARACIÓN';
+                    return 'EN PREPARACION';
                   }
                   if (order.status === 'LISTO') {
                     return 'LISTA';
@@ -357,57 +363,63 @@ const ModernKitchenView: React.FC = () => {
               </div>
             </div>
 
-            {/* Body */}
-            <div className="ticket-body">
-              <div className="order-info">
-                <div className="info-row">
-                  <span className="label">Mesa:</span>
-                  <span className="value">{order.space?.name || 'N/A'}</span>
+            {/* Body blanco como en la imagen */}
+            <div className="ticket-body-white">
+              {/* Información de mesa y hora */}
+              <div className="ticket-info">
+                <div className="info-line">
+                  <span className="info-label">M Mesa:</span>
+                  <span className="info-value">{order.space?.name || 'N/A'}</span>
                 </div>
                 {order.customerName && (
-                  <div className="info-row">
-                    <span className="label">Cliente:</span>
-                    <span className="value">{order.customerName}</span>
+                  <div className="info-line">
+                    <span className="info-label">Cliente:</span>
+                    <span className="info-value">{order.customerName}</span>
                   </div>
                 )}
-                <div className="info-row">
-                  <span className="label">Hora:</span>
-                  <span className="value">{new Date(order.createdAt).toLocaleTimeString('es-ES', { 
+                <div className="info-line">
+                  <span className="info-label">Hora:</span>
+                  <span className="info-value">{new Date(order.createdAt).toLocaleTimeString('es-ES', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                   })}</span>
                 </div>
               </div>
 
-              <div className="sla-indicator">
-                <div className={`sla-badge ${order.timeStatus.toLowerCase()}`}>
+              {/* Indicador SLA como en la imagen */}
+              <div className="sla-progress">
+                <div className={`sla-indicator ${order.timeStatus.toLowerCase()}`}>
                   {getTimeStatusText(order)}
                 </div>
               </div>
 
-              <div className="order-items">
-                <h4>PEDIDO</h4>
+              {/* Sección PEDIDO como en la imagen */}
+              <div className="order-section">
+                <h3>PEDIDO</h3>
                 {order.items.map(item => (
-                  <div key={item.id} className="order-item">
+                  <div key={item.id} className="order-item-row">
                     <button 
-                      className={`item-line ${item.displayStatus.toLowerCase()}`}
+                      className={`item-button ${item.displayStatus.toLowerCase()}`}
                       onClick={() => toggleItemStatus(order.id, item.id, item.displayStatus)}
                       type="button"
                     >
-                      <span className="quantity">{item.quantity}x</span>
+                      <span className="item-quantity">{item.quantity}x</span>
                       <span className="item-name">{item.name}</span>
-                      {item.hasAllergy && <span className="allergy-alert">ALERGIA</span>}
+                      {item.hasAllergy && <span className="allergy-warning">ALERGIA</span>}
                     </button>
+                    
+                    {/* Modificadores como en la imagen */}
                     {item.modifiers && item.modifiers.length > 0 && (
                       <div className="item-modifiers">
                         {item.modifiers.map((modifier) => (
-                          <span key={modifier} className="modifier">{modifier}</span>
+                          <div key={modifier} className="modifier-item">{modifier}</div>
                         ))}
                       </div>
                     )}
+                    
+                    {/* Notas como en la imagen */}
                     {item.notes && (
                       <div className="item-notes">
-                        <span className="notes-icon">✏️</span>
                         <span className="notes-text">{item.notes}</span>
                       </div>
                     )}
@@ -415,19 +427,20 @@ const ModernKitchenView: React.FC = () => {
                 ))}
               </div>
 
+              {/* Total si existe */}
               {order.totalAmount && (
-                <div className="order-total">
+                <div className="order-total-section">
                   <span className="total-label">Total:</span>
-                  <span className="total-amount">${order.totalAmount.toFixed(2)}</span>
+                  <span className="total-value">${order.totalAmount.toFixed(2)}</span>
                 </div>
               )}
             </div>
 
-            {/* Footer */}
-            <div className="ticket-footer">
+            {/* Footer con botones como en la imagen */}
+            <div className="ticket-footer-buttons">
               {activeTab === 'EN_PREPARACION' && (
                 <button 
-                  className="action-button primary"
+                  className="footer-button primary"
                   onClick={() => markOrderAsReady(order.id)}
                 >
                   Marcar como listo
@@ -435,14 +448,14 @@ const ModernKitchenView: React.FC = () => {
               )}
               {activeTab === 'LISTO' && (
                 <button 
-                  className="action-button primary"
+                  className="footer-button primary"
                   onClick={() => markOrderAsDelivered(order.id)}
                 >
                   Entregar
                 </button>
               )}
               <button 
-                className="action-button secondary"
+                className="footer-button secondary"
                 onClick={() => {
                   setSelectedOrder(order);
                   setShowUpdateModal(true);
@@ -450,7 +463,7 @@ const ModernKitchenView: React.FC = () => {
               >
                 Actualizar
               </button>
-              <button className="action-button secondary">
+              <button className="footer-button secondary">
                 Reimprimir
               </button>
             </div>
