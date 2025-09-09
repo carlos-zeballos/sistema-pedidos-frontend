@@ -451,8 +451,8 @@ const OrderCreation: React.FC = () => {
       
       
       const orderData = {
-        spaceId: selectedSpace.id,
-        createdBy: currentUser?.id || 'default-user',
+        spaceId: selectedSpace?.id || '216489b8-a77e-4ecc-9c8a-89cb25e4dfe8', // Usar BARRA1 como fallback
+        createdBy: currentUser?.id || '42d2ac16-2811-4e01-9e76-f8ab02d1aea2', // Usar admin como fallback
         customerName: customerName,
         customerPhone: customerPhone,
         notes: completeOrderNotes.trim(),

@@ -7,11 +7,11 @@ import OrderCreation from './components/OrderCreation';
 import TestOrderCreation from './components/TestOrderCreation';
 import OrdersManagement from './components/OrdersManagement';
 import KitchenView from './components/KitchenView';
+import ModernKitchenView from './components/ModernKitchenView';
 import WaitersView from './components/WaitersView';
 import ReportsView from './components/ReportsView';
 import Catalog from './components/Catalog';
 import CatalogManagement from './components/CatalogManagementNew';
-import SimpleCatalog from './components/SimpleCatalog';
 import ComboManagement from './components/ComboManagement';
 import TablesManagement from './components/TablesManagement';
 import ConnectionTest from './components/ConnectionTest';
@@ -105,6 +105,17 @@ function AppContent() {
               <ProtectedRoute>
                 <AppShell>
                   <KitchenView />
+                </AppShell>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/kitchen-modern" 
+            element={
+              <ProtectedRoute>
+                <AppShell>
+                  <ModernKitchenView />
                 </AppShell>
               </ProtectedRoute>
             } 

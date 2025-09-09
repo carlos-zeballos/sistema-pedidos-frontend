@@ -7,7 +7,6 @@ import {
   Square, 
   BarChart3, 
   Settings,
-  UserCheck,
   Package
 } from 'lucide-react';
 
@@ -47,6 +46,13 @@ export const navigationConfig: NavItem[] = [
     icon: ChefHat,
     roles: ['ADMIN', 'COCINERO'],
     description: 'Panel de cocina'
+  },
+  {
+    path: '/kitchen-modern',
+    label: 'Cocina Moderna',
+    icon: ChefHat,
+    roles: ['ADMIN', 'COCINERO'],
+    description: 'Panel de cocina moderno (KDS)'
   },
   {
     path: '/catalog',
