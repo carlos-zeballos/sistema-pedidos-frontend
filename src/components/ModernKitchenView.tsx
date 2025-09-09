@@ -277,8 +277,8 @@ const ModernKitchenView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="modern-kitchen-view">
-        <div className="loading-container">
+      <div className="kds-container">
+        <div className="loading-state">
           <div className="loading-spinner"></div>
           <p>Cargando órdenes de cocina...</p>
         </div>
@@ -288,8 +288,8 @@ const ModernKitchenView: React.FC = () => {
 
   if (error) {
     return (
-      <div className="modern-kitchen-view">
-        <div className="error-container">
+      <div className="kds-container">
+        <div className="error-state">
           <h2>Error</h2>
           <p>{error}</p>
           <button onClick={loadKitchenOrders}>Reintentar</button>
@@ -301,22 +301,24 @@ const ModernKitchenView: React.FC = () => {
   const filteredOrders = getFilteredOrders();
 
   return (
-    <div className="modern-kitchen-view">
+    <div className="kds-container">
       {/* Header Principal */}
-      <div className="kitchen-main-header">
-        <div className="header-left">
-          <h1>Vista de Cocina - KDS</h1>
-          <h2>Comandas en COCINA</h2>
-        </div>
-        <div className="header-right">
-          <div className="filters-info">
-            Filtros: Estación (Fría, Caliente, Bebidas), Canal (Salón, Delivery, Pickup)
+      <div className="kds-header">
+        <div className="header-content">
+          <div className="header-left">
+            <h1>Vista de Cocina - KDS</h1>
+            <h2>Comandas en COCINA</h2>
+          </div>
+          <div className="header-right">
+            <div className="filters-section">
+              Filtros: Estación (Fría, Caliente, Bebidas), Canal (Salón, Delivery, Pickup)
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs como en la imagen */}
-      <div className="status-tabs-container">
+      {/* Tabs de Estado */}
+      <div className="status-tabs">
         <button
           className={`status-tab ${activeTab === 'EN_PREPARACION' ? 'active' : ''}`}
           onClick={() => setActiveTab('EN_PREPARACION')}
@@ -337,20 +339,20 @@ const ModernKitchenView: React.FC = () => {
         </button>
       </div>
 
-      {/* Grid de órdenes como en la imagen */}
-      <div className="orders-grid">
+      {/* Grid Dinámico de Tickets */}
+      <div className="tickets-grid">
         {filteredOrders.map(order => (
           <div key={order.id} className="kitchen-ticket">
-            {/* Header rojo como en la imagen */}
-            <div className={`ticket-header-red ${getHeaderColor(order)}`}>
-              <div className="ticket-header-content">
-                <div className="order-number">Orden # {order.orderNumber}</div>
-                <div className="table-info">- Mesa {order.space?.name || 'N/A'}</div>
+            {/* Header del Ticket */}
+            <div className={`ticket-header ${getHeaderColor(order)}`}>
+              <div className="ticket-info">
+                <div className="ticket-number">Orden # {order.orderNumber}</div>
+                <div className="ticket-table">- Mesa {order.space?.name || 'N/A'}</div>
               </div>
-              <div className="ticket-status-badge">
+              <div className="ticket-status">
                 {(() => {
                   if (order.status === 'PENDIENTE' || order.status === 'EN_PREPARACION') {
-                    return 'EN PREPARACION';
+                    return 'EN PREPARACIÓN';
                   }
                   if (order.status === 'LISTO') {
                     return 'LISTA';
@@ -363,84 +365,84 @@ const ModernKitchenView: React.FC = () => {
               </div>
             </div>
 
-            {/* Body blanco como en la imagen */}
-            <div className="ticket-body-white">
-              {/* Información de mesa y hora */}
-              <div className="ticket-info">
-                <div className="info-line">
-                  <span className="info-label">M Mesa:</span>
-                  <span className="info-value">{order.space?.name || 'N/A'}</span>
+            {/* Body del Ticket */}
+            <div className="ticket-body">
+              {/* Información de Mesa y Cliente */}
+              <div className="order-details">
+                <div className="detail-row">
+                  <span className="detail-label">M Mesa:</span>
+                  <span className="detail-value">{order.space?.name || 'N/A'}</span>
                 </div>
                 {order.customerName && (
-                  <div className="info-line">
-                    <span className="info-label">Cliente:</span>
-                    <span className="info-value">{order.customerName}</span>
+                  <div className="detail-row">
+                    <span className="detail-label">Cliente:</span>
+                    <span className="detail-value">{order.customerName}</span>
                   </div>
                 )}
-                <div className="info-line">
-                  <span className="info-label">Hora:</span>
-                  <span className="info-value">{new Date(order.createdAt).toLocaleTimeString('es-ES', { 
+                <div className="detail-row">
+                  <span className="detail-label">Hora:</span>
+                  <span className="detail-value">{new Date(order.createdAt).toLocaleTimeString('es-ES', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                   })}</span>
                 </div>
               </div>
 
-              {/* Indicador SLA como en la imagen */}
-              <div className="sla-progress">
-                <div className={`sla-indicator ${order.timeStatus.toLowerCase()}`}>
+              {/* Indicador de Tiempo */}
+              <div className="time-indicator">
+                <div className={`time-badge ${order.timeStatus.toLowerCase()}`}>
                   {getTimeStatusText(order)}
                 </div>
               </div>
 
-              {/* Sección PEDIDO como en la imagen */}
+              {/* Sección de Pedido */}
               <div className="order-section">
-                <h3>PEDIDO</h3>
-                {order.items.map(item => (
-                  <div key={item.id} className="order-item-row">
-                    <button 
-                      className={`item-button ${item.displayStatus.toLowerCase()}`}
-                      onClick={() => toggleItemStatus(order.id, item.id, item.displayStatus)}
-                      type="button"
-                    >
-                      <span className="item-quantity">{item.quantity}x</span>
-                      <span className="item-name">{item.name}</span>
-                      {item.hasAllergy && <span className="allergy-warning">ALERGIA</span>}
-                    </button>
-                    
-                    {/* Modificadores como en la imagen */}
-                    {item.modifiers && item.modifiers.length > 0 && (
-                      <div className="item-modifiers">
-                        {item.modifiers.map((modifier) => (
-                          <div key={modifier} className="modifier-item">{modifier}</div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Notas como en la imagen */}
-                    {item.notes && (
-                      <div className="item-notes">
-                        <span className="notes-text">{item.notes}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Total si existe */}
-              {order.totalAmount && (
-                <div className="order-total-section">
-                  <span className="total-label">Total:</span>
-                  <span className="total-value">${order.totalAmount.toFixed(2)}</span>
+                <div className="section-header">
+                  <h3>PEDIDO</h3>
+                  {order.totalAmount && (
+                    <span className="order-total">${order.totalAmount.toFixed(2)}</span>
+                  )}
                 </div>
-              )}
+                
+                <div className="items-list">
+                  {order.items.map(item => (
+                    <div key={item.id} className="order-item">
+                      <button 
+                        className={`item-button ${item.displayStatus.toLowerCase()}`}
+                        onClick={() => toggleItemStatus(order.id, item.id, item.displayStatus)}
+                        type="button"
+                      >
+                        <span className="item-quantity">{item.quantity}x</span>
+                        <span className="item-name">{item.name}</span>
+                        {item.hasAllergy && <span className="allergy-alert">ALERGIA</span>}
+                      </button>
+                      
+                      {/* Modificadores */}
+                      {item.modifiers && item.modifiers.length > 0 && (
+                        <div className="item-modifiers">
+                          {item.modifiers.map((modifier) => (
+                            <div key={modifier} className="modifier-item">{modifier}</div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Notas */}
+                      {item.notes && (
+                        <div className="item-notes">
+                          <span className="notes-text">{item.notes}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Footer con botones como en la imagen */}
-            <div className="ticket-footer-buttons">
+            {/* Footer con Botones */}
+            <div className="ticket-footer">
               {activeTab === 'EN_PREPARACION' && (
                 <button 
-                  className="footer-button primary"
+                  className="action-button primary"
                   onClick={() => markOrderAsReady(order.id)}
                 >
                   Marcar como listo
@@ -448,14 +450,14 @@ const ModernKitchenView: React.FC = () => {
               )}
               {activeTab === 'LISTO' && (
                 <button 
-                  className="footer-button primary"
+                  className="action-button primary"
                   onClick={() => markOrderAsDelivered(order.id)}
                 >
                   Entregar
                 </button>
               )}
               <button 
-                className="footer-button secondary"
+                className="action-button secondary"
                 onClick={() => {
                   setSelectedOrder(order);
                   setShowUpdateModal(true);
@@ -463,7 +465,7 @@ const ModernKitchenView: React.FC = () => {
               >
                 Actualizar
               </button>
-              <button className="footer-button secondary">
+              <button className="action-button secondary">
                 Reimprimir
               </button>
             </div>
@@ -471,7 +473,7 @@ const ModernKitchenView: React.FC = () => {
         ))}
       </div>
 
-      {/* Modal de actualización */}
+      {/* Modal de Actualización */}
       {showUpdateModal && selectedOrder && (
         <div className="modal-overlay">
           <div className="modal-content">
