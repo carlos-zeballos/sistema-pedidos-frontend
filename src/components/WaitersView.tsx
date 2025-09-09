@@ -32,6 +32,11 @@ const WaitersView: React.FC = () => {
   const [deliveryPaymentModalOpen, setDeliveryPaymentModalOpen] = useState(false);
   const [orderToPay, setOrderToPay] = useState<Order | null>(null);
 
+  // Estado para modificar combo existente
+  const [modifyComboModalOpen, setModifyComboModalOpen] = useState(false);
+  const [comboToModify, setComboToModify] = useState<any>(null);
+  const [itemToModify, setItemToModify] = useState<any>(null);
+
   useEffect(() => {
     loadOrders();
     loadProducts();
@@ -352,6 +357,87 @@ const WaitersView: React.FC = () => {
     closeDeliveryPaymentModal();
   };
 
+  // Función para modificar un combo existente
+  const modifyComboItem = async (order: Order, item: any) => {
+    try {
+      // Buscar el combo en la lista de combos
+      const combo = combos.find(c => c.id === item.comboId);
+      if (!combo) {
+        alert('Combo no encontrado');
+        return;
+      }
+
+      // Parsear las notas existentes para obtener la configuración actual
+      let currentComponents = {};
+      let currentSauces = [];
+      let currentNotes = '';
+
+      if (item.notes) {
+        try {
+          const notesData = JSON.parse(item.notes);
+          currentComponents = notesData.selectedComponents || {};
+          currentSauces = notesData.selectedSauces || [];
+          currentNotes = notesData.itemNotes || '';
+        } catch (error) {
+          console.log('Error parseando notas del item:', error);
+        }
+      }
+
+      // Configurar el combo con los datos actuales
+      const comboWithCurrentData = {
+        ...combo,
+        currentComponents,
+        currentSauces,
+        currentNotes
+      };
+
+      setComboToModify(comboWithCurrentData);
+      setItemToModify(item);
+      setModifyComboModalOpen(true);
+    } catch (error: any) {
+      console.error('Error preparando modificación de combo:', error);
+      alert('Error al preparar la modificación del combo');
+    }
+  };
+
+  // Función para manejar cuando se completa la modificación del combo
+  const handleComboModified = async (modifiedCombo: CustomizedCombo) => {
+    try {
+      if (!itemToModify) {
+        alert('Error: No hay item seleccionado para modificar');
+        return;
+      }
+
+      console.log('🍱 Combo modificado:', modifiedCombo);
+      console.log('📝 Item a modificar:', itemToModify);
+
+      // Preparar los datos del item modificado
+      const modifiedItemData = {
+        notes: JSON.stringify({
+          selectedComponents: modifiedCombo.selectedComponents,
+          selectedSauces: modifiedCombo.selectedSauces,
+          itemNotes: modifiedCombo.itemNotes || ''
+        })
+      };
+
+      // Actualizar el item en la orden
+      await orderService.modifyItemInOrder(itemToModify.orderId || selectedOrder?.id, itemToModify.id, modifiedItemData);
+      
+      alert(`✅ Combo modificado exitosamente: ${modifiedCombo.combo.name}`);
+      
+      // Cerrar modal y limpiar estados
+      setModifyComboModalOpen(false);
+      setComboToModify(null);
+      setItemToModify(null);
+      
+      // Recargar órdenes
+      await loadOrders();
+    } catch (err: any) {
+      console.error('Error modifying combo:', err);
+      alert('Error al modificar el combo: ' + (err.message || 'Error desconocido'));
+    }
+  };
+
   const formatTime = (dateString: string | Date) => {
     return new Date(dateString).toLocaleTimeString('es-ES', {
       hour: '2-digit',
@@ -569,8 +655,20 @@ const WaitersView: React.FC = () => {
                           <span className="item-notes">📝 {formatItemNotes(item.notes)}</span>
                         )}
                       </div>
-                      <div className="item-price">
-                        ${(item.totalPrice || 0).toFixed(2)}
+                      <div className="item-actions">
+                        <div className="item-price">
+                          ${(item.totalPrice || 0).toFixed(2)}
+                        </div>
+                        {/* Botón para modificar combo - solo si es combo y no está listo */}
+                        {item.comboId && !['LISTO', 'ENTREGADO', 'PAGADO'].includes(order.status) && (
+                          <button
+                            className="modify-combo-btn"
+                            onClick={() => modifyComboItem(order, item)}
+                            title="Modificar sabores del combo"
+                          >
+                            ✏️ Modificar
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -1012,6 +1110,20 @@ const WaitersView: React.FC = () => {
           order={orderToPay}
         />
       )}
+
+      {/* Modal de modificación de combo */}
+      <ComboCustomizationModal
+        combo={comboToModify}
+        isOpen={modifyComboModalOpen}
+        onClose={() => {
+          setModifyComboModalOpen(false);
+          setComboToModify(null);
+          setItemToModify(null);
+        }}
+        onAddToCart={handleComboModified}
+        isModification={true}
+        currentItem={itemToModify}
+      />
     </div>
   );
 };
