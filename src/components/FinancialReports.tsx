@@ -572,7 +572,11 @@ const FinancialReports: React.FC = () => {
                       {notesData.selectedSauces && notesData.selectedSauces.length > 0 && (
                         <div className="combo-sauces">
                           <span className="sauce-label">Salsas:</span>
-                          <span className="sauce-values">{notesData.selectedSauces.join(', ')}</span>
+                          <span className="sauce-values">
+                            {notesData.selectedSauces.map((sauce: any) => 
+                              typeof sauce === 'string' ? sauce : sauce.name || sauce
+                            ).join(', ')}
+                          </span>
                         </div>
                       )}
                     </div>
