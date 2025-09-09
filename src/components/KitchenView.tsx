@@ -381,21 +381,6 @@ const KitchenView: React.FC = () => {
         </button>
       </div>
 
-      {/* Estadísticas */}
-      <div className="kitchen-stats">
-        <div className="stat-card">
-          <span className="stat-number">{inProgressOrders.length}</span>
-          <span className="stat-label">En Preparación</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-number">{readyOrders.length}</span>
-          <span className="stat-label">Listas</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-number">{deliveredOrders.length}</span>
-          <span className="stat-label">Entregadas</span>
-        </div>
-      </div>
 
 
 
