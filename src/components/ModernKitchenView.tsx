@@ -47,7 +47,7 @@ const ModernKitchenView: React.FC = () => {
       const kitchenOrders = await orderService.getKitchenOrders();
       
       // Transformar órdenes al formato del nuevo sistema
-      const transformedOrders: KitchenOrder[] = kitchenOrders.map(order => {
+      const transformedOrders: KitchenOrder[] = kitchenOrders.map((order: Order) => {
         const elapsedMinutes = Math.floor((currentTime.getTime() - new Date(order.createdAt).getTime()) / (1000 * 60));
         
         // Determinar estado de tiempo
