@@ -599,6 +599,20 @@ const FinancialReports: React.FC = () => {
     loadAllOrders();
   }, []);
 
+  // Escuchar eventos de pago completado para recargar datos
+  useEffect(() => {
+    const handlePaymentCompleted = () => {
+      console.log('💰 Pago completado detectado, recargando reportes...');
+      loadAllOrders();
+    };
+
+    window.addEventListener('orderPaymentCompleted', handlePaymentCompleted);
+    
+    return () => {
+      window.removeEventListener('orderPaymentCompleted', handlePaymentCompleted);
+    };
+  }, []);
+
   // Aplicar filtros automáticamente cuando cambien
   useEffect(() => {
     console.log('🔄 useEffect ejecutado - Filtros o órdenes cambiaron');

@@ -340,6 +340,13 @@ const WaitersView: React.FC = () => {
   const handlePaymentComplete = async () => {
     // Recargar las órdenes después del pago
     await loadOrders();
+    
+    // Emitir evento personalizado para notificar a otros componentes
+    const event = new CustomEvent('orderPaymentCompleted', {
+      detail: { timestamp: new Date().toISOString() }
+    });
+    window.dispatchEvent(event);
+    
     // Cerrar ambos modales
     closePaymentModal();
     closeDeliveryPaymentModal();
