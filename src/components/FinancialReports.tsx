@@ -1,43 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { orderService, paymentService } from '../services/api';
+import { Order, OrderItem } from '../types';
 import './FinancialReports.css';
 
-// Interfaces
-interface Order {
-  id: string;
-  orderNumber: string;
-  status: string;
-  totalAmount: number;
-  customerName?: string;
-  createdAt: string;
-  updatedAt: string;
-  createdBy?: string;
-  space?: {
-    id: string;
-    name: string;
-  };
-  items?: OrderItem[];
-}
-
-interface OrderItem {
-  id: string;
-  name: string;
-  quantity: number;
-  totalprice: number;
-  unitprice: number;
-  notes?: string;
-  product?: {
-    id: string;
-    name: string;
-    price: number;
-  };
-  combo?: {
-    id: string;
-    name: string;
-    price: number;
-  };
-  selectedComponents?: Record<string, string[]>;
-}
 
 interface PaymentMethod {
   id: string;
