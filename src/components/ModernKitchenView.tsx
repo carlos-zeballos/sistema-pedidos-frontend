@@ -302,12 +302,15 @@ const ModernKitchenView: React.FC = () => {
 
   return (
     <div className="kds-container">
-      {/* Header Principal */}
+      {/* Header Principal - Versión Dinámica */}
       <div className="kds-header">
         <div className="header-content">
           <div className="header-left">
             <h1>Vista de Cocina - KDS</h1>
             <h2>Comandas en COCINA</h2>
+            <div style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
+              ✨ Versión Dinámica con Efectos Visuales ✨
+            </div>
           </div>
           <div className="header-right">
             <div className="filters-section">
