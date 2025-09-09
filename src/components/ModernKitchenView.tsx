@@ -445,7 +445,7 @@ const ModernKitchenView: React.FC = () => {
                           </div>
                           <div className="info-row">
                             <span className="info-label">Precio Base:</span>
-                            <span className="info-value">${item.combo.basePrice.toFixed(2)}</span>
+                            <span className="info-value">${(item.combo.basePrice || 0).toFixed(2)}</span>
                           </div>
                         </div>
                       )}
@@ -454,11 +454,11 @@ const ModernKitchenView: React.FC = () => {
                       <div className="item-prices">
                         <div className="price-row">
                           <span className="price-label">Precio Unit:</span>
-                          <span className="price-value">${item.unitPrice.toFixed(2)}</span>
+                          <span className="price-value">${(item.unitPrice || 0).toFixed(2)}</span>
                         </div>
                         <div className="price-row">
                           <span className="price-label">Total:</span>
-                          <span className="price-value">${item.totalPrice.toFixed(2)}</span>
+                          <span className="price-value">${(item.totalPrice || 0).toFixed(2)}</span>
                         </div>
                       </div>
                       
@@ -485,7 +485,7 @@ const ModernKitchenView: React.FC = () => {
                           {item.components.map((component) => (
                             <div key={component.id} className="component-item">
                               <span className="component-name">{component.name}</span>
-                              <span className="component-price">${component.price.toFixed(2)}</span>
+                              <span className="component-price">${(component.price || 0).toFixed(2)}</span>
                             </div>
                           ))}
                         </div>
