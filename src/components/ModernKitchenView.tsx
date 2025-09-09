@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { orderService } from '../services/api';
-import { Order } from '../types';
+import { Order, OrderItem as BaseOrderItem } from '../types';
 import './ModernKitchenView.css';
 
 // Tipos para el nuevo sistema
@@ -8,18 +8,14 @@ type OrderStatus = 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO';
 type ItemStatus = 'PENDIENTE' | 'TRABAJANDO' | 'FINALIZADO';
 type TimeStatus = 'EN_TIEMPO' | 'ATENCION' | 'CRITICO';
 
-interface OrderItem {
-  id: string;
-  name: string;
-  quantity: number;
-  notes?: string;
-  status: ItemStatus;
+interface ModernOrderItem extends BaseOrderItem {
   hasAllergy?: boolean;
   modifiers?: string[];
+  displayStatus: ItemStatus;
 }
 
 interface KitchenOrder extends Order {
-  items: OrderItem[];
+  items: ModernOrderItem[];
   timeStatus: TimeStatus;
   elapsedMinutes: number;
   priority: number;
@@ -60,17 +56,14 @@ const ModernKitchenView: React.FC = () => {
         else if (elapsedMinutes >= 15) timeStatus = 'ATENCION';
         
         // Transformar items
-        const items: OrderItem[] = (order.items || []).map(item => {
-          let itemStatus: ItemStatus = 'PENDIENTE';
-          if (item.status === 'LISTO') itemStatus = 'FINALIZADO';
-          else if (item.status === 'EN_PREPARACION') itemStatus = 'TRABAJANDO';
+        const items: ModernOrderItem[] = (order.items || []).map(item => {
+          let displayStatus: ItemStatus = 'PENDIENTE';
+          if (item.status === 'LISTO') displayStatus = 'FINALIZADO';
+          else if (item.status === 'EN_PREPARACION') displayStatus = 'TRABAJANDO';
           
           return {
-            id: item.id,
-            name: item.name,
-            quantity: item.quantity,
-            notes: item.notes,
-            status: itemStatus,
+            ...item,
+            displayStatus,
             hasAllergy: item.notes?.toLowerCase().includes('alergia') || false,
             modifiers: extractModifiers(item.notes)
           };
@@ -214,7 +207,7 @@ const ModernKitchenView: React.FC = () => {
         if (order.id !== orderId) return order;
         
         const updatedItems = order.items.map(item => 
-          item.id === itemId ? { ...item, status: newStatus } : item
+          item.id === itemId ? { ...item, displayStatus: newStatus } : item
         );
         
         return { ...order, items: updatedItems };
@@ -397,8 +390,8 @@ const ModernKitchenView: React.FC = () => {
                 {order.items.map(item => (
                   <div key={item.id} className="order-item">
                     <button 
-                      className={`item-line ${item.status.toLowerCase()}`}
-                      onClick={() => toggleItemStatus(order.id, item.id, item.status)}
+                      className={`item-line ${item.displayStatus.toLowerCase()}`}
+                      onClick={() => toggleItemStatus(order.id, item.id, item.displayStatus)}
                       type="button"
                     >
                       <span className="quantity">{item.quantity}x</span>
