@@ -410,7 +410,7 @@ const OrderCreation: React.FC = () => {
 
   const getTotalPrice = () => {
     return cart.reduce((total, item) => {
-      const price = item.product.price || 0;
+      const price = getSafePrice(item.product);
       return total + (price * item.quantity);
     }, 0);
   };
@@ -464,7 +464,7 @@ const OrderCreation: React.FC = () => {
         isDelivery: isDelivery,
         items: cart.map(item => {
           const isCombo = item.product.id.startsWith('combo-');
-          const price = item.product.price || 0;
+          const price = getSafePrice(item.product);
           
           return {
             productId: isCombo ? null : item.product.id.replace('combo-', ''),
@@ -751,7 +751,7 @@ const OrderCreation: React.FC = () => {
                 <div key={index} className="cart-item">
                                       <div className="item-info">
                       <div className="item-name">{item.product.name}</div>
-                      <div className="item-price">${(item.product.price || 0).toFixed(2)}</div>
+                      <div className="item-price">${getSafePrice(item.product).toFixed(2)}</div>
                     </div>
                   <div className="item-quantity">
                     <button
@@ -772,7 +772,7 @@ const OrderCreation: React.FC = () => {
                     </button>
                   </div>
                   <div className="item-total">
-                    ${((item.product.price || 0) * item.quantity).toFixed(2)}
+                    ${(getSafePrice(item.product) * item.quantity).toFixed(2)}
                   </div>
                   <button
                     type="button"
