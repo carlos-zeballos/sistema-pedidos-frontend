@@ -383,7 +383,7 @@ const ModernKitchenView: React.FC = () => {
                             {item.modifiers.map((modifier, index) => (
                               <span key={modifier}>
                                 {modifier}
-                                {index < item.modifiers.length - 1 ? ', ' : ''}
+                                {index < (item.modifiers?.length || 0) - 1 ? ', ' : ''}
                               </span>
                             ))}
                           </div>
