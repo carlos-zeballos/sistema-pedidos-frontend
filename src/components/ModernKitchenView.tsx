@@ -412,7 +412,7 @@ const ModernKitchenView: React.FC = () => {
               </button>
               <button
                 className="action-button update"
-                onClick={() => handleRefresh()}
+                onClick={() => loadKitchenOrders()}
               >
                 <span className="button-icon">✏️</span>
                 ACTUALIZAR
