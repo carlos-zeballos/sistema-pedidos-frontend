@@ -380,10 +380,10 @@ const ModernKitchenView: React.FC = () => {
                         {item.notes && <div>{item.notes}</div>}
                         {item.modifiers && item.modifiers.length > 0 && (
                           <div>
-                            {item.modifiers.map((modifier) => (
+                            {item.modifiers.map((modifier, index) => (
                               <span key={modifier}>
                                 {modifier}
-                                {item.modifiers.indexOf(modifier) < item.modifiers.length - 1 ? ', ' : ''}
+                                {index < item.modifiers.length - 1 ? ', ' : ''}
                               </span>
                             ))}
                           </div>
