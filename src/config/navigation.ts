@@ -48,13 +48,6 @@ export const navigationConfig: NavItem[] = [
     description: 'Panel de cocina'
   },
   {
-    path: '/kitchen-modern',
-    label: 'Cocina Moderna',
-    icon: ChefHat,
-    roles: ['ADMIN', 'COCINERO'],
-    description: 'Panel de cocina moderno (KDS)'
-  },
-  {
     path: '/catalog',
     label: 'Catálogo',
     icon: BookOpen,

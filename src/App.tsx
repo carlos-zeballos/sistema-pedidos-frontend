@@ -7,7 +7,6 @@ import OrderCreation from './components/OrderCreation';
 import TestOrderCreation from './components/TestOrderCreation';
 import OrdersManagement from './components/OrdersManagement';
 import KitchenView from './components/KitchenView';
-import ModernKitchenView from './components/ModernKitchenView';
 import WaitersView from './components/WaitersView';
 import ReportsView from './components/ReportsView';
 import Catalog from './components/Catalog';
@@ -110,16 +109,6 @@ function AppContent() {
             } 
           />
           
-          <Route 
-            path="/kitchen-modern" 
-            element={
-              <ProtectedRoute>
-                <AppShell>
-                  <ModernKitchenView />
-                </AppShell>
-              </ProtectedRoute>
-            } 
-          />
           
           <Route 
             path="/waiters" 
