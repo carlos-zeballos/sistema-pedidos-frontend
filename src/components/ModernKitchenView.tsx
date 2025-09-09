@@ -420,6 +420,48 @@ const ModernKitchenView: React.FC = () => {
                         {item.hasAllergy && <span className="allergy-alert">ALERGIA</span>}
                       </button>
                       
+                      {/* Información del Producto */}
+                      {item.product && (
+                        <div className="item-info">
+                          <div className="info-row">
+                            <span className="info-label">Tipo:</span>
+                            <span className="info-value">{item.product.type}</span>
+                          </div>
+                          {item.product.category && (
+                            <div className="info-row">
+                              <span className="info-label">Categoría:</span>
+                              <span className="info-value">{item.product.category.name}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Información del Combo */}
+                      {item.combo && (
+                        <div className="item-info">
+                          <div className="info-row">
+                            <span className="info-label">Combo:</span>
+                            <span className="info-value">{item.combo.name}</span>
+                          </div>
+                          <div className="info-row">
+                            <span className="info-label">Precio Base:</span>
+                            <span className="info-value">${item.combo.basePrice.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Precios */}
+                      <div className="item-prices">
+                        <div className="price-row">
+                          <span className="price-label">Precio Unit:</span>
+                          <span className="price-value">${item.unitPrice.toFixed(2)}</span>
+                        </div>
+                        <div className="price-row">
+                          <span className="price-label">Total:</span>
+                          <span className="price-value">${item.totalPrice.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      
                       {/* Modificadores */}
                       {item.modifiers && item.modifiers.length > 0 && (
                         <div className="item-modifiers">
@@ -433,6 +475,19 @@ const ModernKitchenView: React.FC = () => {
                       {item.notes && (
                         <div className="item-notes">
                           <span className="notes-text">{item.notes}</span>
+                        </div>
+                      )}
+                      
+                      {/* Componentes del Combo */}
+                      {item.components && item.components.length > 0 && (
+                        <div className="combo-components">
+                          <div className="components-header">Componentes del Combo:</div>
+                          {item.components.map((component) => (
+                            <div key={component.id} className="component-item">
+                              <span className="component-name">{component.name}</span>
+                              <span className="component-price">${component.price.toFixed(2)}</span>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
