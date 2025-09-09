@@ -300,7 +300,7 @@ const FinancialReports: React.FC = () => {
               };
             }
             productStats[comboKey].quantity += item.quantity;
-            productStats[comboKey].totalAmount += (item.combo.price * item.quantity);
+            productStats[comboKey].totalAmount += (item.combo.basePrice * item.quantity);
             productStats[comboKey].orders += 1;
 
             // Analizar componentes del combo
