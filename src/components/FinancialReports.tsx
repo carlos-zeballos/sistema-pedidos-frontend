@@ -554,7 +554,14 @@ const FinancialReports: React.FC = () => {
                   return (
                     <div className="combo-details">
                       <div className="combo-price">
-                        Total: {formatCurrency(item.totalprice || 0)}
+                        {order.totalAmount !== item.totalprice ? (
+                          <>
+                            <div className="item-price">Item: {formatCurrency(item.totalprice || 0)}</div>
+                            <div className="order-total">Total Orden: {formatCurrency(order.totalAmount || 0)}</div>
+                          </>
+                        ) : (
+                          <div>Total: {formatCurrency(item.totalprice || 0)}</div>
+                        )}
                       </div>
                       <div className="combo-components">
                         {Object.entries(notesData.selectedComponents).map(([type, components]) => (
@@ -1579,7 +1586,7 @@ const FinancialReports: React.FC = () => {
                         <div className="stat-trend">+23%</div>
                       </div>
                       <div className="stat-content">
-                        <div className="stat-number">${getTotalAmount(allOrders).toFixed(2)}</div>
+                        <div className="stat-number">{formatCurrency(getTotalAmount(allOrders))}</div>
                         <div className="stat-label">Ventas Totales</div>
                         <div className="stat-description">Ingresos generados</div>
                       </div>
