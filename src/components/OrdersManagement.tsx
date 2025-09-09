@@ -11,6 +11,9 @@ const OrdersManagement: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('date');
   const [updating, setUpdating] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
 
   const loadOrders = async () => {
     try {
@@ -78,6 +81,27 @@ const OrdersManagement: React.FC = () => {
     } finally {
       setUpdating(null);
     }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    setUpdating(orderId);
+    try {
+      await orderService.deleteOrder(orderId);
+      await loadOrders();
+      setShowDeleteModal(false);
+      setOrderToDelete(null);
+      alert('Pedido eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error deleting order:', error);
+      alert('Error al eliminar el pedido');
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const confirmDeleteOrder = (order: Order) => {
+    setOrderToDelete(order);
+    setShowDeleteModal(true);
   };
 
   const formatDate = (date: Date) => {
@@ -233,6 +257,13 @@ const OrdersManagement: React.FC = () => {
                     </span>
                   )}
                 </div>
+                <button 
+                  className="view-details-btn"
+                  onClick={() => setSelectedOrder(order)}
+                  title="Ver detalles completos"
+                >
+                  👁️ Ver Detalles
+                </button>
               </div>
 
               <div className="table-cell order-total">
@@ -287,6 +318,18 @@ const OrdersManagement: React.FC = () => {
                     </button>
                   )}
 
+                  {/* Botón de eliminar - solo para pedidos pendientes o cancelados */}
+                  {(order.status === 'PENDIENTE' || order.status === 'CANCELADO') && (
+                    <button
+                      className="action-btn delete-btn"
+                      onClick={() => confirmDeleteOrder(order)}
+                      disabled={updating === order.id}
+                      title="Eliminar pedido permanentemente"
+                    >
+                      🗑️
+                    </button>
+                  )}
+
                   {order.status !== 'ENTREGADO' && order.status !== 'CANCELADO' && (
                     <button
                       className="action-btn cancel-btn"
@@ -303,6 +346,154 @@ const OrdersManagement: React.FC = () => {
           ))
         )}
       </div>
+
+      {/* Modal de detalles de pedido */}
+      {selectedOrder && (
+        <div className="modal-overlay" onClick={() => setSelectedOrder(null)}>
+          <div className="modal-content order-details-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>📋 Detalles del Pedido #{selectedOrder.orderNumber}</h2>
+              <button className="close-btn" onClick={() => setSelectedOrder(null)}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="order-info-grid">
+                <div className="info-section">
+                  <h3>📊 Información General</h3>
+                  <div className="info-item">
+                    <span className="label">Número de Orden:</span>
+                    <span className="value">#{selectedOrder.orderNumber}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Espacio:</span>
+                    <span className="value">{selectedOrder.space?.name || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Cliente:</span>
+                    <span className="value">{selectedOrder.customerName || 'Cliente'}</span>
+                  </div>
+                  {selectedOrder.customerPhone && (
+                    <div className="info-item">
+                      <span className="label">Teléfono:</span>
+                      <span className="value">{selectedOrder.customerPhone}</span>
+                    </div>
+                  )}
+                  <div className="info-item">
+                    <span className="label">Estado:</span>
+                    <span className="value">
+                      <span 
+                        className="status-badge"
+                        style={{ backgroundColor: getStatusColor(selectedOrder.status) }}
+                      >
+                        {getStatusText(selectedOrder.status)}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Fecha:</span>
+                    <span className="value">{formatDate(selectedOrder.createdAt)}</span>
+                  </div>
+                </div>
+
+                <div className="info-section">
+                  <h3>💰 Información Financiera</h3>
+                  <div className="info-item">
+                    <span className="label">Total Original:</span>
+                    <span className="value">S/ {(selectedOrder.items?.reduce((total, item) => total + (item.totalprice || 0), 0) || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Total Actual:</span>
+                    <span className="value">S/ {(selectedOrder.totalAmount || 0).toFixed(2)}</span>
+                  </div>
+                  {selectedOrder.notes && (
+                    <div className="info-item">
+                      <span className="label">Notas:</span>
+                      <span className="value">{selectedOrder.notes}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="items-section">
+                <h3>🍽️ Items del Pedido</h3>
+                <div className="items-table">
+                  <div className="items-header">
+                    <div className="item-cell">Item</div>
+                    <div className="item-cell">Cantidad</div>
+                    <div className="item-cell">Precio Unit.</div>
+                    <div className="item-cell">Total</div>
+                  </div>
+                  {selectedOrder.items?.map((item, index) => (
+                    <div key={index} className="items-row">
+                      <div className="item-cell item-name">
+                        {item.name}
+                        {item.notes && (
+                          <div className="item-notes">
+                            {(() => {
+                              try {
+                                const notesData = JSON.parse(item.notes);
+                                if (notesData.selectedComponents) {
+                                  return Object.entries(notesData.selectedComponents).map(([type, components]) => (
+                                    <div key={type} className="component-detail">
+                                      <strong>{type}:</strong> {Array.isArray(components) 
+                                        ? components.map((comp: any) => comp.name || comp).join(', ')
+                                        : String(components)
+                                      }
+                                    </div>
+                                  ));
+                                }
+                                return item.notes;
+                              } catch {
+                                return item.notes;
+                              }
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="item-cell">{item.quantity}</div>
+                      <div className="item-cell">S/ {(item.unitprice || 0).toFixed(2)}</div>
+                      <div className="item-cell">S/ {(item.totalprice || 0).toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && orderToDelete && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>⚠️ Confirmar Eliminación</h2>
+              <button className="close-btn" onClick={() => setShowDeleteModal(false)}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <p>¿Estás seguro de que deseas eliminar permanentemente el pedido <strong>#{orderToDelete.orderNumber}</strong>?</p>
+              <p className="warning-text">Esta acción no se puede deshacer.</p>
+              
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  className="btn btn-danger" 
+                  onClick={() => deleteOrder(orderToDelete.id)}
+                  disabled={updating === orderToDelete.id}
+                >
+                  {updating === orderToDelete.id ? 'Eliminando...' : 'Eliminar Permanentemente'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
