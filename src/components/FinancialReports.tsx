@@ -142,6 +142,73 @@ const FinancialReports: React.FC = () => {
     return data.length;
   };
 
+  // Funciones para separar deliveries y pedidos
+  const getDeliveryOrders = () => {
+    return allOrders.filter(order => order.isDelivery === true);
+  };
+
+  const getOrdersOnly = () => {
+    return allOrders.filter(order => order.isDelivery !== true);
+  };
+
+  // Función para calcular métodos de pago de deliveries
+  const getDeliveryPaymentMethods = (): PaymentMethod[] => {
+    const deliveryOrders = getDeliveryOrders();
+    const methodMap = new Map<string, PaymentMethod>();
+
+    // Usar los métodos de pago reales de la base de datos
+    paymentMethods.forEach(method => {
+      methodMap.set(method.name, {
+        ...method,
+        total_orders: 0,
+        total_amount: 0
+      });
+    });
+
+    // Contar deliveries por método de pago
+    deliveryOrders.forEach(order => {
+      // Por ahora usaremos un método por defecto hasta que tengamos los datos reales
+      // En el futuro esto debería venir de OrderPayment
+      const methodName = 'EFECTIVO'; // Esto debería venir de la base de datos
+      const method = methodMap.get(methodName);
+      if (method) {
+        method.total_orders += 1;
+        method.total_amount += order.totalAmount || 0;
+      }
+    });
+
+    return Array.from(methodMap.values()).filter(method => method.total_orders > 0);
+  };
+
+  // Función para calcular métodos de pago de pedidos (no deliveries)
+  const getOrdersPaymentMethods = (): PaymentMethod[] => {
+    const ordersOnly = getOrdersOnly();
+    const methodMap = new Map<string, PaymentMethod>();
+
+    // Usar los métodos de pago reales de la base de datos
+    paymentMethods.forEach(method => {
+      methodMap.set(method.name, {
+        ...method,
+        total_orders: 0,
+        total_amount: 0
+      });
+    });
+
+    // Contar pedidos por método de pago
+    ordersOnly.forEach(order => {
+      // Por ahora usaremos un método por defecto hasta que tengamos los datos reales
+      // En el futuro esto debería venir de OrderPayment
+      const methodName = 'EFECTIVO'; // Esto debería venir de la base de datos
+      const method = methodMap.get(methodName);
+      if (method) {
+        method.total_orders += 1;
+        method.total_amount += order.totalAmount || 0;
+      }
+    });
+
+    return Array.from(methodMap.values()).filter(method => method.total_orders > 0);
+  };
+
   // Analizar productos más vendidos desde datos reales
   const analyzeTopProducts = (ordersToAnalyze?: Order[]) => {
     const orders = ordersToAnalyze || allOrders;
@@ -801,6 +868,78 @@ const FinancialReports: React.FC = () => {
                           <div className="method-stats">
                             <div className="stat-item">
                               <span className="stat-label">Órdenes</span>
+                              <span className="stat-value">{method.total_orders}</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">Total</span>
+                              <span className="stat-value">{formatCurrency(method.total_amount)}</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">%</span>
+                              <span className="stat-value">{percentage.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* TOTAL DELIVERYS */}
+                <div className="delivery-reports-section">
+                  <h3>🚚 TOTAL DE DELIVERYS</h3>
+                  <div className="delivery-methods-grid">
+                    {getDeliveryPaymentMethods().map((method: PaymentMethod) => {
+                      const totalAmount = getTotalAmount(getDeliveryOrders());
+                      const percentage = totalAmount > 0 ? (method.total_amount / totalAmount) * 100 : 0;
+                      
+                      return (
+                        <div key={method.id} className="delivery-method-card">
+                          <div className="method-header">
+                            <div className="method-icon" style={{ color: method.color }}>
+                              {method.icon}
+                            </div>
+                            <div className="method-name">{method.name}</div>
+                          </div>
+                          <div className="method-stats">
+                            <div className="stat-item">
+                              <span className="stat-label">Deliverys</span>
+                              <span className="stat-value">{method.total_orders}</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">Total</span>
+                              <span className="stat-value">{formatCurrency(method.total_amount)}</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">%</span>
+                              <span className="stat-value">{percentage.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* TOTAL PEDIDOS */}
+                <div className="orders-reports-section">
+                  <h3>🍽️ TOTAL PEDIDOS</h3>
+                  <div className="orders-methods-grid">
+                    {getOrdersPaymentMethods().map((method: PaymentMethod) => {
+                      const totalAmount = getTotalAmount(getOrdersOnly());
+                      const percentage = totalAmount > 0 ? (method.total_amount / totalAmount) * 100 : 0;
+                      
+                      return (
+                        <div key={method.id} className="orders-method-card">
+                          <div className="method-header">
+                            <div className="method-icon" style={{ color: method.color }}>
+                              {method.icon}
+                            </div>
+                            <div className="method-name">{method.name}</div>
+                          </div>
+                          <div className="method-stats">
+                            <div className="stat-item">
+                              <span className="stat-label">Pedidos</span>
                               <span className="stat-value">{method.total_orders}</span>
                             </div>
                             <div className="stat-item">
