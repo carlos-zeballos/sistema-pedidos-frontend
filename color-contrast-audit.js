@@ -148,3 +148,4 @@ console.log('4. Probar en diferentes condiciones de luz');
 
 console.log('\n✅ AUDITORÍA COMPLETADA');
 
+

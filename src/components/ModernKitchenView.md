@@ -162,3 +162,4 @@ Para reportar problemas o solicitar nuevas funcionalidades:
 **Versión**: 1.0.0  
 **Última actualización**: Diciembre 2024  
 **Compatibilidad**: React 18+, TypeScript 4.9+
+

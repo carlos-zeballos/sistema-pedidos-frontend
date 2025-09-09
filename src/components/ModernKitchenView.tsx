@@ -8,10 +8,17 @@ type OrderStatus = 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO';
 type ItemStatus = 'PENDIENTE' | 'TRABAJANDO' | 'FINALIZADO';
 type TimeStatus = 'EN_TIEMPO' | 'ATENCION' | 'CRITICO';
 
+interface ComplementChip {
+  category: string;
+  items: string[];
+}
+
 interface ModernOrderItem extends BaseOrderItem {
   hasAllergy?: boolean;
   modifiers?: string[];
   displayStatus: ItemStatus;
+  complements?: ComplementChip[];
+  comments?: string;
 }
 
 interface KitchenOrder extends Order {
@@ -20,6 +27,75 @@ interface KitchenOrder extends Order {
   elapsedMinutes: number;
   priority: number;
 }
+
+// Parser de complementos y comentarios
+const parseItemComplements = (item: BaseOrderItem): { complements: ComplementChip[], comments: string } => {
+  const complements: ComplementChip[] = [];
+  let comments = '';
+  
+  try {
+    // Parsear notes si contiene JSON
+    if (item.notes) {
+      try {
+        const parsed = JSON.parse(item.notes);
+        
+        // Procesar selectedComponents
+        if (parsed.selectedComponents) {
+          Object.entries(parsed.selectedComponents).forEach(([key, value]: [string, any]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              const normalizedKey = key === 'SABOR' ? 'Sabor' : 
+                                  key === 'selected Sauces' ? 'Salsas' : 
+                                  key.charAt(0).toUpperCase() + key.slice(1);
+              
+              const items = value
+                .filter((comp: any) => comp.quantity > 0)
+                .map((comp: any) => comp.quantity > 1 ? `${comp.name} ×${comp.quantity}` : comp.name);
+              
+              if (items.length > 0) {
+                complements.push({ category: normalizedKey, items });
+              }
+            }
+          });
+        }
+        
+        // Procesar campos sueltos
+        if (parsed.normalChopsticks > 0) {
+          complements.push({ 
+            category: 'Palitos', 
+            items: [`${parsed.normalChopsticks} normales`] 
+          });
+        }
+        
+        if (parsed.assistedChopsticks > 0) {
+          complements.push({ 
+            category: 'Asistidos', 
+            items: [`${parsed.assistedChopsticks} de entrenamiento`] 
+          });
+        }
+        
+        // Comentarios adicionales
+        if (parsed.notes && typeof parsed.notes === 'string') {
+          comments = parsed.notes;
+        }
+        
+      } catch (jsonError) {
+        // Si no es JSON, tratar como texto simple
+        comments = item.notes;
+      }
+    }
+    
+    // Detectar alergias
+    if (comments.toLowerCase().includes('alerg')) {
+      comments = `🚨 ALERGIA: ${comments}`;
+    }
+    
+  } catch (error) {
+    console.error('Error parsing complements:', error);
+    comments = item.notes || '';
+  }
+  
+  return { complements, comments };
+};
 
 const ModernKitchenView: React.FC = () => {
   // Estados principales
@@ -55,17 +131,21 @@ const ModernKitchenView: React.FC = () => {
         if (elapsedMinutes >= 30) timeStatus = 'CRITICO';
         else if (elapsedMinutes >= 15) timeStatus = 'ATENCION';
         
-        // Transformar items
+        // Transformar items con parser de complementos
         const items: ModernOrderItem[] = (order.items || []).map(item => {
           let displayStatus: ItemStatus = 'PENDIENTE';
           if (item.status === 'LISTO') displayStatus = 'FINALIZADO';
           else if (item.status === 'EN_PREPARACION') displayStatus = 'TRABAJANDO';
           
+          const { complements, comments } = parseItemComplements(item);
+          
           return {
             ...item,
             displayStatus,
-            hasAllergy: item.notes?.toLowerCase().includes('alergia') || false,
-            modifiers: extractModifiers(item.notes)
+            hasAllergy: comments.toLowerCase().includes('alerg') || false,
+            modifiers: extractModifiers(item.notes),
+            complements,
+            comments
           };
         });
         
@@ -160,12 +240,12 @@ const ModernKitchenView: React.FC = () => {
     return orders.filter(filterByTab).sort(sortByPriority);
   };
 
-  // Formatear tiempo transcurrido (copiado de KitchenView.tsx)
+  // Formatear tiempo transcurrido HH:MM:SS (sin negativos)
   const formatElapsedTime = (dateString: string | Date): string => {
     const now = new Date();
     const orderTime = new Date(dateString);
     const diffMs = now.getTime() - orderTime.getTime();
-    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffSeconds = Math.max(0, Math.floor(diffMs / 1000)); // Nunca negativo
     
     const hours = Math.floor(diffSeconds / 3600);
     const minutes = Math.floor((diffSeconds % 3600) / 60);
@@ -187,6 +267,13 @@ const ModernKitchenView: React.FC = () => {
     if (order.timeStatus === 'CRITICO') return 'CRÍTICO >30';
     if (order.timeStatus === 'ATENCION') return 'ATENCIÓN 15-30';
     return 'EN TIEMPO <15';
+  };
+
+  // Obtener clase CSS para el badge SLA
+  const getSlaBadgeClass = (elapsedMinutes: number): string => {
+    if (elapsedMinutes > 30) return 'sla-critical';
+    if (elapsedMinutes > 15) return 'sla-warning';
+    return 'sla-ok';
   };
 
 
@@ -341,15 +428,15 @@ const ModernKitchenView: React.FC = () => {
               </div>
             </div>
 
-            {/* Timer y Urgencia */}
+            {/* Timer y SLA */}
             <div className="timer-section">
               <div className="timer-info">
                 <span className="timer-icon">⏱️</span>
                 <span className="timer-display">{formatElapsedTime(order.createdAt)}</span>
               </div>
-              <div className="urgency-info">
-                <div className={`urgency-dot ${getTimeStatusClass(order.elapsedMinutes)}`}></div>
-                <span className="urgency-text">{getTimeStatusText(order)}</span>
+              <div className="sla-badge">
+                <span className={`sla-indicator ${getSlaBadgeClass(order.elapsedMinutes)}`}></span>
+                <span className="sla-text">{getTimeStatusText(order)}</span>
               </div>
             </div>
 
@@ -373,22 +460,30 @@ const ModernKitchenView: React.FC = () => {
                     <span className="item-price">${(item.unitPrice || 0).toFixed(2)}</span>
                   </div>
 
-                  {/* Notas y Modificadores */}
-                  {(item.notes || (item.modifiers && item.modifiers.length > 0)) && (
-                    <div className="item-notes">
-                      <div className="notes-text">
-                        {item.notes && <div>{item.notes}</div>}
-                        {item.modifiers && item.modifiers.length > 0 && (
-                          <div>
-                            {item.modifiers.map((modifier, index) => (
-                              <span key={modifier}>
-                                {modifier}
-                                {index < (item.modifiers?.length || 0) - 1 ? ', ' : ''}
+                  {/* Complementos y Comentarios */}
+                  {((item.complements && item.complements.length > 0) || item.comments) && (
+                    <div className="item-complements">
+                      {/* Complementos como chips */}
+                      {item.complements && item.complements.length > 0 && (
+                        <div className="complement-chips">
+                          {item.complements.map((complement, index) => (
+                            <div key={index} className="complement-category">
+                              <span className="complement-label">{complement.category}:</span>
+                              <span className="complement-items">
+                                {complement.items.join(', ')}
                               </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Comentarios */}
+                      {item.comments && (
+                        <div className="item-comments">
+                          <span className="comment-icon">💬</span>
+                          <span className="comment-text">{item.comments}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
