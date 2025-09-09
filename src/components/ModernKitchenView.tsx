@@ -301,7 +301,7 @@ const ModernKitchenView: React.FC = () => {
               <div className="ticket-header-content">
                 <div>
                   <div className="ticket-label">TICKET</div>
-                  <div className="ticket-code">#{order.orderCode}</div>
+                  <div className="ticket-code">#{order.orderNumber}</div>
                 </div>
                 <div className="ticket-status-badge">
                   {(() => {
