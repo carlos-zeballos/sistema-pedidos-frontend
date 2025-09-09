@@ -172,6 +172,13 @@ const ModernKitchenView: React.FC = () => {
   };
 
 
+  // Obtener clase CSS según tiempo transcurrido
+  const getTimeStatusClass = (elapsedMinutes: number): string => {
+    if (elapsedMinutes > 30) return 'urgent';
+    if (elapsedMinutes > 15) return 'attention';
+    return 'ontime';
+  };
+
   // Obtener texto del estado de tiempo
   const getTimeStatusText = (order: KitchenOrder): string => {
     if (order.timeStatus === 'CRITICO') return 'CRÍTICO >30';
