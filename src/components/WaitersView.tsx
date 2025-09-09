@@ -416,7 +416,8 @@ const WaitersView: React.FC = () => {
         notes: JSON.stringify({
           selectedComponents: modifiedCombo.selectedComponents,
           selectedSauces: modifiedCombo.selectedSauces,
-          itemNotes: modifiedCombo.itemNotes || ''
+          normalChopsticks: modifiedCombo.normalChopsticks || 0,
+          assistedChopsticks: modifiedCombo.assistedChopsticks || 0
         })
       };
 
