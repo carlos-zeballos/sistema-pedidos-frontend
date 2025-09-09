@@ -879,13 +879,46 @@ const FinancialReports: React.FC = () => {
                   </div>
                 </div>
 
-                {/* TOTAL DELIVERYS */}
+                {/* TOTAL DELIVERYS - VERSIÓN DETALLADA */}
                 <div className="delivery-reports-section">
                   <h3>🚚 TOTAL DE DELIVERYS</h3>
+                  
+                  {/* Resumen General de Deliverys */}
+                  <div className="delivery-summary">
+                    <div className="summary-card">
+                      <div className="summary-icon">📊</div>
+                      <div className="summary-content">
+                        <div className="summary-title">Total Deliverys</div>
+                        <div className="summary-value">{getDeliveryOrders().length}</div>
+                      </div>
+                    </div>
+                    <div className="summary-card">
+                      <div className="summary-icon">💰</div>
+                      <div className="summary-content">
+                        <div className="summary-title">Ingresos Totales</div>
+                        <div className="summary-value">{formatCurrency(getTotalAmount(getDeliveryOrders()))}</div>
+                      </div>
+                    </div>
+                    <div className="summary-card">
+                      <div className="summary-icon">📈</div>
+                      <div className="summary-content">
+                        <div className="summary-title">Ticket Promedio</div>
+                        <div className="summary-value">
+                          {getDeliveryOrders().length > 0 
+                            ? formatCurrency(getTotalAmount(getDeliveryOrders()) / getDeliveryOrders().length)
+                            : formatCurrency(0)
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Métodos de Pago de Deliverys */}
                   <div className="delivery-methods-grid">
                     {getDeliveryPaymentMethods().map((method: PaymentMethod) => {
                       const totalAmount = getTotalAmount(getDeliveryOrders());
                       const percentage = totalAmount > 0 ? (method.total_amount / totalAmount) * 100 : 0;
+                      const avgTicket = method.total_orders > 0 ? method.total_amount / method.total_orders : 0;
                       
                       return (
                         <div key={method.id} className="delivery-method-card">
@@ -894,24 +927,112 @@ const FinancialReports: React.FC = () => {
                               {method.icon}
                             </div>
                             <div className="method-name">{method.name}</div>
+                            <div className="method-percentage">{percentage.toFixed(1)}%</div>
                           </div>
                           <div className="method-stats">
-                            <div className="stat-item">
-                              <span className="stat-label">Deliverys</span>
-                              <span className="stat-value">{method.total_orders}</span>
+                            <div className="stat-row">
+                              <div className="stat-item">
+                                <span className="stat-label">Deliverys</span>
+                                <span className="stat-value">{method.total_orders}</span>
+                              </div>
+                              <div className="stat-item">
+                                <span className="stat-label">Total</span>
+                                <span className="stat-value">{formatCurrency(method.total_amount)}</span>
+                              </div>
                             </div>
-                            <div className="stat-item">
-                              <span className="stat-label">Total</span>
-                              <span className="stat-value">{formatCurrency(method.total_amount)}</span>
+                            <div className="stat-row">
+                              <div className="stat-item">
+                                <span className="stat-label">Ticket Promedio</span>
+                                <span className="stat-value">{formatCurrency(avgTicket)}</span>
+                              </div>
+                              <div className="stat-item">
+                                <span className="stat-label">Participación</span>
+                                <span className="stat-value">{percentage.toFixed(1)}%</span>
+                              </div>
                             </div>
-                            <div className="stat-item">
-                              <span className="stat-label">%</span>
-                              <span className="stat-value">{percentage.toFixed(1)}%</span>
-                            </div>
+                          </div>
+                          <div className="method-progress">
+                            <div 
+                              className="progress-bar" 
+                              style={{ 
+                                width: `${percentage}%`,
+                                backgroundColor: method.color 
+                              }}
+                            ></div>
                           </div>
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Análisis Detallado de Deliverys */}
+                  <div className="delivery-analysis">
+                    <h4>📋 Análisis Detallado de Deliverys</h4>
+                    <div className="analysis-grid">
+                      <div className="analysis-card">
+                        <div className="analysis-title">🏆 Método Más Popular</div>
+                        <div className="analysis-content">
+                          {(() => {
+                            const methods = getDeliveryPaymentMethods();
+                            const mostPopular = methods.reduce((max, method) => 
+                              method.total_orders > max.total_orders ? method : max, methods[0] || { total_orders: 0, name: 'N/A' }
+                            );
+                            return (
+                              <div>
+                                <div className="analysis-value">{mostPopular.name}</div>
+                                <div className="analysis-detail">{mostPopular.total_orders} deliverys</div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                      
+                      <div className="analysis-card">
+                        <div className="analysis-title">💰 Método Más Rentable</div>
+                        <div className="analysis-content">
+                          {(() => {
+                            const methods = getDeliveryPaymentMethods();
+                            const mostProfitable = methods.reduce((max, method) => 
+                              method.total_amount > max.total_amount ? method : max, methods[0] || { total_amount: 0, name: 'N/A' }
+                            );
+                            return (
+                              <div>
+                                <div className="analysis-value">{mostProfitable.name}</div>
+                                <div className="analysis-detail">{formatCurrency(mostProfitable.total_amount)}</div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                      
+                      <div className="analysis-card">
+                        <div className="analysis-title">📊 Distribución</div>
+                        <div className="analysis-content">
+                          <div className="distribution-chart">
+                            {getDeliveryPaymentMethods().map((method: PaymentMethod) => {
+                              const percentage = getTotalAmount(getDeliveryOrders()) > 0 
+                                ? (method.total_amount / getTotalAmount(getDeliveryOrders())) * 100 
+                                : 0;
+                              return (
+                                <div key={method.id} className="distribution-item">
+                                  <div className="distribution-label">{method.name}</div>
+                                  <div className="distribution-bar">
+                                    <div 
+                                      className="distribution-fill" 
+                                      style={{ 
+                                        width: `${percentage}%`,
+                                        backgroundColor: method.color 
+                                      }}
+                                    ></div>
+                                  </div>
+                                  <div className="distribution-percentage">{percentage.toFixed(1)}%</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
