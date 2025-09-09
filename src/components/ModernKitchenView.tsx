@@ -160,15 +160,18 @@ const ModernKitchenView: React.FC = () => {
     return orders.filter(filterByTab).sort(sortByPriority);
   };
 
-  // Formatear tiempo transcurrido
-  const formatElapsedTime = (minutes: number): string => {
-    if (minutes < 60) {
-      return `${minutes.toString().padStart(2, '0')}:00`;
-    } else {
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      return `${hours}:${mins.toString().padStart(2, '0')}:00`;
-    }
+  // Formatear tiempo transcurrido (copiado de KitchenView.tsx)
+  const formatElapsedTime = (dateString: string | Date): string => {
+    const now = new Date();
+    const orderTime = new Date(dateString);
+    const diffMs = now.getTime() - orderTime.getTime();
+    const diffSeconds = Math.floor(diffMs / 1000);
+    
+    const hours = Math.floor(diffSeconds / 3600);
+    const minutes = Math.floor((diffSeconds % 3600) / 60);
+    const seconds = diffSeconds % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
 
@@ -342,7 +345,7 @@ const ModernKitchenView: React.FC = () => {
             <div className="timer-section">
               <div className="timer-info">
                 <span className="timer-icon">⏱️</span>
-                <span className="timer-display">{formatElapsedTime(order.elapsedMinutes)}</span>
+                <span className="timer-display">{formatElapsedTime(order.createdAt)}</span>
               </div>
               <div className="urgency-info">
                 <div className={`urgency-dot ${getTimeStatusClass(order.elapsedMinutes)}`}></div>
@@ -373,9 +376,6 @@ const ModernKitchenView: React.FC = () => {
                   {/* Notas y Modificadores */}
                   {(item.notes || (item.modifiers && item.modifiers.length > 0)) && (
                     <div className="item-notes">
-                      <div className="notes-header">
-                        <span className="notes-icon">📝</span>
-                      </div>
                       <div className="notes-text">
                         {item.notes && <div>{item.notes}</div>}
                         {item.modifiers && item.modifiers.length > 0 && (
