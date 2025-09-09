@@ -142,6 +142,24 @@ const FinancialReports: React.FC = () => {
     return data.length;
   };
 
+  // Función para calcular el total original de los items de una orden
+  const getOriginalTotal = (order: Order): number => {
+    if (!order.items || !Array.isArray(order.items)) {
+      return order.totalAmount || 0;
+    }
+    
+    return order.items.reduce((total, item) => {
+      return total + (item.totalprice || 0);
+    }, 0);
+  };
+
+  // Función para verificar si el precio fue modificado
+  const isPriceModified = (order: Order): boolean => {
+    const originalTotal = getOriginalTotal(order);
+    const currentTotal = order.totalAmount || 0;
+    return Math.abs(originalTotal - currentTotal) > 0.01; // Tolerancia para decimales
+  };
+
   // Funciones para separar deliveries y pedidos
   const getDeliveryOrders = () => {
     return allOrders.filter(order => order.isDelivery === true);
@@ -621,10 +639,11 @@ const FinancialReports: React.FC = () => {
                   return (
                     <div className="combo-details">
                       <div className="combo-price">
-                        {order.totalAmount !== item.totalprice ? (
+                        {/* Solo mostrar diferencia de precios para pedidos (no deliveries) */}
+                        {!order.isDelivery && isPriceModified(order) ? (
                           <>
-                            <div className="item-price">Item: {formatCurrency(item.totalprice || 0)}</div>
-                            <div className="order-total">Total Orden: {formatCurrency(order.totalAmount || 0)}</div>
+                            <div className="item-price">Total Original: {formatCurrency(getOriginalTotal(order))}</div>
+                            <div className="order-total">Total Actualizado: {formatCurrency(order.totalAmount || 0)}</div>
                           </>
                         ) : (
                           <div>Total: {formatCurrency(item.totalprice || 0)}</div>
@@ -954,6 +973,40 @@ const FinancialReports: React.FC = () => {
                         </div>
                       );
                     })}
+                  </div>
+                  
+                  {/* Resumen de precios modificados */}
+                  <div className="price-modification-summary">
+                    <h4>💰 Resumen de Precios Modificados</h4>
+                    <div className="price-summary-grid">
+                      <div className="price-summary-card">
+                        <div className="summary-icon">📊</div>
+                        <div className="summary-content">
+                          <div className="summary-label">Total Original</div>
+                          <div className="summary-value">
+                            {formatCurrency(getOrdersOnly().reduce((total, order) => total + getOriginalTotal(order), 0))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="price-summary-card">
+                        <div className="summary-icon">💵</div>
+                        <div className="summary-content">
+                          <div className="summary-label">Total Actualizado</div>
+                          <div className="summary-value">
+                            {formatCurrency(getTotalAmount(getOrdersOnly()))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="price-summary-card">
+                        <div className="summary-icon">📈</div>
+                        <div className="summary-content">
+                          <div className="summary-label">Diferencia</div>
+                          <div className="summary-value">
+                            {formatCurrency(getTotalAmount(getOrdersOnly()) - getOrdersOnly().reduce((total, order) => total + getOriginalTotal(order), 0))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </>
