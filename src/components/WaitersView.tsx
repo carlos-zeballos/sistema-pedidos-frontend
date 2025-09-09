@@ -1122,8 +1122,6 @@ const WaitersView: React.FC = () => {
           setItemToModify(null);
         }}
         onAddToCart={handleComboModified}
-        isModification={true}
-        currentItem={itemToModify}
       />
     </div>
   );
