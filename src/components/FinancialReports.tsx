@@ -114,7 +114,7 @@ const FinancialReports: React.FC = () => {
     }
     
     return order.items.reduce((total, item) => {
-      return total + (item.totalprice || 0);
+      return total + (item.totalPrice || 0);
     }, 0);
   };
 
@@ -210,7 +210,7 @@ const FinancialReports: React.FC = () => {
           console.log(`   Item ${itemIndex + 1}:`, {
             name: item.name,
             quantity: item.quantity,
-            totalprice: item.totalprice,
+            totalprice: item.totalPrice,
             notes: item.notes
           });
           
@@ -226,7 +226,7 @@ const FinancialReports: React.FC = () => {
               };
             }
             productStats[key].quantity += item.quantity || 1;
-            productStats[key].totalAmount += item.totalprice || 0;
+            productStats[key].totalAmount += item.totalPrice || 0;
             productStats[key].orders += 1;
             
             console.log(`   ✅ Producto agregado: ${item.name} (${productStats[key].quantity} total)`);
@@ -591,7 +591,7 @@ const FinancialReports: React.FC = () => {
                 {item.name || 'Item sin nombre'}
               </div>
               <div className="item-price">
-                {formatCurrency(item.totalprice || 0)}
+                {formatCurrency(item.totalPrice || 0)}
               </div>
             </div>
             <div className="item-quantity">x{item.quantity}</div>
@@ -611,7 +611,7 @@ const FinancialReports: React.FC = () => {
                             <div className="order-total">Total Actualizado: {formatCurrency(order.totalAmount || 0)}</div>
                           </>
                         ) : (
-                          <div>Total: {formatCurrency(item.totalprice || 0)}</div>
+                          <div>Total: {formatCurrency(item.totalPrice || 0)}</div>
                         )}
                       </div>
                       <div className="combo-components">
