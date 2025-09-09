@@ -304,21 +304,31 @@ const FinancialReports: React.FC = () => {
             productStats[comboKey].orders += 1;
 
             // Analizar componentes del combo
-            if (item.selectedComponents) {
-              Object.entries(item.selectedComponents).forEach(([type, components]) => {
-                components.forEach(componentName => {
-                  const componentKey = `component_${type}_${componentName}`;
-                  if (!comboComponentStats[componentKey]) {
-                    comboComponentStats[componentKey] = {
-                      name: `${componentName} (${type})`,
-                      quantity: 0,
-                      usage: 0
-                    };
-                  }
-                  comboComponentStats[componentKey].quantity += item.quantity;
-                  comboComponentStats[componentKey].usage += 1;
-                });
-              });
+            if (item.notes) {
+              try {
+                const notesData = JSON.parse(item.notes);
+                if (notesData.selectedComponents) {
+                  Object.entries(notesData.selectedComponents).forEach(([type, components]: [string, any]) => {
+                    if (Array.isArray(components)) {
+                      components.forEach((component: any) => {
+                        const componentName = component.name || component;
+                        const componentKey = `component_${type}_${componentName}`;
+                        if (!comboComponentStats[componentKey]) {
+                          comboComponentStats[componentKey] = {
+                            name: `${componentName} (${type})`,
+                            quantity: 0,
+                            usage: 0
+                          };
+                        }
+                        comboComponentStats[componentKey].quantity += item.quantity;
+                        comboComponentStats[componentKey].usage += 1;
+                      });
+                    }
+                  });
+                }
+              } catch (error) {
+                console.warn('Error parsing combo notes:', error);
+              }
             }
           }
         });
