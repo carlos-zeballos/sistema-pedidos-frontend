@@ -65,6 +65,8 @@ const ReportsView: React.FC = () => {
   const [ordersTotal, setOrdersTotal] = useState(0);
   const [ordersPage, setOrdersPage] = useState(1);
   const [ordersLimit] = useState(50);
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+  const [showBulkDelete, setShowBulkDelete] = useState(false);
 
   // Filtros
   const [filters, setFilters] = useState<ReportsFilters>({
@@ -150,6 +152,61 @@ const ReportsView: React.FC = () => {
       loadData();
     } catch (err: any) {
       alert(`Error: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
+  const handleSelectOrder = (orderId: string) => {
+    const newSelected = new Set(selectedOrders);
+    if (newSelected.has(orderId)) {
+      newSelected.delete(orderId);
+    } else {
+      newSelected.add(orderId);
+    }
+    setSelectedOrders(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedOrders.size === ordersData.length) {
+      setSelectedOrders(new Set());
+    } else {
+      setSelectedOrders(new Set(ordersData.map(order => order.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedOrders.size === 0) {
+      alert('No hay órdenes seleccionadas para eliminar');
+      return;
+    }
+
+    const orderNumbers = ordersData
+      .filter(order => selectedOrders.has(order.id))
+      .map(order => order.orderNumber)
+      .join(', ');
+
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar ${selectedOrders.size} órdenes?\n\nÓrdenes: ${orderNumbers}`)) {
+      return;
+    }
+
+    const reason = prompt('Motivo de eliminación masiva (opcional):') || 'Eliminación masiva por administrador';
+
+    try {
+      const deletePromises = Array.from(selectedOrders).map(orderId =>
+        api.delete(`/reports/orders/${orderId}`, {
+          data: { reason }
+        })
+      );
+
+      await Promise.all(deletePromises);
+      
+      alert(`${selectedOrders.size} órdenes eliminadas exitosamente`);
+      setSelectedOrders(new Set());
+      setShowBulkDelete(false);
+      
+      // Recargar datos
+      loadData();
+    } catch (err: any) {
+      alert(`Error al eliminar órdenes: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -425,11 +482,43 @@ const ReportsView: React.FC = () => {
             {/* Pestaña Ventas Totales */}
             {activeTab === 'orders' && (
               <div className="orders-tab">
-                <h2>📋 Ventas Totales</h2>
+                <div className="orders-header">
+                  <h2>📋 Ventas Totales</h2>
+                  <div className="bulk-actions">
+                    {selectedOrders.size > 0 && (
+                      <div className="bulk-actions-bar">
+                        <span className="selected-count">
+                          {selectedOrders.size} órdenes seleccionadas
+                        </span>
+                        <button
+                          className="bulk-delete-btn"
+                          onClick={handleBulkDelete}
+                        >
+                          <Trash2 size={16} />
+                          Eliminar Seleccionadas
+                        </button>
+                        <button
+                          className="clear-selection-btn"
+                          onClick={() => setSelectedOrders(new Set())}
+                        >
+                          Limpiar Selección
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <div className="orders-table-container">
                   <table className="orders-table">
                     <thead>
                       <tr>
+                        <th>
+                          <input
+                            type="checkbox"
+                            checked={selectedOrders.size === ordersData.length && ordersData.length > 0}
+                            onChange={handleSelectAll}
+                            title="Seleccionar todas"
+                          />
+                        </th>
                         <th>Orden</th>
                         <th>Fecha</th>
                         <th>Espacio</th>
@@ -445,7 +534,15 @@ const ReportsView: React.FC = () => {
                     </thead>
                     <tbody>
                       {ordersData.map((order) => (
-                        <tr key={order.id}>
+                        <tr key={order.id} className={selectedOrders.has(order.id) ? 'selected' : ''}>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={selectedOrders.has(order.id)}
+                              onChange={() => handleSelectOrder(order.id)}
+                              title="Seleccionar orden"
+                            />
+                          </td>
                           <td>{order.orderNumber}</td>
                           <td>{formatDate(order.createdAt)}</td>
                           <td>{order.spaceCode}</td>
