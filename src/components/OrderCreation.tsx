@@ -30,10 +30,22 @@ interface ProductOrCombo {
 
 // Función helper para obtener precio seguro
 const getSafePrice = (item: Product | ProductOrCombo): number => {
+  console.log('🔍 getSafePrice called with:', {
+    itemName: item.name,
+    hasComboComponent: 'ComboComponent' in item,
+    productPrice: (item as Product).price,
+    basePrice: (item as ProductOrCombo).basePrice,
+    itemKeys: Object.keys(item)
+  });
+  
   if ('ComboComponent' in item) {
-    return (item as ProductOrCombo).basePrice || 0;
+    const price = (item as ProductOrCombo).basePrice || 0;
+    console.log('🍱 Combo price calculated:', price);
+    return price;
   }
-  return (item as Product).price || 0;
+  const price = (item as Product).price || 0;
+  console.log('🍽️ Product price calculated:', price);
+  return price;
 };
 
 interface CartItem {
@@ -465,6 +477,17 @@ const OrderCreation: React.FC = () => {
         items: cart.map(item => {
           const isCombo = item.product.id.startsWith('combo-');
           const price = getSafePrice(item.product);
+          
+          console.log('🔍 Debugging item price calculation:', {
+            itemName: item.product.name,
+            isCombo,
+            productId: item.product.id,
+            productPrice: item.product.price,
+            basePrice: item.product.basePrice,
+            calculatedPrice: price,
+            quantity: item.quantity,
+            totalPrice: price * item.quantity
+          });
           
           return {
             productId: isCombo ? null : item.product.id.replace('combo-', ''),

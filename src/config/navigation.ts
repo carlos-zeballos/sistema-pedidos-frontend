@@ -5,9 +5,9 @@ import {
   ChefHat, 
   BookOpen, 
   Square, 
-  BarChart3, 
   Settings,
-  Package
+  Package,
+  BarChart3
 } from 'lucide-react';
 
 export interface NavItem {
@@ -80,7 +80,7 @@ export const navigationConfig: NavItem[] = [
     label: 'Reportes',
     icon: BarChart3,
     roles: ['ADMIN'],
-    description: 'Reportes y estadísticas'
+    description: 'Reportes de ventas y pagos'
   },
   {
     path: '/test',
@@ -146,8 +146,8 @@ export const quickActions = [
     label: 'Reportes',
     icon: BarChart3,
     roles: ['ADMIN'],
-    description: 'Reportes y estadísticas'
-  }
+    description: 'Reportes de ventas y pagos'
+  },
 ];
 
 export const getNavigationForRole = (role: string): NavItem[] => {

@@ -108,3 +108,4 @@ console.log('3. Hay un error en el renderizado');
 console.log('4. Los productos están siendo filtrados incorrectamente');
 
 
+

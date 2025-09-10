@@ -8,11 +8,11 @@ import TestOrderCreation from './components/TestOrderCreation';
 import OrdersManagement from './components/OrdersManagement';
 import KitchenView from './components/KitchenView';
 import WaitersView from './components/WaitersView';
-import ReportsView from './components/ReportsView';
 import Catalog from './components/Catalog';
 import CatalogManagement from './components/CatalogManagementNew';
 import ComboManagement from './components/ComboManagement';
 import TablesManagement from './components/TablesManagement';
+import ReportsView from './components/ReportsView';
 import ConnectionTest from './components/ConnectionTest';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import './App.css';
@@ -121,16 +121,6 @@ function AppContent() {
             } 
           />
           
-          <Route 
-            path="/reports" 
-            element={
-              <ProtectedRoute requiredRole="ADMIN">
-                <AppShell>
-                  <ReportsView />
-                </AppShell>
-              </ProtectedRoute>
-            } 
-          />
           
           <Route 
             path="/catalog" 
@@ -171,6 +161,17 @@ function AppContent() {
               <ProtectedRoute requiredRole="ADMIN">
                 <AppShell>
                   <TablesManagement />
+                </AppShell>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/reports" 
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <AppShell>
+                  <ReportsView />
                 </AppShell>
               </ProtectedRoute>
             } 

@@ -98,17 +98,6 @@ const Header: React.FC = () => {
               </Link>
             </li>
 
-            {user?.role === 'ADMIN' && (
-              <li className="nav-item">
-                <Link 
-                  to="/reports" 
-                  className={`nav-link ${isActive('/reports') ? 'active' : ''}`}
-                >
-                  <span className="nav-icon">📊</span>
-                  <span className="nav-text">Reportes</span>
-                </Link>
-              </li>
-            )}
 
             {user?.role === 'ADMIN' && (
               <li className="nav-item">
@@ -245,18 +234,6 @@ const Header: React.FC = () => {
               </Link>
             </li>
 
-            {user?.role === 'ADMIN' && (
-              <li className="mobile-nav-item">
-                <Link 
-                  to="/reports" 
-                  className={`mobile-nav-link ${isActive('/reports') ? 'active' : ''}`}
-                  onClick={toggleMobileMenu}
-                >
-                  <span className="mobile-nav-icon">📊</span>
-                  Reportes
-                </Link>
-              </li>
-            )}
 
             {user?.role === 'ADMIN' && (
               <li className="mobile-nav-item">

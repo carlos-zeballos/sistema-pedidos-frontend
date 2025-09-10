@@ -399,7 +399,7 @@ const OrdersManagement: React.FC = () => {
                   <h3>💰 Información Financiera</h3>
                   <div className="info-item">
                     <span className="label">Total Original:</span>
-                    <span className="value">S/ {(selectedOrder.items?.reduce((total, item) => total + (item.totalPrice || 0), 0) || 0).toFixed(2)}</span>
+                    <span className="value">S/ {(selectedOrder.items?.reduce((total, item) => total + ((item.unitPrice || 0) * (item.quantity || 1)), 0) || 0).toFixed(2)}</span>
                   </div>
                   <div className="info-item">
                     <span className="label">Total Actual:</span>

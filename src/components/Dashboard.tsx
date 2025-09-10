@@ -270,14 +270,6 @@ const Dashboard: React.FC = () => {
             <div className="action-description">Gestión de usuarios</div>
           </button>
 
-          <button 
-            className="action-card"
-            onClick={() => handleQuickAction('/reports')}
-          >
-            <div className="action-icon">📊</div>
-            <div className="action-title">Reportes</div>
-            <div className="action-description">Reportes y estadísticas</div>
-          </button>
         </div>
       </div>
 
