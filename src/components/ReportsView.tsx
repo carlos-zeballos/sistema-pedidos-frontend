@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Download, Trash2, Filter } from 'lucide-react';
+import api from '../services/api';
 import './ReportsView.css';
 
 interface PaymentMethodReport {
@@ -84,50 +85,42 @@ const ReportsView: React.FC = () => {
     setError(null);
 
     try {
-      const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No hay token de autenticación');
-      }
-
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-
       switch (activeTab) {
         case 'payments': {
-          const paymentsResponse = await fetch(
-            `${baseUrl}/reports/payments?from=${filters.from}&to=${filters.to}`,
-            { headers }
-          );
-          if (!paymentsResponse.ok) throw new Error('Error al cargar métodos de pago');
-          const paymentsData = await paymentsResponse.json();
-          setPaymentMethodsData(paymentsData);
+          const paymentsResponse = await api.get('/reports/payments', {
+            params: {
+              from: filters.from,
+              to: filters.to
+            }
+          });
+          setPaymentMethodsData(paymentsResponse.data);
           break;
         }
 
         case 'delivery': {
-          const deliveryResponse = await fetch(
-            `${baseUrl}/reports/delivery-payments?from=${filters.from}&to=${filters.to}`,
-            { headers }
-          );
-          if (!deliveryResponse.ok) throw new Error('Error al cargar pagos de delivery');
-          const deliveryData = await deliveryResponse.json();
-          setDeliveryPaymentsData(deliveryData);
+          const deliveryResponse = await api.get('/reports/delivery-payments', {
+            params: {
+              from: filters.from,
+              to: filters.to
+            }
+          });
+          setDeliveryPaymentsData(deliveryResponse.data);
           break;
         }
 
         case 'orders': {
-          const ordersResponse = await fetch(
-            `${baseUrl}/reports/orders?from=${filters.from}&to=${filters.to}&page=${ordersPage}&limit=${ordersLimit}`,
-            { headers }
-          );
-          if (!ordersResponse.ok) throw new Error('Error al cargar órdenes');
-          const ordersResult = await ordersResponse.json();
-          setOrdersData(ordersResult.orders);
-          setOrdersTotal(ordersResult.total);
+          const ordersResponse = await api.get('/reports/orders', {
+            params: {
+              from: filters.from,
+              to: filters.to,
+              page: ordersPage,
+              limit: ordersLimit,
+              status: filters.status,
+              spaceType: filters.spaceType
+            }
+          });
+          setOrdersData(ordersResponse.data.orders);
+          setOrdersTotal(ordersResponse.data.total);
           break;
         }
       }
@@ -147,47 +140,29 @@ const ReportsView: React.FC = () => {
     const reason = prompt('Motivo de eliminación (opcional):') || 'Eliminado por administrador';
 
     try {
-      const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(`${baseUrl}/reports/orders/${orderId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ reason })
+      const response = await api.delete(`/reports/orders/${orderId}`, {
+        data: { reason }
       });
 
-      if (!response.ok) throw new Error('Error al eliminar la orden');
-
-      const result = await response.json();
-      alert(result.message);
+      alert(response.data.message);
       
       // Recargar datos
       loadData();
     } catch (err: any) {
-      alert(`Error: ${err.message}`);
+      alert(`Error: ${err.response?.data?.message || err.message}`);
     }
   };
 
   const handleExport = async () => {
     try {
-      const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(
-        `${baseUrl}/reports/export/orders?from=${filters.from}&to=${filters.to}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+      const response = await api.get('/reports/export/orders', {
+        params: {
+          from: filters.from,
+          to: filters.to
         }
-      );
+      });
 
-      if (!response.ok) throw new Error('Error al exportar datos');
-
-      const result = await response.json();
+      const result = response.data;
       
       // Descargar archivo CSV
       const blob = new Blob([result.csv], { type: 'text/csv' });
@@ -200,7 +175,7 @@ const ReportsView: React.FC = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err: any) {
-      alert(`Error al exportar: ${err.message}`);
+      alert(`Error al exportar: ${err.response?.data?.message || err.message}`);
     }
   };
 
