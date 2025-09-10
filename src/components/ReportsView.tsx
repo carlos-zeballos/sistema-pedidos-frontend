@@ -406,6 +406,7 @@ const ReportsView: React.FC = () => {
                     </div>
                   ))}
                 </div>
+                )}
               </div>
             )}
 
