@@ -159,12 +159,12 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
             {combo?.components && Object.keys(combo.components).length > 0 && (
               <div className="combo-section">
                 <h4>🍽️ Componentes del Combo</h4>
-                {Object.entries(combo.components).map(([category, components]: [string, any]) => (
+                {Object.entries(combo.components || {}).map(([category, components]: [string, any]) => (
                   <div key={category} className="category-section">
                     <h5 className="category-title">{category}</h5>
                     <div className="components-grid">
                       {Array.isArray(components) && components.map((component: any) => {
-                        const currentComponent = modifiedData.selectedComponents[category]?.find(
+                        const currentComponent = modifiedData.selectedComponents?.[category]?.find(
                           comp => comp.name === component.name
                         );
                         const currentQuantity = currentComponent?.quantity || 0;
@@ -206,7 +206,7 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                 <h4>🌶️ Salsas</h4>
                 <div className="sauces-grid">
                   {combo.sauces.map((sauce: any) => {
-                    const currentSauce = modifiedData.selectedSauces.find(s => s.name === sauce.name);
+                    const currentSauce = modifiedData.selectedSauces?.find(s => s.name === sauce.name);
                     const currentQuantity = currentSauce?.quantity || 0;
                     
                     return (
@@ -305,23 +305,33 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                 <div className="summary-item">
                   <strong>Componentes seleccionados:</strong>
                   <ul>
-                    {Object.entries(modifiedData.selectedComponents).map(([category, components]) => 
-                      components.map((comp) => (
-                        <li key={`${category}-${comp.name}`}>
-                          {comp.name} (x{comp.quantity}) - {category}
-                        </li>
-                      ))
+                    {modifiedData.selectedComponents && Object.keys(modifiedData.selectedComponents).length > 0 ? (
+                      Object.entries(modifiedData.selectedComponents).map(([category, components]) => 
+                        Array.isArray(components) && components.length > 0 ? (
+                          components.map((comp) => (
+                            <li key={`${category}-${comp.name}`}>
+                              {comp.name} (x{comp.quantity}) - {category}
+                            </li>
+                          ))
+                        ) : null
+                      )
+                    ) : (
+                      <li>No hay componentes seleccionados</li>
                     )}
                   </ul>
                 </div>
                 <div className="summary-item">
                   <strong>Salsas:</strong>
                   <ul>
-                    {modifiedData.selectedSauces.map((sauce) => (
-                      <li key={sauce.name}>
-                        {sauce.name} (x{sauce.quantity})
-                      </li>
-                    ))}
+                    {modifiedData.selectedSauces && modifiedData.selectedSauces.length > 0 ? (
+                      modifiedData.selectedSauces.map((sauce) => (
+                        <li key={sauce.name}>
+                          {sauce.name} (x{sauce.quantity})
+                        </li>
+                      ))
+                    ) : (
+                      <li>No hay salsas seleccionadas</li>
+                    )}
                   </ul>
                 </div>
                 <div className="summary-item">
