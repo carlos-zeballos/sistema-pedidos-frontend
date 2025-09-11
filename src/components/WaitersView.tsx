@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { orderService, catalogService, tableService } from '../services/api';
 import { Order, Product } from '../types';
 import ComboCustomizationModal, { CustomizedCombo } from './ComboCustomizationModal';
+import ComboModificationModal from './ComboModificationModal';
 import PaymentMethodModal from './PaymentMethodModal';
 import DeliveryPaymentModal from './DeliveryPaymentModal';
 import './WaitersView.css';
@@ -36,6 +37,11 @@ const WaitersView: React.FC = () => {
   const [modifyComboModalOpen, setModifyComboModalOpen] = useState(false);
   const [comboToModify, setComboToModify] = useState<any>(null);
   const [itemToModify, setItemToModify] = useState<any>(null);
+  
+  // Estado para el nuevo modal de modificación visual
+  const [visualComboModifyOpen, setVisualComboModifyOpen] = useState(false);
+  const [comboToModifyVisual, setComboToModifyVisual] = useState<any>(null);
+  const [comboDataToModify, setComboDataToModify] = useState<any>(null);
 
   useEffect(() => {
     loadOrders();
@@ -368,35 +374,71 @@ const WaitersView: React.FC = () => {
       }
 
       // Parsear las notas existentes para obtener la configuración actual
-      let currentComponents = {};
-      let currentSauces = [];
-      let currentNotes = '';
+      let comboData = {
+        selectedComponents: {},
+        selectedSauces: [],
+        normalChopsticks: 0,
+        assistedChopsticks: 0,
+        comboType: 'existing',
+        itemNotes: ''
+      };
 
       if (item.notes) {
         try {
           const notesData = JSON.parse(item.notes);
-          currentComponents = notesData.selectedComponents || {};
-          currentSauces = notesData.selectedSauces || [];
-          currentNotes = notesData.itemNotes || '';
+          comboData = {
+            selectedComponents: notesData.selectedComponents || {},
+            selectedSauces: notesData.selectedSauces || [],
+            normalChopsticks: notesData.normalChopsticks || 0,
+            assistedChopsticks: notesData.assistedChopsticks || 0,
+            comboType: notesData.comboType || 'existing',
+            itemNotes: notesData.itemNotes || ''
+          };
         } catch (error) {
           console.log('Error parseando notas del item:', error);
+          // Si no se puede parsear, usar las notas como texto plano
+          comboData.itemNotes = item.notes;
         }
       }
 
-      // Configurar el combo con los datos actuales
-      const comboWithCurrentData = {
-        ...combo,
-        currentComponents,
-        currentSauces,
-        currentNotes
-      };
-
-      setComboToModify(comboWithCurrentData);
-      setItemToModify(item);
-      setModifyComboModalOpen(true);
+      setComboToModifyVisual(combo);
+      setComboDataToModify(comboData);
+      setVisualComboModifyOpen(true);
     } catch (error: any) {
       console.error('Error preparando modificación de combo:', error);
       alert('Error al preparar la modificación del combo');
+    }
+  };
+
+  // Función para manejar la modificación visual del combo
+  const handleVisualComboModified = async (modifiedData: any) => {
+    try {
+      if (!itemToModify) {
+        alert('Error: No hay item seleccionado para modificar');
+        return;
+      }
+
+      // Preparar los datos del item modificado
+      const modifiedItemData = {
+        notes: JSON.stringify(modifiedData)
+      };
+
+      // Actualizar el item en la orden
+      await orderService.updateOrderItem(itemToModify.id, modifiedItemData);
+      
+      // Cerrar modal y limpiar estado
+      setVisualComboModifyOpen(false);
+      setComboToModifyVisual(null);
+      setComboDataToModify(null);
+      setItemToModify(null);
+      
+      // Recargar órdenes
+      await loadOrders();
+      
+      alert('¡Combo modificado exitosamente!');
+    } catch (err: any) {
+      console.error('Error modifying combo:', err);
+      alert('Error al modificar el combo: ' + (err.message || 'Error desconocido'));
     }
   };
 
@@ -1122,6 +1164,21 @@ const WaitersView: React.FC = () => {
           setItemToModify(null);
         }}
         onAddToCart={handleComboModified}
+      />
+
+      {/* Modal de modificación visual de combo */}
+      <ComboModificationModal
+        isOpen={visualComboModifyOpen}
+        onClose={() => {
+          setVisualComboModifyOpen(false);
+          setComboToModifyVisual(null);
+          setComboDataToModify(null);
+          setItemToModify(null);
+        }}
+        onSave={handleVisualComboModified}
+        comboName={comboToModifyVisual?.name || 'Combo'}
+        currentData={comboDataToModify || {}}
+        comboId={comboToModifyVisual?.id || ''}
       />
     </div>
   );
