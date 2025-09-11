@@ -424,7 +424,7 @@ const WaitersView: React.FC = () => {
       };
 
       // Actualizar el item en la orden
-      await orderService.updateOrderItem(itemToModify.id, modifiedItemData);
+      await orderService.modifyItemInOrder(selectedOrder?.id || '', itemToModify.id, modifiedItemData);
       
       // Cerrar modal y limpiar estado
       setVisualComboModifyOpen(false);
