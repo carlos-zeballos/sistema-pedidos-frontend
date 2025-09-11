@@ -80,29 +80,83 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
     }
   };
 
-  const handleComponentQuantityChange = (category: string, componentIndex: number, newQuantity: number) => {
+  const handleComponentQuantityChange = (category: string, componentName: string, newQuantity: number) => {
     if (newQuantity < 0) return;
     
-    setModifiedData(prev => ({
-      ...prev,
-      selectedComponents: {
-        ...prev.selectedComponents,
-        [category]: prev.selectedComponents[category]?.map((comp, index) => 
-          index === componentIndex ? { ...comp, quantity: newQuantity } : comp
-        ) || []
+    setModifiedData(prev => {
+      const currentComponents = prev.selectedComponents || {};
+      const categoryComponents = currentComponents[category] || [];
+      
+      // Buscar si el componente ya existe
+      const existingComponentIndex = categoryComponents.findIndex(comp => comp.name === componentName);
+      
+      if (existingComponentIndex >= 0) {
+        // Si el componente ya existe, actualizar su cantidad
+        const updatedComponents = [...categoryComponents];
+        updatedComponents[existingComponentIndex] = {
+          ...updatedComponents[existingComponentIndex],
+          quantity: newQuantity
+        };
+        
+        return {
+          ...prev,
+          selectedComponents: {
+            ...currentComponents,
+            [category]: updatedComponents
+          }
+        };
+      } else {
+        // Si el componente no existe, agregarlo
+        const newComponent = {
+          name: componentName,
+          quantity: newQuantity
+        };
+        
+        return {
+          ...prev,
+          selectedComponents: {
+            ...currentComponents,
+            [category]: [...categoryComponents, newComponent]
+          }
+        };
       }
-    }));
+    });
   };
 
-  const handleSauceQuantityChange = (sauceIndex: number, newQuantity: number) => {
+  const handleSauceQuantityChange = (sauceName: string, newQuantity: number) => {
     if (newQuantity < 0) return;
     
-    setModifiedData(prev => ({
-      ...prev,
-      selectedSauces: prev.selectedSauces.map((sauce, index) => 
-        index === sauceIndex ? { ...sauce, quantity: newQuantity } : sauce
-      )
-    }));
+    setModifiedData(prev => {
+      const currentSauces = prev.selectedSauces || [];
+      
+      // Buscar si la salsa ya existe
+      const existingSauceIndex = currentSauces.findIndex(sauce => sauce.name === sauceName);
+      
+      if (existingSauceIndex >= 0) {
+        // Si la salsa ya existe, actualizar su cantidad
+        const updatedSauces = [...currentSauces];
+        updatedSauces[existingSauceIndex] = {
+          ...updatedSauces[existingSauceIndex],
+          quantity: newQuantity
+        };
+        
+        return {
+          ...prev,
+          selectedSauces: updatedSauces
+        };
+      } else {
+        // Si la salsa no existe, agregarla
+        const newSauce = {
+          name: sauceName,
+          quantity: newQuantity
+        };
+        
+        return {
+          ...prev,
+          selectedSauces: [...currentSauces, newSauce]
+        };
+      }
+    });
   };
 
   const handleChopsticksChange = (type: 'normal' | 'assisted', quantity: number) => {
@@ -177,7 +231,7 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                             </div>
                             <div className="quantity-controls">
                               <button
-                                onClick={() => handleComponentQuantityChange(category, components.findIndex((c: any) => c.name === component.name), currentQuantity - 1)}
+                                onClick={() => handleComponentQuantityChange(category, component.name, currentQuantity - 1)}
                                 className="qty-btn qty-decrease"
                                 disabled={currentQuantity <= 0}
                               >
@@ -185,7 +239,7 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                               </button>
                               <span className="qty-display">{currentQuantity}</span>
                               <button
-                                onClick={() => handleComponentQuantityChange(category, components.findIndex((c: any) => c.name === component.name), currentQuantity + 1)}
+                                onClick={() => handleComponentQuantityChange(category, component.name, currentQuantity + 1)}
                                 className="qty-btn qty-increase"
                               >
                                 +
@@ -217,7 +271,7 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                         </div>
                         <div className="quantity-controls">
                           <button
-                            onClick={() => handleSauceQuantityChange(combo.sauces.findIndex((s: any) => s.name === sauce.name), currentQuantity - 1)}
+                            onClick={() => handleSauceQuantityChange(sauce.name, currentQuantity - 1)}
                             className="qty-btn qty-decrease"
                             disabled={currentQuantity <= 0}
                           >
@@ -225,7 +279,7 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                           </button>
                           <span className="qty-display">{currentQuantity}</span>
                           <button
-                            onClick={() => handleSauceQuantityChange(combo.sauces.findIndex((s: any) => s.name === sauce.name), currentQuantity + 1)}
+                            onClick={() => handleSauceQuantityChange(sauce.name, currentQuantity + 1)}
                             className="qty-btn qty-increase"
                           >
                             +
