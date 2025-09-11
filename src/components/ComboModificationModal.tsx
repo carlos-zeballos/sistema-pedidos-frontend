@@ -45,6 +45,13 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
   const [modifiedData, setModifiedData] = useState<ComboData>(currentData);
   const [error, setError] = useState<string | null>(null);
 
+  console.log('🎭 ComboModificationModal - Props recibidas:', {
+    isOpen,
+    comboName,
+    comboId,
+    currentData
+  });
+
   useEffect(() => {
     if (isOpen && comboId) {
       loadComboData();
@@ -59,13 +66,15 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
 
   const loadComboData = async () => {
     try {
+      console.log('🔄 ComboModificationModal - Cargando datos del combo:', comboId);
       setLoading(true);
       setError(null);
       const comboData = await catalogService.getComboById(comboId);
+      console.log('✅ ComboModificationModal - Datos del combo cargados:', comboData);
       setCombo(comboData);
     } catch (err: any) {
+      console.error('❌ ComboModificationModal - Error loading combo:', err);
       setError('Error al cargar datos del combo: ' + err.message);
-      console.error('Error loading combo:', err);
     } finally {
       setLoading(false);
     }
@@ -117,8 +126,14 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
     onClose();
   };
 
-  if (!isOpen) return null;
+  console.log('🎨 ComboModificationModal - Renderizando modal, isOpen:', isOpen);
 
+  if (!isOpen) {
+    console.log('🚫 ComboModificationModal - Modal cerrado, no renderizando');
+    return null;
+  }
+
+  console.log('✅ ComboModificationModal - Renderizando modal abierto');
   return (
     <div className="combo-modification-overlay">
       <div className="combo-modification-modal">

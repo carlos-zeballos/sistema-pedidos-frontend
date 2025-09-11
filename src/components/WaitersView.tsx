@@ -366,9 +366,16 @@ const WaitersView: React.FC = () => {
   // Función para modificar un combo existente
   const modifyComboItem = async (order: Order, item: any) => {
     try {
+      console.log('🔧 modifyComboItem - Iniciando modificación de combo');
+      console.log('📋 Item:', item);
+      console.log('📋 Order:', order);
+      
       // Buscar el combo en la lista de combos
       const combo = combos.find(c => c.id === item.comboId);
+      console.log('🍱 Combo encontrado:', combo);
+      
       if (!combo) {
+        console.error('❌ Combo no encontrado para ID:', item.comboId);
         alert('Combo no encontrado');
         return;
       }
@@ -394,18 +401,21 @@ const WaitersView: React.FC = () => {
             comboType: notesData.comboType || 'existing',
             itemNotes: notesData.itemNotes || ''
           };
+          console.log('✅ Datos del combo parseados:', comboData);
         } catch (error) {
-          console.log('Error parseando notas del item:', error);
+          console.log('⚠️ Error parseando notas del item:', error);
           // Si no se puede parsear, usar las notas como texto plano
           comboData.itemNotes = item.notes;
         }
       }
 
+      console.log('🎯 Configurando estado del modal...');
       setComboToModifyVisual(combo);
       setComboDataToModify(comboData);
       setVisualComboModifyOpen(true);
+      console.log('✅ Modal de modificación de combo abierto');
     } catch (error: any) {
-      console.error('Error preparando modificación de combo:', error);
+      console.error('❌ Error preparando modificación de combo:', error);
       alert('Error al preparar la modificación del combo');
     }
   };
