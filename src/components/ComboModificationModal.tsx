@@ -89,12 +89,27 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
   const handleComponentQuantityChange = (category: string, componentName: string, newQuantity: number) => {
     if (newQuantity < 0) return;
     
+    console.log('🔧 handleComponentQuantityChange - Parámetros:', {
+      category,
+      componentName,
+      newQuantity
+    });
+    
     setModifiedData(prev => {
+      console.log('🔧 handleComponentQuantityChange - Estado previo:', prev);
+      
       const currentComponents = prev.selectedComponents || {};
       const categoryComponents = currentComponents[category] || [];
       
+      console.log('🔧 handleComponentQuantityChange - Componentes actuales:', {
+        currentComponents,
+        categoryComponents
+      });
+      
       // Buscar si el componente ya existe
       const existingComponentIndex = categoryComponents.findIndex(comp => comp.name === componentName);
+      
+      console.log('🔧 handleComponentQuantityChange - Índice encontrado:', existingComponentIndex);
       
       if (existingComponentIndex >= 0) {
         // Si el componente ya existe, actualizar su cantidad
@@ -104,13 +119,16 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
           quantity: newQuantity
         };
         
-        return {
+        const newState = {
           ...prev,
           selectedComponents: {
             ...currentComponents,
             [category]: updatedComponents
           }
         };
+        
+        console.log('🔧 handleComponentQuantityChange - Actualizando componente existente:', newState);
+        return newState;
       } else {
         // Si el componente no existe, agregarlo
         const newComponent = {
@@ -118,13 +136,16 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
           quantity: newQuantity
         };
         
-        return {
+        const newState = {
           ...prev,
           selectedComponents: {
             ...currentComponents,
             [category]: [...categoryComponents, newComponent]
           }
         };
+        
+        console.log('🔧 handleComponentQuantityChange - Agregando nuevo componente:', newState);
+        return newState;
       }
     });
   };
@@ -228,6 +249,14 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
                           comp => comp.name === component.name
                         );
                         const currentQuantity = currentComponent?.quantity || 0;
+                        
+                        console.log('🎨 Renderizando componente:', {
+                          category,
+                          componentName: component.name,
+                          currentComponent,
+                          currentQuantity,
+                          selectedComponents: modifiedData.selectedComponents
+                        });
                         
                         return (
                           <div key={`${category}-${component.name}`} className="component-card">
