@@ -1,0 +1,37 @@
+warning: in the working copy of 'build.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'deploy-netlify.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/App.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/Dashboard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/NewDashboard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ReportsView.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/ReportsView.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/layout/AppShell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/config/navigation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/index.css', LF will be replaced by CRLF the next time Git touches it
+KITCHEN_VIEW_FIX_SUMMARY.md
+TIMER_AND_UPDATES_FIX_SUMMARY.md
+_redirects
+build.sh
+color-contrast-audit.js
+debug-frontend-products.js
+debug-products-issue.js
+deploy-netlify.sh
+public/_redirects
+src/App.tsx
+src/components/ConnectionStatus.tsx
+src/components/ContrastImprovements.css
+src/components/Dashboard.tsx
+src/components/NewDashboard.css
+src/components/NewDashboard.tsx
+src/components/layout/AppShell.tsx
+src/config/navigation.ts
+src/index.css
+src/types/payment.types.ts
+test-api-data.js
+test-backend-connection.js
+test-combo-data.js
+test-frontend-data.js
+test-individual-products.js
+test-order-display.js
+test-prices.js
+vercel.json

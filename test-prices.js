@@ -89,3 +89,5 @@ console.log(`\n💰 Total Original: $${totalOriginal.toFixed(2)}`);
 
 console.log('\n✅ Test completado');
 
+
+

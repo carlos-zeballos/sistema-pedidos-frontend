@@ -84,3 +84,5 @@ console.log('   3. O los datos se están perdiendo en algún punto del flujo');
 
 console.log('\n✅ Test completado');
 
+
+

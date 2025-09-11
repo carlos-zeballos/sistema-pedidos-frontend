@@ -62,7 +62,7 @@ export const navigationConfig: NavItem[] = [
     description: 'Crear y editar productos, categorías y espacios'
   },
   {
-    path: '/combos',
+    path: '/combo-management',
     label: 'Gestión Combos',
     icon: Package,
     roles: ['ADMIN'],
@@ -128,7 +128,7 @@ export const quickActions = [
     description: 'Crear y editar productos, categorías y espacios'
   },
   {
-    path: '/combos',
+    path: '/combo-management',
     label: 'Gestión Combos',
     icon: Package,
     roles: ['ADMIN'],

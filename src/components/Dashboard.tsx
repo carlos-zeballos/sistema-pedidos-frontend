@@ -209,7 +209,7 @@ const Dashboard: React.FC = () => {
         <div className="actions-grid">
           <button 
             className="action-card"
-            onClick={() => handleQuickAction('/orders/new')}
+            onClick={() => handleQuickAction('/new-order')}
           >
             <div className="action-icon">➕</div>
             <div className="action-title">Nueva Orden</div>

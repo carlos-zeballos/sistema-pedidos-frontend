@@ -104,3 +104,5 @@ console.log(JSON.stringify(orderData, null, 2));
 
 console.log('\n✅ Test del frontend completado');
 
+
+

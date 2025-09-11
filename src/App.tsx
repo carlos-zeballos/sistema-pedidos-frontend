@@ -145,7 +145,7 @@ function AppContent() {
           />
           
           <Route 
-            path="/combos" 
+            path="/combo-management" 
             element={
               <ProtectedRoute requiredRole="ADMIN">
                 <AppShell>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
@@ -20,8 +20,26 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const userDropdownRef = useRef<HTMLDivElement>(null);
 
   const navigationItems = user ? getNavigationForRole(user.role) : [];
+
+  // Cerrar dropdown cuando se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+        setUserDropdownOpen(false);
+      }
+    };
+
+    if (userDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userDropdownOpen]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -95,7 +113,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             </button>
 
             {/* User Menu */}
-            <div className="user-menu">
+            <div className="user-menu" ref={userDropdownRef}>
               <button
                 className="user-menu-toggle"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
