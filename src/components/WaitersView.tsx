@@ -1015,47 +1015,152 @@ const WaitersView: React.FC = () => {
                   {selectedItemToModify && (
                     <div className="modify-form">
                       <h4>✏️ Modificar: {selectedItemToModify.name}</h4>
-                      <div className="form-group">
-                        <label>Nueva Cantidad:</label>
-                        <input
-                          type="number"
-                          min="1"
-                          defaultValue={selectedItemToModify.quantity}
-                          className="form-control"
-                          id="modify-quantity"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>Nuevas Notas:</label>
-                        <textarea
-                          defaultValue={selectedItemToModify.notes || ''}
-                          className="form-control"
-                          placeholder="Nuevas notas para este item..."
-                          id="modify-notes"
-                        />
-                      </div>
-                      <div className="form-actions">
-                        <button
-                          onClick={() => {
-                            const newQuantity = parseInt((document.getElementById('modify-quantity') as HTMLInputElement)?.value || '1');
-                            const newNotes = (document.getElementById('modify-notes') as HTMLTextAreaElement)?.value || '';
-                            
-                            modifyItemInOrder(selectedItemToModify.id, {
-                              quantity: newQuantity,
-                              notes: newNotes
-                            });
-                          }}
-                          className="btn btn-primary"
-                        >
-                          💾 Guardar Cambios
-                        </button>
-                        <button
-                          onClick={() => setSelectedItemToModify(null)}
-                          className="btn btn-secondary"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
+                      
+                      {/* Detectar si es un combo */}
+                      {selectedItemToModify.comboId ? (
+                        <div className="combo-modification-section">
+                          <div className="combo-info">
+                            <div className="combo-badge">
+                              🍱 Combo Personalizable
+                            </div>
+                            <p className="combo-description">
+                              Este es un combo que puede ser modificado. Haz clic en "Modificar Combo" para cambiar los componentes, salsas y palillos.
+                            </p>
+                          </div>
+                          
+                          <div className="combo-current-data">
+                            <h5>📋 Configuración Actual:</h5>
+                            <div className="current-combo-display">
+                              {(() => {
+                                try {
+                                  const comboData = JSON.parse(selectedItemToModify.notes || '{}');
+                                  return (
+                                    <div className="combo-data-preview">
+                                      {comboData.selectedComponents && Object.keys(comboData.selectedComponents).length > 0 && (
+                                        <div className="combo-section">
+                                          <strong>Componentes:</strong>
+                                          {Object.entries(comboData.selectedComponents).map(([category, components]: [string, any]) => (
+                                            <div key={category} className="category-preview">
+                                              <span className="category-name">{category}:</span>
+                                              {Array.isArray(components) && components.map((comp: any) => (
+                                                <span key={comp.name} className="component-preview">
+                                                  {comp.name} (x{comp.quantity})
+                                                </span>
+                                              ))}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                      
+                                      {comboData.selectedSauces && comboData.selectedSauces.length > 0 && (
+                                        <div className="combo-section">
+                                          <strong>Salsas:</strong>
+                                          {comboData.selectedSauces.map((sauce: any) => (
+                                            <span key={sauce.name} className="sauce-preview">
+                                              {sauce.name} (x{sauce.quantity})
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                      
+                                      {(comboData.normalChopsticks > 0 || comboData.assistedChopsticks > 0) && (
+                                        <div className="combo-section">
+                                          <strong>Palillos:</strong>
+                                          {comboData.normalChopsticks > 0 && (
+                                            <span className="chopstick-preview">
+                                              Normales: {comboData.normalChopsticks}
+                                            </span>
+                                          )}
+                                          {comboData.assistedChopsticks > 0 && (
+                                            <span className="chopstick-preview">
+                                              Entrenamiento: {comboData.assistedChopsticks}
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
+                                      
+                                      {comboData.itemNotes && (
+                                        <div className="combo-section">
+                                          <strong>Notas:</strong>
+                                          <span className="notes-preview">{comboData.itemNotes}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                } catch (error) {
+                                  return (
+                                    <div className="combo-data-preview">
+                                      <div className="combo-section">
+                                        <strong>Notas:</strong>
+                                        <span className="notes-preview">{selectedItemToModify.notes}</span>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              })()}
+                            </div>
+                          </div>
+                          
+                          <div className="combo-actions">
+                            <button
+                              onClick={() => modifyComboItem(selectedOrder!, selectedItemToModify)}
+                              className="btn btn-primary btn-combo-modify"
+                            >
+                              🍱 Modificar Combo
+                            </button>
+                            <button
+                              onClick={() => setSelectedItemToModify(null)}
+                              className="btn btn-secondary"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="product-modification-section">
+                          <div className="form-group">
+                            <label htmlFor="modify-quantity">Nueva Cantidad:</label>
+                            <input
+                              type="number"
+                              min="1"
+                              defaultValue={selectedItemToModify.quantity}
+                              className="form-control"
+                              id="modify-quantity"
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor="modify-notes">Nuevas Notas:</label>
+                            <textarea
+                              defaultValue={selectedItemToModify.notes || ''}
+                              className="form-control"
+                              placeholder="Nuevas notas para este item..."
+                              id="modify-notes"
+                            />
+                          </div>
+                          <div className="form-actions">
+                            <button
+                              onClick={() => {
+                                const newQuantity = parseInt((document.getElementById('modify-quantity') as HTMLInputElement)?.value || '1');
+                                const newNotes = (document.getElementById('modify-notes') as HTMLTextAreaElement)?.value || '';
+                                
+                                modifyItemInOrder(selectedItemToModify.id, {
+                                  quantity: newQuantity,
+                                  notes: newNotes
+                                });
+                              }}
+                              className="btn btn-primary"
+                            >
+                              💾 Guardar Cambios
+                            </button>
+                            <button
+                              onClick={() => setSelectedItemToModify(null)}
+                              className="btn btn-secondary"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

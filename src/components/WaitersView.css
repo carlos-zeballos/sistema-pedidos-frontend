@@ -962,3 +962,166 @@
     flex-direction: column;
   }
 }
+
+/* ===== COMBO MODIFICATION SECTION ===== */
+.combo-modification-section {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #0ea5e9;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.combo-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.combo-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.combo-description {
+  color: #0c4a6e;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.combo-current-data {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e0f2fe;
+}
+
+.combo-current-data h5 {
+  margin: 0 0 12px 0;
+  color: #0c4a6e;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.current-combo-display {
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.combo-data-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.combo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.combo-section strong {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.category-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.category-name {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.component-preview, .sauce-preview, .chopstick-preview {
+  background: #e0f2fe;
+  color: #0c4a6e;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #bae6fd;
+}
+
+.notes-preview {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  word-break: break-word;
+}
+
+.combo-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-combo-modify {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.btn-combo-modify:hover {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(14, 165, 233, 0.4);
+}
+
+.product-modification-section {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Responsive para combo modification */
+@media (max-width: 768px) {
+  .combo-modification-section {
+    padding: 16px;
+  }
+  
+  .combo-actions {
+    flex-direction: column;
+  }
+  
+  .btn-combo-modify {
+    width: 100%;
+  }
+  
+  .category-preview {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .category-name {
+    min-width: auto;
+  }
+}
