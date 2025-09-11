@@ -93,19 +93,35 @@ const OrderCreation: React.FC = () => {
   // Efecto para detectar si el espacio seleccionado es de delivery
   useEffect(() => {
     if (selectedSpace) {
+      console.log('🚚 Verificando si el espacio es de delivery:', {
+        spaceName: selectedSpace.name,
+        spaceType: selectedSpace.type,
+        spaceCode: selectedSpace.code
+      });
+      
       const spaceIsDelivery = selectedSpace.type === 'DELIVERY' || 
                              selectedSpace.name.toLowerCase().includes('delivery') ||
                              selectedSpace.code.toLowerCase().includes('d');
       
+      console.log('🚚 Resultado de verificación:', {
+        spaceIsDelivery,
+        typeCheck: selectedSpace.type === 'DELIVERY',
+        nameCheck: selectedSpace.name.toLowerCase().includes('delivery'),
+        codeCheck: selectedSpace.code.toLowerCase().includes('d')
+      });
+      
       setIsDelivery(spaceIsDelivery);
       if (spaceIsDelivery) {
         setDeliveryCost(5.00); // Costo por defecto de delivery
+        console.log('✅ Delivery detectado - Costo establecido: $5.00');
       } else {
         setDeliveryCost(0);
+        console.log('❌ No es delivery - Costo establecido: $0.00');
       }
     } else {
       setIsDelivery(false);
       setDeliveryCost(0);
+      console.log('❌ No hay espacio seleccionado - Delivery desactivado');
     }
   }, [selectedSpace]);
 
@@ -814,6 +830,14 @@ const OrderCreation: React.FC = () => {
                     <span>Subtotal:</span>
                     <span>${getTotalPrice().toFixed(2)}</span>
                   </div>
+                  {(() => {
+                    console.log('🎨 Renderizando resumen - Estado delivery:', {
+                      isDelivery,
+                      deliveryCost,
+                      shouldShow: isDelivery && deliveryCost > 0
+                    });
+                    return null;
+                  })()}
                   {isDelivery && deliveryCost > 0 && (
                     <div className="delivery-line">
                       <span>🚚 Delivery:</span>
