@@ -51,6 +51,7 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
     comboId,
     currentData
   });
+  console.log('🔍 ComboModificationModal - currentData detallado:', JSON.stringify(currentData, null, 2));
 
   useEffect(() => {
     if (isOpen && comboId) {
@@ -71,6 +72,11 @@ const ComboModificationModal: React.FC<ComboModificationModalProps> = ({
       setError(null);
       const comboData = await catalogService.getComboById(comboId);
       console.log('✅ ComboModificationModal - Datos del combo cargados:', comboData);
+      console.log('🔍 ComboModificationModal - Estructura del combo:');
+      console.log('  - ID:', comboData.id);
+      console.log('  - Nombre:', comboData.name);
+      console.log('  - Componentes:', comboData.components);
+      console.log('  - Salsas:', comboData.sauces);
       setCombo(comboData);
     } catch (err: any) {
       console.error('❌ ComboModificationModal - Error loading combo:', err);

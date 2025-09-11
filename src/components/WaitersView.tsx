@@ -412,6 +412,7 @@ const WaitersView: React.FC = () => {
       console.log('🎯 Configurando estado del modal...');
       setComboToModifyVisual(combo);
       setComboDataToModify(comboData);
+      setItemToModify(item); // Establecer el item a modificar
       setVisualComboModifyOpen(true);
       console.log('✅ Modal de modificación de combo abierto');
     } catch (error: any) {
