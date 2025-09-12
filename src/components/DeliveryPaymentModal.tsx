@@ -74,38 +74,22 @@ const DeliveryPaymentModal: React.FC<DeliveryPaymentModalProps> = ({
     setError('');
 
     try {
-      // Registrar pago de la orden principal
-      await paymentService.registerPayment({
-        orderId: order.id,
-        paymentMethodId: orderPaymentMethod,
-        amount: modifiedOrderAmount,
-        notes: notes.trim() || undefined
-      });
-
-      // Si es delivery y tiene costo, registrar pago del delivery
-      if (order.isDelivery && modifiedDeliveryAmount > 0) {
-        await paymentService.registerPayment({
-          orderId: order.id,
-          paymentMethodId: deliveryPaymentMethod,
-          amount: modifiedDeliveryAmount,
-          notes: `Costo de delivery - ${notes.trim() || 'Sin notas'}`
-        });
-      }
-
-      // Actualizar métodos de pago en la orden
-      await orderService.updateOrderPaymentMethods(
+      const totalAmount = modifiedOrderAmount + modifiedDeliveryAmount;
+      
+      // Usar el nuevo endpoint de pago completo
+      await orderService.registerCompletePayment(
         order.id,
         orderPaymentMethod,
-        order.isDelivery && order.deliveryCost && order.deliveryCost > 0 ? deliveryPaymentMethod : undefined
+        totalAmount,
+        modifiedDeliveryAmount,
+        notes.trim() || undefined
       );
 
-      // Marcar la orden como pagada
-      await orderService.updateOrderStatus(order.id, 'PAGADO');
-      
+      console.log('✅ Pago completo registrado exitosamente');
       onPaymentComplete();
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Error al procesar el pago');
+      setError(err.response?.data?.error || err.message || 'Error al procesar el pago');
       console.error('Error processing payment:', err);
     } finally {
       setLoading(false);
