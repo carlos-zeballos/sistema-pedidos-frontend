@@ -52,7 +52,8 @@ const WaitersView: React.FC = () => {
 
   const loadOrders = async () => {
     try {
-      const ordersData = await orderService.getOrders();
+      // Solo obtener órdenes activas (no pagadas ni canceladas)
+      const ordersData = await orderService.getOrders('PENDIENTE,EN_PREPARACION,LISTO,ENTREGADO');
       setOrders(ordersData);
       
       // Verificar si hay órdenes listas para notificar
