@@ -100,7 +100,7 @@ const WaitersView: React.FC = () => {
           
           // Liberar el espacio (marcar como disponible)
           try {
-            await tableService.updateSpaceStatus(order.space.id, 'DISPONIBLE');
+            await tableService.updateSpaceStatus(order.space.id, 'LIBRE');
             console.log(`✅ Espacio ${order.space.name} liberado automáticamente`);
           } catch (spaceError) {
             console.error('Error liberando espacio:', spaceError);
@@ -322,7 +322,7 @@ const WaitersView: React.FC = () => {
         // Liberar el espacio (marcar como disponible)
         if (order.space) {
           try {
-            await tableService.updateSpaceStatus(order.space.id, 'DISPONIBLE');
+            await tableService.updateSpaceStatus(order.space.id, 'LIBRE');
             console.log(`✅ Espacio ${order.space.name} liberado automáticamente`);
           } catch (spaceError) {
             console.error('Error liberando espacio:', spaceError);
@@ -353,7 +353,7 @@ const WaitersView: React.FC = () => {
     // Liberar el espacio si existe una orden de pago
     if (orderToPay && orderToPay.space) {
       try {
-        await tableService.updateSpaceStatus(orderToPay.space.id, 'DISPONIBLE');
+        await tableService.updateSpaceStatus(orderToPay.space.id, 'LIBRE');
         console.log(`✅ Espacio ${orderToPay.space.name} liberado automáticamente después del pago`);
       } catch (spaceError) {
         console.error('Error liberando espacio después del pago:', spaceError);
