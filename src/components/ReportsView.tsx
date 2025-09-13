@@ -91,17 +91,15 @@ const ReportsView: React.FC = () => {
       finalTotal: Set<string>;
     }>();
 
-    // Procesar cada orden
+    // Procesar cada orden EXACTAMENTE como aparece en Ventas Totales
     orders.forEach(order => {
-      // Agrupar pagos por método para esta orden (tomar solo el primer pago de cada método)
+      // Agrupar pagos por método para esta orden
       const paymentsByMethod = new Map<string, number>();
       
       order.payments.forEach(payment => {
         const method = payment.method;
-        // Solo tomar el primer pago de cada método para evitar duplicaciones
-        if (!paymentsByMethod.has(method)) {
-          paymentsByMethod.set(method, payment.amount);
-        }
+        // Sumar todos los pagos del mismo método para esta orden
+        paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + payment.amount);
       });
 
       // Procesar cada método de pago usado en esta orden
@@ -165,11 +163,11 @@ const ReportsView: React.FC = () => {
       totalPaid: number;
     }>();
 
-    // Procesar solo órdenes de delivery
+    // Procesar solo órdenes de delivery EXACTAMENTE como aparece en Ventas Totales
     const deliveryOrders = orders.filter(order => order.spaceType === 'DELIVERY');
 
     deliveryOrders.forEach(order => {
-      // Solo procesar pagos de delivery (fees)
+      // Procesar TODOS los pagos de delivery (fees) como aparecen en Ventas Totales
       const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
       
       if (deliveryPayments.length === 0) {
@@ -182,6 +180,7 @@ const ReportsView: React.FC = () => {
       
       deliveryPayments.forEach(payment => {
         const method = payment.method;
+        // Sumar todos los pagos de delivery del mismo método
         deliveryPaymentsByMethod.set(method, (deliveryPaymentsByMethod.get(method) || 0) + payment.amount);
       });
 
