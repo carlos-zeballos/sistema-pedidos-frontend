@@ -69,7 +69,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       });
 
       // Marcar la orden como pagada
-      await orderService.updateOrderStatus(order.id, 'PAGADO');
+      await orderService.updateOrderStatus(order.id, 'ENTREGADO');
       
       onPaymentComplete();
       onClose();

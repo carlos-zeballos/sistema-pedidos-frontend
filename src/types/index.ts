@@ -111,7 +111,7 @@ export interface Order {
   space?: Space;
   customerName?: string;
   customerPhone?: string;
-  status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO' | 'PAGADO' | 'CANCELADO';
+  status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO' | 'CANCELADO';
   totalAmount: number;
   subtotal: number;
   tax: number;

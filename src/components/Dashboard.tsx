@@ -106,7 +106,7 @@ const Dashboard: React.FC = () => {
       case 'PENDIENTE': return 'pending';
       case 'EN_PREPARACION': return 'preparing';
       case 'LISTO': return 'ready';
-      case 'PAGADO': return 'paid';
+      case 'ENTREGADO': return 'paid';
       default: return 'default';
     }
   };
@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
       case 'PENDIENTE': return 'PENDIENTE';
       case 'EN_PREPARACION': return 'EN PREPARACIÓN';
       case 'LISTO': return 'LISTO';
-      case 'PAGADO': return 'PAGADO';
+      case 'ENTREGADO': return 'ENTREGADO';
       default: return status;
     }
   };
