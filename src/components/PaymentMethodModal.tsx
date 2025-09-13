@@ -61,16 +61,16 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
     setError('');
 
     try {
-      await paymentService.registerPayment({
-        orderId: order.id,
-        paymentMethodId: selectedMethod,
-        amount: modifiedAmount,
-        notes: notes.trim() || undefined
-      });
+      // Usar el mismo endpoint que funciona para delivery
+      await orderService.registerCompletePayment(
+        order.id,
+        selectedMethod,
+        modifiedAmount,
+        0, // No hay fee de delivery para espacios normales
+        notes.trim() || undefined
+      );
 
-      // Marcar la orden como pagada
-      await orderService.updateOrderStatus(order.id, 'ENTREGADO');
-      
+      console.log('✅ Pago completo registrado exitosamente');
       onPaymentComplete();
       onClose();
     } catch (err: any) {
