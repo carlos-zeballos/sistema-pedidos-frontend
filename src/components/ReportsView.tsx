@@ -10,8 +10,6 @@ interface PaymentMethodReport {
   icon: string;
   color: string;
   ordersCount: number;
-  paidByMethod: number;
-  originalTotal: number;
   finalTotal: number;
 }
 
@@ -20,9 +18,7 @@ interface DeliveryPaymentReport {
   icon: string;
   color: string;
   deliveryOrdersCount: number;
-  deliveryFeesPaid: number;
-  orderTotalsPaid: number;
-  totalPaid: number;
+  finalTotal: number;
 }
 
 interface OrderReport {
@@ -34,7 +30,6 @@ interface OrderReport {
   spaceType: string;
   customerName: string;
   status: string;
-  originalTotal: number;
   finalTotal: number;
   paidTotal: number;
   deliveryFeeTotal: number;
@@ -88,8 +83,6 @@ const ReportsView: React.FC = () => {
       icon: string;
       color: string;
       ordersCount: Set<string>;
-      paidByMethod: number;
-      originalTotal: number;
       finalTotal: number;
     }>();
 
@@ -115,17 +108,13 @@ const ReportsView: React.FC = () => {
             icon: methodConfig.icon,
             color: methodConfig.color,
             ordersCount: new Set(),
-            paidByMethod: 0,
-            originalTotal: 0,
             finalTotal: 0
           });
         }
 
         const methodData = methodMap.get(method)!;
-        methodData.paidByMethod += amount;
         methodData.ordersCount.add(order.id);
-        methodData.originalTotal += order.originalTotal;  // Solo una vez por orden
-        methodData.finalTotal += order.finalTotal;        // Solo una vez por orden
+        methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - valor único y verdadero
       });
     });
 
@@ -135,8 +124,6 @@ const ReportsView: React.FC = () => {
       icon: method.icon,
       color: method.color,
       ordersCount: method.ordersCount.size,
-      paidByMethod: method.paidByMethod,
-      originalTotal: method.originalTotal,
       finalTotal: method.finalTotal
     }));
   };
@@ -147,9 +134,7 @@ const ReportsView: React.FC = () => {
       icon: string;
       color: string;
       deliveryOrdersCount: Set<string>;
-      deliveryFeesPaid: number;
-      orderTotalsPaid: number;
-      totalPaid: number;
+      finalTotal: number;
     }>();
 
     // Procesar solo órdenes de delivery
@@ -171,16 +156,13 @@ const ReportsView: React.FC = () => {
             icon: methodConfig.icon,
             color: methodConfig.color,
             deliveryOrdersCount: new Set(),
-            deliveryFeesPaid: 0,
-            orderTotalsPaid: 0,
-            totalPaid: 0
+            finalTotal: 0
           });
         }
 
         const methodData = methodMap.get(method)!;
-        methodData.deliveryFeesPaid += amount;
-        methodData.totalPaid += amount;
         methodData.deliveryOrdersCount.add(order.id);
+        methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - valor único y verdadero
       });
     });
 
@@ -190,9 +172,7 @@ const ReportsView: React.FC = () => {
       icon: method.icon,
       color: method.color,
       deliveryOrdersCount: method.deliveryOrdersCount.size,
-      deliveryFeesPaid: method.deliveryFeesPaid,
-      orderTotalsPaid: 0, // No mostrar totales de orden
-      totalPaid: method.totalPaid
+      finalTotal: method.finalTotal
     }));
   };
 
@@ -550,17 +530,9 @@ const ReportsView: React.FC = () => {
                           <span className="stat-label">Pedidos:</span>
                           <span className="stat-value">{payment.ordersCount}</span>
                         </div>
-                        <div className="stat">
-                          <span className="stat-label">Total Original:</span>
-                          <span className="stat-value">{formatCurrency(payment.originalTotal)}</span>
-                        </div>
-                        <div className="stat">
+                        <div className="stat highlight">
                           <span className="stat-label">Total Final:</span>
                           <span className="stat-value">{formatCurrency(payment.finalTotal)}</span>
-                        </div>
-                        <div className="stat highlight">
-                          <span className="stat-label">Total Cobrado:</span>
-                          <span className="stat-value">{formatCurrency(payment.paidByMethod)}</span>
                         </div>
                       </div>
                     </div>
@@ -588,17 +560,9 @@ const ReportsView: React.FC = () => {
                           <span className="stat-label">Deliverys:</span>
                           <span className="stat-value">{delivery.deliveryOrdersCount}</span>
                         </div>
-                        <div className="stat">
-                          <span className="stat-label">Total Pedidos:</span>
-                          <span className="stat-value">{formatCurrency(delivery.orderTotalsPaid)}</span>
-                        </div>
-                        <div className="stat">
-                          <span className="stat-label">Fees Delivery:</span>
-                          <span className="stat-value">{formatCurrency(delivery.deliveryFeesPaid)}</span>
-                        </div>
                         <div className="stat highlight">
-                          <span className="stat-label">Total General:</span>
-                          <span className="stat-value">{formatCurrency(delivery.totalPaid)}</span>
+                          <span className="stat-label">Total Final:</span>
+                          <span className="stat-value">{formatCurrency(delivery.finalTotal)}</span>
                         </div>
                       </div>
                     </div>
@@ -652,8 +616,7 @@ const ReportsView: React.FC = () => {
                         <th>Espacio</th>
                         <th>Cliente</th>
                         <th>Estado</th>
-                        <th>Original</th>
-                        <th>Final</th>
+                        <th>Total Final</th>
                         <th>Pagado</th>
                         <th>Fee Delivery</th>
                         <th>Pagos</th>
@@ -680,7 +643,6 @@ const ReportsView: React.FC = () => {
                               {order.status}
                             </span>
                           </td>
-                          <td>{formatCurrency(order.originalTotal)}</td>
                           <td>{formatCurrency(order.finalTotal)}</td>
                           <td>{formatCurrency(order.paidTotal)}</td>
                           <td>{formatCurrency(order.deliveryFeeTotal)}</td>
