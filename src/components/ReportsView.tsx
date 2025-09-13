@@ -98,9 +98,10 @@ const ReportsView: React.FC = () => {
       
       order.payments.forEach(payment => {
         const method = payment.method;
-        // SOLO incluir pagos que NO son de delivery
+        // SOLO incluir pagos que NO son de delivery - usar baseAmount
         if (!payment.isDelivery) {
-          paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + payment.amount);
+          const baseAmount = payment.baseAmount || payment.amount;
+          paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + baseAmount);
         }
       });
 
@@ -182,8 +183,9 @@ const ReportsView: React.FC = () => {
       
       deliveryPayments.forEach(payment => {
         const method = payment.method;
-        // Sumar todos los pagos de delivery del mismo método
-        deliveryPaymentsByMethod.set(method, (deliveryPaymentsByMethod.get(method) || 0) + payment.amount);
+        // Sumar solo el monto del delivery (surchargeAmount), NO el monto total
+        const deliveryAmount = payment.surchargeAmount || payment.amount;
+        deliveryPaymentsByMethod.set(method, (deliveryPaymentsByMethod.get(method) || 0) + deliveryAmount);
       });
 
       // Procesar cada método de pago usado para delivery fees
