@@ -103,7 +103,10 @@ const ReportsView: React.FC = () => {
         // SOLO incluir pagos que NO son de delivery - usar baseAmount
         if (!payment.isDelivery) {
           const baseAmount = payment.baseAmount || payment.amount;
-          paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + baseAmount);
+          // Solo tomar el primer pago de cada método para evitar duplicaciones
+          if (!paymentsByMethod.has(method)) {
+            paymentsByMethod.set(method, baseAmount);
+          }
         }
       });
 
