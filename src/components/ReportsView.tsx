@@ -647,23 +647,41 @@ const ReportsView: React.FC = () => {
                           <td>
                             <div className="payments-tooltip">
                               {(() => {
-                                // Mostrar cada pago individual pero evitar duplicaciones del mismo método
-                                const seenPayments = new Set<string>();
-                                const uniquePayments: Array<{
+                                // Aplicar misma lógica que reportes: mostrar SOLO el pago más reciente por tipo
+                                const basePayments = order.payments.filter(payment => !payment.isDelivery);
+                                const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
+                                
+                                const finalPayments: Array<{
                                   method: string;
                                   amount: number;
                                   isDelivery: boolean;
                                 }> = [];
                                 
-                                order.payments.forEach(payment => {
-                                  const key = `${payment.method}-${payment.amount}-${payment.isDelivery}`;
-                                  if (!seenPayments.has(key)) {
-                                    seenPayments.add(key);
-                                    uniquePayments.push(payment);
-                                  }
-                                });
+                                // Tomar SOLO el pago más reciente para base (NO delivery)
+                                if (basePayments.length > 0) {
+                                  const latestBasePayment = basePayments.sort((a, b) => 
+                                    new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+                                  )[0];
+                                  finalPayments.push({
+                                    method: latestBasePayment.method,
+                                    amount: latestBasePayment.amount,
+                                    isDelivery: false
+                                  });
+                                }
                                 
-                                return uniquePayments.map((payment, index) => (
+                                // Tomar SOLO el pago más reciente para delivery
+                                if (deliveryPayments.length > 0) {
+                                  const latestDeliveryPayment = deliveryPayments.sort((a, b) => 
+                                    new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+                                  )[0];
+                                  finalPayments.push({
+                                    method: latestDeliveryPayment.method,
+                                    amount: latestDeliveryPayment.amount,
+                                    isDelivery: true
+                                  });
+                                }
+                                
+                                return finalPayments.map((payment, index) => (
                                   <div key={`${payment.method}-${index}`} className="payment-item">
                                     {payment.method}: {formatCurrency(payment.amount)}
                                     {payment.isDelivery && ' (Delivery)'}
