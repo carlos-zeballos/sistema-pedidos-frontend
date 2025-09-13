@@ -42,6 +42,8 @@ interface OrderReport {
   payments: Array<{
     method: string;
     amount: number;
+    baseAmount?: number;
+    surchargeAmount?: number;
     isDelivery: boolean;
     paymentDate: string;
   }>;
