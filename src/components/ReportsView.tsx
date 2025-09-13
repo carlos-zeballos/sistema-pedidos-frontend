@@ -164,24 +164,24 @@ const ReportsView: React.FC = () => {
     const deliveryOrders = orders.filter(order => order.spaceType === 'DELIVERY');
 
     deliveryOrders.forEach(order => {
-      // Agrupar pagos por método para esta orden de delivery
-      const paymentsByMethod = new Map<string, { deliveryFees: number; orderTotal: number }>();
+      // Solo procesar pagos de delivery (fees)
+      const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
       
-      order.payments.forEach(payment => {
+      if (deliveryPayments.length === 0) {
+        // Si no hay pagos de delivery, no incluir esta orden en el reporte
+        return;
+      }
+
+      // Agrupar pagos de delivery por método
+      const deliveryPaymentsByMethod = new Map<string, number>();
+      
+      deliveryPayments.forEach(payment => {
         const method = payment.method;
-        const current = paymentsByMethod.get(method) || { deliveryFees: 0, orderTotal: 0 };
-        
-        if (payment.isDelivery) {
-          current.deliveryFees += payment.amount;
-        } else {
-          current.orderTotal += payment.amount;
-        }
-        
-        paymentsByMethod.set(method, current);
+        deliveryPaymentsByMethod.set(method, (deliveryPaymentsByMethod.get(method) || 0) + payment.amount);
       });
 
-      // Procesar cada método de pago usado en esta orden de delivery
-      paymentsByMethod.forEach((amounts, method) => {
+      // Procesar cada método de pago usado para delivery fees
+      deliveryPaymentsByMethod.forEach((amount, method) => {
         if (!methodMap.has(method)) {
           const methodConfig = getPaymentMethodConfig(method);
           methodMap.set(method, {
@@ -190,23 +190,27 @@ const ReportsView: React.FC = () => {
             color: methodConfig.color,
             deliveryOrdersCount: new Set(),
             deliveryFeesPaid: 0,
-            orderTotalsPaid: 0,
+            orderTotalsPaid: 0, // No mostrar totales de orden en este reporte
             totalPaid: 0
           });
         }
 
         const methodData = methodMap.get(method)!;
-        methodData.deliveryFeesPaid += amounts.deliveryFees;
-        methodData.orderTotalsPaid += amounts.orderTotal;
-        methodData.totalPaid += amounts.deliveryFees + amounts.orderTotal;
+        methodData.deliveryFeesPaid += amount;
+        methodData.totalPaid += amount; // Solo fees de delivery
         methodData.deliveryOrdersCount.add(order.id); // Agregar ID único de orden
       });
     });
 
-    // Convertir Set a número
+    // Convertir Set a número y limpiar datos
     return Array.from(methodMap.values()).map(method => ({
-      ...method,
-      deliveryOrdersCount: method.deliveryOrdersCount.size
+      method: method.method,
+      icon: method.icon,
+      color: method.color,
+      deliveryOrdersCount: method.deliveryOrdersCount.size,
+      deliveryFeesPaid: method.deliveryFeesPaid,
+      orderTotalsPaid: 0, // No mostrar totales de orden
+      totalPaid: method.totalPaid
     }));
   };
 
