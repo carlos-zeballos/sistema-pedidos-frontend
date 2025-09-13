@@ -54,10 +54,25 @@ const WaitersView: React.FC = () => {
     try {
       // Solo obtener órdenes activas (no pagadas ni canceladas)
       const ordersData = await orderService.getOrders('PENDIENTE,EN_PREPARACION,LISTO,ENTREGADO');
-      setOrders(ordersData);
+      
+      // Filtrar órdenes pagadas (ENTREGADO con isPaid: true)
+      const activeOrders = ordersData.filter((order: any) => {
+        // Si la orden está ENTREGADO pero no está pagada, mostrarla
+        if (order.status === 'ENTREGADO' && !order.isPaid) {
+          return true;
+        }
+        // Si la orden está ENTREGADO y está pagada, NO mostrarla
+        if (order.status === 'ENTREGADO' && order.isPaid) {
+          return false;
+        }
+        // Para otros estados, mostrarla normalmente
+        return true;
+      });
+      
+      setOrders(activeOrders);
       
       // Verificar si hay órdenes listas para notificar
-      const readyOrders = ordersData.filter((order: any) => order.status === 'LISTO');
+      const readyOrders = activeOrders.filter((order: any) => order.status === 'LISTO');
       if (readyOrders.length > 0) {
         const newNotifications = readyOrders.map((order: any) => 
           `¡Orden #${order.orderNumber} está lista para recoger!`
