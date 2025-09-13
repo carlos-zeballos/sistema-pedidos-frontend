@@ -3,6 +3,8 @@ import { Calendar, Download, Trash2, Filter } from 'lucide-react';
 import api from '../services/api';
 import './ReportsView.css';
 
+// Trigger: Autodeploy - Limpieza de duplicados completada
+
 interface PaymentMethodReport {
   method: string;
   icon: string;
