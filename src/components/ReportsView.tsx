@@ -91,18 +91,20 @@ const ReportsView: React.FC = () => {
       finalTotal: Set<string>;
     }>();
 
-    // Procesar cada orden EXACTAMENTE como aparece en Ventas Totales
+    // Procesar cada orden - SOLO montos de órdenes base (NO delivery)
     orders.forEach(order => {
-      // Agrupar pagos por método para esta orden
+      // Agrupar pagos por método para esta orden - SOLO pagos NO de delivery
       const paymentsByMethod = new Map<string, number>();
       
       order.payments.forEach(payment => {
         const method = payment.method;
-        // Sumar todos los pagos del mismo método para esta orden
-        paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + payment.amount);
+        // SOLO incluir pagos que NO son de delivery
+        if (!payment.isDelivery) {
+          paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + payment.amount);
+        }
       });
 
-      // Procesar cada método de pago usado en esta orden
+      // Procesar cada método de pago usado en esta orden (solo base)
       paymentsByMethod.forEach((amount, method) => {
         if (!methodMap.has(method)) {
           // Configuración por método de pago
