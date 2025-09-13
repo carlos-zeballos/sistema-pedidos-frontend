@@ -91,26 +91,29 @@ const ReportsView: React.FC = () => {
       // Obtener SOLO los pagos que NO son de delivery
       const basePayments = order.payments.filter(payment => !payment.isDelivery);
       
-      // Obtener métodos únicos usados en esta orden
-      const uniqueMethods = new Set(basePayments.map(payment => payment.method));
+      if (basePayments.length === 0) return; // No hay pagos base
       
-      // Procesar cada método único usado en esta orden
-      uniqueMethods.forEach(method => {
-        if (!methodMap.has(method)) {
-          const methodConfig = getPaymentMethodConfig(method);
-          methodMap.set(method, {
-            method: method,
-            icon: methodConfig.icon,
-            color: methodConfig.color,
-            ordersCount: new Set(),
-            finalTotal: 0
-          });
-        }
+      // Para órdenes NO delivery: tomar SOLO el método de pago más reciente (el elegido al final)
+      const latestPayment = basePayments.sort((a, b) => 
+        new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+      )[0];
+      
+      const method = latestPayment.method;
+      
+      if (!methodMap.has(method)) {
+        const methodConfig = getPaymentMethodConfig(method);
+        methodMap.set(method, {
+          method: method,
+          icon: methodConfig.icon,
+          color: methodConfig.color,
+          ordersCount: new Set(),
+          finalTotal: 0
+        });
+      }
 
-        const methodData = methodMap.get(method)!;
-        methodData.ordersCount.add(order.id);
-        methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - una vez por orden
-      });
+      const methodData = methodMap.get(method)!;
+      methodData.ordersCount.add(order.id);
+      methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - una vez por orden
     });
 
     // Convertir a array de reportes
