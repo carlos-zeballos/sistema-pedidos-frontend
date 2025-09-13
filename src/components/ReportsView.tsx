@@ -681,12 +681,29 @@ const ReportsView: React.FC = () => {
                           <td>{formatCurrency(order.deliveryFeeTotal)}</td>
                           <td>
                             <div className="payments-tooltip">
-                              {order.payments.map((payment) => (
-                                <div key={`${payment.method}-${payment.amount}`} className="payment-item">
-                                  {payment.method}: {formatCurrency(payment.amount)}
-                                  {payment.isDelivery && ' (Delivery)'}
-                                </div>
-                              ))}
+                              {(() => {
+                                // Agrupar pagos por método para evitar duplicaciones
+                                const groupedPayments = new Map();
+                                
+                                order.payments.forEach(payment => {
+                                  const key = `${payment.method}-${payment.isDelivery}`;
+                                  if (!groupedPayments.has(key)) {
+                                    groupedPayments.set(key, {
+                                      method: payment.method,
+                                      amount: 0,
+                                      isDelivery: payment.isDelivery
+                                    });
+                                  }
+                                  groupedPayments.get(key).amount += payment.amount;
+                                });
+                                
+                                return Array.from(groupedPayments.values()).map((payment, index) => (
+                                  <div key={`${payment.method}-${index}`} className="payment-item">
+                                    {payment.method}: {formatCurrency(payment.amount)}
+                                    {payment.isDelivery && ' (Delivery)'}
+                                  </div>
+                                ));
+                              })()}
                             </div>
                           </td>
                           <td>
