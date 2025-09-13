@@ -91,16 +91,11 @@ const ReportsView: React.FC = () => {
       // Obtener SOLO los pagos que NO son de delivery
       const basePayments = order.payments.filter(payment => !payment.isDelivery);
       
-      // Agrupar pagos por método para esta orden
-      const paymentsByMethod = new Map<string, number>();
-      basePayments.forEach(payment => {
-        const method = payment.method;
-        const amount = payment.baseAmount || payment.amount;
-        paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + amount);
-      });
+      // Obtener métodos únicos usados en esta orden
+      const uniqueMethods = new Set(basePayments.map(payment => payment.method));
       
-      // Procesar cada método de pago usado en esta orden
-      paymentsByMethod.forEach((amount, method) => {
+      // Procesar cada método único usado en esta orden
+      uniqueMethods.forEach(method => {
         if (!methodMap.has(method)) {
           const methodConfig = getPaymentMethodConfig(method);
           methodMap.set(method, {
@@ -114,7 +109,7 @@ const ReportsView: React.FC = () => {
 
         const methodData = methodMap.get(method)!;
         methodData.ordersCount.add(order.id);
-        methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - valor único y verdadero
+        methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - una vez por orden
       });
     });
 
