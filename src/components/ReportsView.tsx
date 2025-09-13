@@ -682,22 +682,19 @@ const ReportsView: React.FC = () => {
                           <td>
                             <div className="payments-tooltip">
                               {(() => {
-                                // Agrupar pagos por método para evitar duplicaciones
-                                const groupedPayments = new Map();
+                                // Mostrar cada pago individual pero evitar duplicaciones del mismo método
+                                const seenPayments = new Set();
+                                const uniquePayments = [];
                                 
                                 order.payments.forEach(payment => {
-                                  const key = `${payment.method}-${payment.isDelivery}`;
-                                  if (!groupedPayments.has(key)) {
-                                    groupedPayments.set(key, {
-                                      method: payment.method,
-                                      amount: 0,
-                                      isDelivery: payment.isDelivery
-                                    });
+                                  const key = `${payment.method}-${payment.amount}-${payment.isDelivery}`;
+                                  if (!seenPayments.has(key)) {
+                                    seenPayments.add(key);
+                                    uniquePayments.push(payment);
                                   }
-                                  groupedPayments.get(key).amount += payment.amount;
                                 });
                                 
-                                return Array.from(groupedPayments.values()).map((payment, index) => (
+                                return uniquePayments.map((payment, index) => (
                                   <div key={`${payment.method}-${index}`} className="payment-item">
                                     {payment.method}: {formatCurrency(payment.amount)}
                                     {payment.isDelivery && ' (Delivery)'}
