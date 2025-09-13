@@ -64,7 +64,7 @@ const ReportsView: React.FC = () => {
   const [ordersData, setOrdersData] = useState<OrderReport[]>([]);
   const [ordersTotal, setOrdersTotal] = useState(0);
   const [ordersPage, setOrdersPage] = useState(1);
-  const [ordersLimit] = useState(50);
+  const [ordersLimit] = useState(15);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [showBulkDelete, setShowBulkDelete] = useState(false);
 
@@ -77,6 +77,116 @@ const ReportsView: React.FC = () => {
     spaceType: ''
   });
 
+  // Funciones para generar reportes basados en datos de órdenes
+  const generatePaymentMethodsReport = (orders: OrderReport[]): PaymentMethodReport[] => {
+    const methodMap = new Map<string, {
+      method: string;
+      icon: string;
+      color: string;
+      ordersCount: Set<string>;
+      paidByMethod: number;
+      originalTotal: number;
+      finalTotal: number;
+    }>();
+
+    // Procesar cada orden
+    orders.forEach(order => {
+      order.payments.forEach(payment => {
+        const method = payment.method;
+        
+        if (!methodMap.has(method)) {
+          // Configuración por método de pago
+          const methodConfig = getPaymentMethodConfig(method);
+          methodMap.set(method, {
+            method: method,
+            icon: methodConfig.icon,
+            color: methodConfig.color,
+            ordersCount: new Set(),
+            paidByMethod: 0,
+            originalTotal: 0,
+            finalTotal: 0
+          });
+        }
+
+        const methodData = methodMap.get(method)!;
+        methodData.paidByMethod += payment.amount;
+        methodData.originalTotal += order.originalTotal;
+        methodData.finalTotal += order.finalTotal;
+        methodData.ordersCount.add(order.id); // Agregar ID único de orden
+      });
+    });
+
+    // Convertir Set a número
+    return Array.from(methodMap.values()).map(method => ({
+      ...method,
+      ordersCount: method.ordersCount.size
+    }));
+  };
+
+  const generateDeliveryPaymentsReport = (orders: OrderReport[]): DeliveryPaymentReport[] => {
+    const methodMap = new Map<string, {
+      method: string;
+      icon: string;
+      color: string;
+      deliveryOrdersCount: Set<string>;
+      deliveryFeesPaid: number;
+      orderTotalsPaid: number;
+      totalPaid: number;
+    }>();
+
+    // Procesar solo órdenes de delivery
+    const deliveryOrders = orders.filter(order => order.spaceType === 'DELIVERY');
+
+    deliveryOrders.forEach(order => {
+      order.payments.forEach(payment => {
+        const method = payment.method;
+        
+        if (!methodMap.has(method)) {
+          const methodConfig = getPaymentMethodConfig(method);
+          methodMap.set(method, {
+            method: method,
+            icon: methodConfig.icon,
+            color: methodConfig.color,
+            deliveryOrdersCount: new Set(),
+            deliveryFeesPaid: 0,
+            orderTotalsPaid: 0,
+            totalPaid: 0
+          });
+        }
+
+        const methodData = methodMap.get(method)!;
+        
+        if (payment.isDelivery) {
+          methodData.deliveryFeesPaid += payment.amount;
+        } else {
+          methodData.orderTotalsPaid += payment.amount;
+        }
+        
+        methodData.totalPaid += payment.amount;
+        methodData.deliveryOrdersCount.add(order.id); // Agregar ID único de orden
+      });
+    });
+
+    // Convertir Set a número
+    return Array.from(methodMap.values()).map(method => ({
+      ...method,
+      deliveryOrdersCount: method.deliveryOrdersCount.size
+    }));
+  };
+
+  const getPaymentMethodConfig = (method: string) => {
+    const configs: Record<string, { icon: string; color: string }> = {
+      'EFECTIVO': { icon: '💵', color: '#4caf50' },
+      'TARJETA': { icon: '💳', color: '#2196f3' },
+      'TRANSFERENCIA': { icon: '🏦', color: '#ff9800' },
+      'YAPE': { icon: '📱', color: '#9c27b0' },
+      'PLIN': { icon: '📱', color: '#00bcd4' },
+      'BIM': { icon: '📱', color: '#795548' }
+    };
+    
+    return configs[method] || { icon: '💰', color: '#666' };
+  };
+
   // Cargar datos según la pestaña activa
   useEffect(() => {
     loadData();
@@ -87,42 +197,38 @@ const ReportsView: React.FC = () => {
     setError(null);
 
     try {
+      // Siempre cargar datos de órdenes primero (fuente de verdad)
+      const ordersResponse = await api.get('/reports/orders', {
+        params: {
+          from: filters.from,
+          to: filters.to,
+          page: ordersPage,
+          limit: ordersLimit,
+          status: filters.status,
+          spaceType: filters.spaceType
+        }
+      });
+      
+      const ordersData = ordersResponse.data.orders;
+      setOrdersData(ordersData);
+      setOrdersTotal(ordersResponse.data.total);
+
+      // Generar reportes basados en los datos de órdenes
       switch (activeTab) {
         case 'payments': {
-          const paymentsResponse = await api.get('/reports/payments', {
-            params: {
-              from: filters.from,
-              to: filters.to
-            }
-          });
-          setPaymentMethodsData(paymentsResponse.data);
+          const paymentMethodsData = generatePaymentMethodsReport(ordersData);
+          setPaymentMethodsData(paymentMethodsData);
           break;
         }
 
         case 'delivery': {
-          const deliveryResponse = await api.get('/reports/delivery-payments', {
-            params: {
-              from: filters.from,
-              to: filters.to
-            }
-          });
-          setDeliveryPaymentsData(deliveryResponse.data);
+          const deliveryPaymentsData = generateDeliveryPaymentsReport(ordersData);
+          setDeliveryPaymentsData(deliveryPaymentsData);
           break;
         }
 
         case 'orders': {
-          const ordersResponse = await api.get('/reports/orders', {
-            params: {
-              from: filters.from,
-              to: filters.to,
-              page: ordersPage,
-              limit: ordersLimit,
-              status: filters.status,
-              spaceType: filters.spaceType
-            }
-          });
-          setOrdersData(ordersResponse.data.orders);
-          setOrdersTotal(ordersResponse.data.total);
+          // Los datos ya están cargados arriba
           break;
         }
       }
