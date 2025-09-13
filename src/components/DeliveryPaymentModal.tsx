@@ -76,10 +76,11 @@ const DeliveryPaymentModal: React.FC<DeliveryPaymentModalProps> = ({
     try {
       const totalAmount = modifiedOrderAmount + modifiedDeliveryAmount;
       
-      // Usar el nuevo endpoint de pago completo
+      // Usar el nuevo endpoint de pago completo con métodos separados
       await orderService.registerCompletePayment(
         order.id,
         orderPaymentMethod,
+        deliveryPaymentMethod,
         totalAmount,
         modifiedDeliveryAmount,
         notes.trim() || undefined

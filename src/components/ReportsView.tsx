@@ -89,31 +89,21 @@ const ReportsView: React.FC = () => {
       color: string;
       ordersCount: Set<string>;
       paidByMethod: number;
-      originalTotal: Set<string>;
-      finalTotal: Set<string>;
+      originalTotal: number;
+      finalTotal: number;
     }>();
 
     // Procesar cada orden - SOLO montos de órdenes base (NO delivery)
     orders.forEach(order => {
-      // Agrupar pagos por método para esta orden - SOLO pagos NO de delivery
-      const paymentsByMethod = new Map<string, number>();
+      // Obtener SOLO los pagos que NO son de delivery
+      const basePayments = order.payments.filter(payment => !payment.isDelivery);
       
-      order.payments.forEach(payment => {
+      // Procesar cada pago base
+      basePayments.forEach(payment => {
         const method = payment.method;
-        // SOLO incluir pagos que NO son de delivery - usar baseAmount
-        if (!payment.isDelivery) {
-          const baseAmount = payment.baseAmount || payment.amount;
-          // Solo tomar el primer pago de cada método para evitar duplicaciones
-          if (!paymentsByMethod.has(method)) {
-            paymentsByMethod.set(method, baseAmount);
-          }
-        }
-      });
-
-      // Procesar cada método de pago usado en esta orden (solo base)
-      paymentsByMethod.forEach((amount, method) => {
+        const amount = payment.baseAmount || payment.amount;
+        
         if (!methodMap.has(method)) {
-          // Configuración por método de pago
           const methodConfig = getPaymentMethodConfig(method);
           methodMap.set(method, {
             method: method,
@@ -121,43 +111,29 @@ const ReportsView: React.FC = () => {
             color: methodConfig.color,
             ordersCount: new Set(),
             paidByMethod: 0,
-            originalTotal: new Set(),
-            finalTotal: new Set()
+            originalTotal: 0,
+            finalTotal: 0
           });
         }
 
         const methodData = methodMap.get(method)!;
         methodData.paidByMethod += amount;
-        methodData.ordersCount.add(order.id); // Agregar ID único de orden
-        methodData.originalTotal.add(order.id); // Agregar ID único para totales
-        methodData.finalTotal.add(order.id); // Agregar ID único para totales
+        methodData.ordersCount.add(order.id);
+        methodData.originalTotal += order.originalTotal;
+        methodData.finalTotal += order.finalTotal;
       });
     });
 
-    // Convertir Sets a números y calcular totales correctos
-    return Array.from(methodMap.values()).map(method => {
-      // Calcular totales basados en órdenes únicas
-      const uniqueOrderIds = Array.from(method.ordersCount);
-      const originalTotal = uniqueOrderIds.reduce((sum, orderId) => {
-        const order = orders.find(o => o.id === orderId);
-        return sum + (order?.originalTotal || 0);
-      }, 0);
-      
-      const finalTotal = uniqueOrderIds.reduce((sum, orderId) => {
-        const order = orders.find(o => o.id === orderId);
-        return sum + (order?.finalTotal || 0);
-      }, 0);
-
-      return {
-        method: method.method,
-        icon: method.icon,
-        color: method.color,
-        ordersCount: method.ordersCount.size,
-        paidByMethod: method.paidByMethod,
-        originalTotal: originalTotal,
-        finalTotal: finalTotal
-      };
-    });
+    // Convertir a array de reportes
+    return Array.from(methodMap.values()).map(method => ({
+      method: method.method,
+      icon: method.icon,
+      color: method.color,
+      ordersCount: method.ordersCount.size,
+      paidByMethod: method.paidByMethod,
+      originalTotal: method.originalTotal,
+      finalTotal: method.finalTotal
+    }));
   };
 
   const generateDeliveryPaymentsReport = (orders: OrderReport[]): DeliveryPaymentReport[] => {
@@ -171,30 +147,18 @@ const ReportsView: React.FC = () => {
       totalPaid: number;
     }>();
 
-    // Procesar solo órdenes de delivery EXACTAMENTE como aparece en Ventas Totales
+    // Procesar solo órdenes de delivery
     const deliveryOrders = orders.filter(order => order.spaceType === 'DELIVERY');
 
     deliveryOrders.forEach(order => {
-      // Procesar TODOS los pagos de delivery (fees) como aparecen en Ventas Totales
+      // Obtener SOLO los pagos que SÍ son de delivery
       const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
       
-      if (deliveryPayments.length === 0) {
-        // Si no hay pagos de delivery, no incluir esta orden en el reporte
-        return;
-      }
-
-      // Agrupar pagos de delivery por método
-      const deliveryPaymentsByMethod = new Map<string, number>();
-      
+      // Procesar cada pago de delivery
       deliveryPayments.forEach(payment => {
         const method = payment.method;
-        // Sumar solo el monto del delivery (surchargeAmount), NO el monto total
-        const deliveryAmount = payment.surchargeAmount || payment.amount;
-        deliveryPaymentsByMethod.set(method, (deliveryPaymentsByMethod.get(method) || 0) + deliveryAmount);
-      });
-
-      // Procesar cada método de pago usado para delivery fees
-      deliveryPaymentsByMethod.forEach((amount, method) => {
+        const amount = payment.surchargeAmount || payment.amount;
+        
         if (!methodMap.has(method)) {
           const methodConfig = getPaymentMethodConfig(method);
           methodMap.set(method, {
@@ -203,19 +167,19 @@ const ReportsView: React.FC = () => {
             color: methodConfig.color,
             deliveryOrdersCount: new Set(),
             deliveryFeesPaid: 0,
-            orderTotalsPaid: 0, // No mostrar totales de orden en este reporte
+            orderTotalsPaid: 0,
             totalPaid: 0
           });
         }
 
         const methodData = methodMap.get(method)!;
         methodData.deliveryFeesPaid += amount;
-        methodData.totalPaid += amount; // Solo fees de delivery
-        methodData.deliveryOrdersCount.add(order.id); // Agregar ID único de orden
+        methodData.totalPaid += amount;
+        methodData.deliveryOrdersCount.add(order.id);
       });
     });
 
-    // Convertir Set a número y limpiar datos
+    // Convertir a array de reportes
     return Array.from(methodMap.values()).map(method => ({
       method: method.method,
       icon: method.icon,

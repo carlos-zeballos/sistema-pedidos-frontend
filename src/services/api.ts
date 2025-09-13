@@ -258,10 +258,11 @@ export const orderService = {
     });
     return response.data;
   },
-  registerCompletePayment: async (orderId: string, paymentMethodId: string, totalAmount: number, deliveryAmount?: number, notes?: string) => {
+  registerCompletePayment: async (orderId: string, basePaymentMethodId: string, deliveryPaymentMethodId: string, totalAmount: number, deliveryAmount?: number, notes?: string) => {
     const response = await api.post('/payments/complete', {
       orderId,
-      paymentMethodId,
+      basePaymentMethodId,
+      deliveryPaymentMethodId,
       totalAmount,
       deliveryAmount,
       notes

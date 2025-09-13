@@ -65,6 +65,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       await orderService.registerCompletePayment(
         order.id,
         selectedMethod,
+        selectedMethod, // Mismo método para ambos (no hay delivery)
         modifiedAmount,
         0, // No hay fee de delivery para espacios normales
         notes.trim() || undefined
