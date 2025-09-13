@@ -350,6 +350,17 @@ const WaitersView: React.FC = () => {
   };
 
   const handlePaymentComplete = async () => {
+    // Liberar el espacio si existe una orden de pago
+    if (orderToPay && orderToPay.space) {
+      try {
+        await tableService.updateSpaceStatus(orderToPay.space.id, 'DISPONIBLE');
+        console.log(`✅ Espacio ${orderToPay.space.name} liberado automáticamente después del pago`);
+      } catch (spaceError) {
+        console.error('Error liberando espacio después del pago:', spaceError);
+        // No mostrar error al usuario, solo log
+      }
+    }
+    
     // Recargar las órdenes después del pago
     await loadOrders();
     
