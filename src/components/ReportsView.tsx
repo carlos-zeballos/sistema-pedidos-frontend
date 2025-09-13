@@ -162,7 +162,7 @@ const ReportsView: React.FC = () => {
 
         const methodData = methodMap.get(method)!;
         methodData.deliveryOrdersCount.add(order.id);
-        methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - valor único y verdadero
+        methodData.finalTotal += amount;  // Solo el monto del delivery (surchargeAmount)
       });
     });
 
