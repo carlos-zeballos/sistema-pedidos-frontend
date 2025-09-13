@@ -683,8 +683,12 @@ const ReportsView: React.FC = () => {
                             <div className="payments-tooltip">
                               {(() => {
                                 // Mostrar cada pago individual pero evitar duplicaciones del mismo método
-                                const seenPayments = new Set();
-                                const uniquePayments = [];
+                                const seenPayments = new Set<string>();
+                                const uniquePayments: Array<{
+                                  method: string;
+                                  amount: number;
+                                  isDelivery: boolean;
+                                }> = [];
                                 
                                 order.payments.forEach(payment => {
                                   const key = `${payment.method}-${payment.amount}-${payment.isDelivery}`;
