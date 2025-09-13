@@ -93,12 +93,15 @@ const ReportsView: React.FC = () => {
 
     // Procesar cada orden
     orders.forEach(order => {
-      // Agrupar pagos por método para esta orden
+      // Agrupar pagos por método para esta orden (tomar solo el primer pago de cada método)
       const paymentsByMethod = new Map<string, number>();
       
       order.payments.forEach(payment => {
         const method = payment.method;
-        paymentsByMethod.set(method, (paymentsByMethod.get(method) || 0) + payment.amount);
+        // Solo tomar el primer pago de cada método para evitar duplicaciones
+        if (!paymentsByMethod.has(method)) {
+          paymentsByMethod.set(method, payment.amount);
+        }
       });
 
       // Procesar cada método de pago usado en esta orden
