@@ -109,28 +109,13 @@ export interface Order {
   orderNumber: string;
   spaceId: string;
   space?: Space;
-  customerName?: string;
-  customerPhone?: string;
-  status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO' | 'CANCELADO';
+  customerName: string;
+  status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'PAGADO' | 'CANCELADO';
   totalAmount: number;
-  subtotal: number;
-  tax: number;
-  discount: number;
-  estimatedReadyTime?: Date;
-  actualReadyTime?: Date;
   notes?: string;
-  createdBy: string;
-  createdByUser?: User;
-  assignedTo?: string;
-  assignedToUser?: User;
   createdAt: Date;
   updatedAt: Date;
   items?: OrderItem[];
-  // Campos de delivery
-  deliveryCost?: number;
-  isDelivery?: boolean;
-  orderPaymentMethodId?: string;
-  deliveryPaymentMethodId?: string;
 }
 
 export interface OrderItem {
@@ -140,15 +125,12 @@ export interface OrderItem {
   product?: Product;
   comboId?: string;
   combo?: Combo;
-  name: string;
-  unitPrice: number;
-  totalPrice: number;
   quantity: number;
-  status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO' | 'CANCELADO';
+  price: number;
   notes?: string;
+  status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'PAGADO' | 'CANCELADO';
   createdAt: Date;
   updatedAt: Date;
-  components?: OrderItemComponent[];
 }
 
 export interface OrderItemComponent {
