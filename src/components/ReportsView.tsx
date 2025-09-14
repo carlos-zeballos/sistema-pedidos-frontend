@@ -113,7 +113,7 @@ const ReportsView: React.FC = () => {
 
       const methodData = methodMap.get(method)!;
       methodData.ordersCount.add(order.id);
-      methodData.finalTotal += order.finalTotal;  // Solo TOTAL FINAL - una vez por orden
+      methodData.finalTotal += latestPayment.amount;  // Solo el monto del método específico
     });
 
     // Convertir a array de reportes
@@ -142,26 +142,30 @@ const ReportsView: React.FC = () => {
       // Obtener SOLO los pagos que SÍ son de delivery
       const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
       
-      // Procesar cada pago de delivery
-      deliveryPayments.forEach(payment => {
-        const method = payment.method;
-        const amount = payment.surchargeAmount || payment.amount;
-        
-        if (!methodMap.has(method)) {
-          const methodConfig = getPaymentMethodConfig(method);
-          methodMap.set(method, {
-            method: method,
-            icon: methodConfig.icon,
-            color: methodConfig.color,
-            deliveryOrdersCount: new Set(),
-            finalTotal: 0
-          });
-        }
+      if (deliveryPayments.length === 0) return; // No hay pagos de delivery
+      
+      // Tomar SOLO el pago de delivery más reciente
+      const latestDeliveryPayment = deliveryPayments.sort((a, b) => 
+        new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+      )[0];
+      
+      const method = latestDeliveryPayment.method;
+      const amount = latestDeliveryPayment.surchargeAmount || latestDeliveryPayment.amount;
+      
+      if (!methodMap.has(method)) {
+        const methodConfig = getPaymentMethodConfig(method);
+        methodMap.set(method, {
+          method: method,
+          icon: methodConfig.icon,
+          color: methodConfig.color,
+          deliveryOrdersCount: new Set(),
+          finalTotal: 0
+        });
+      }
 
-        const methodData = methodMap.get(method)!;
-        methodData.deliveryOrdersCount.add(order.id);
-        methodData.finalTotal += amount;  // Solo el monto del delivery (surchargeAmount)
-      });
+      const methodData = methodMap.get(method)!;
+      methodData.deliveryOrdersCount.add(order.id);
+      methodData.finalTotal += amount;  // Solo el monto del delivery más reciente
     });
 
     // Convertir a array de reportes
