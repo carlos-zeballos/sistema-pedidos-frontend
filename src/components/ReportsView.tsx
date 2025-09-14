@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Download, Trash2, Filter } from 'lucide-react';
+import { Download, Trash2, Filter, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api';
 import './ReportsView.css';
 
-// Trigger: Autodeploy - Limpieza de duplicados completada
+// =====================================================
+// INTERFACES TYPESCRIPT
+// =====================================================
 
 interface PaymentMethodReport {
   method: string;
@@ -11,6 +13,8 @@ interface PaymentMethodReport {
   color: string;
   ordersCount: number;
   finalTotal: number;
+  originalTotal: number;
+  paidByMethod: number;
 }
 
 interface DeliveryPaymentReport {
@@ -18,7 +22,9 @@ interface DeliveryPaymentReport {
   icon: string;
   color: string;
   deliveryOrdersCount: number;
-  finalTotal: number;
+  deliveryFeesPaid: number;
+  orderTotalsPaid: number;
+  totalPaid: number;
 }
 
 interface OrderReport {
@@ -30,6 +36,7 @@ interface OrderReport {
   spaceType: string;
   customerName: string;
   status: string;
+  originalTotal: number;
   finalTotal: number;
   paidTotal: number;
   deliveryFeeTotal: number;
@@ -52,7 +59,12 @@ interface ReportsFilters {
   spaceType?: string;
 }
 
+// =====================================================
+// COMPONENTE PRINCIPAL
+// =====================================================
+
 const ReportsView: React.FC = () => {
+  // Estados principales
   const [activeTab, setActiveTab] = useState<'payments' | 'delivery' | 'orders'>('payments');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,8 +76,9 @@ const ReportsView: React.FC = () => {
   const [ordersTotal, setOrdersTotal] = useState(0);
   const [ordersPage, setOrdersPage] = useState(1);
   const [ordersLimit] = useState(15);
+
+  // Estados para selección y eliminación
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
-  const [showBulkDelete, setShowBulkDelete] = useState(false);
 
   // Filtros
   const [filters, setFilters] = useState<ReportsFilters>({
@@ -76,133 +89,46 @@ const ReportsView: React.FC = () => {
     spaceType: ''
   });
 
-  // Funciones para generar reportes basados en datos de órdenes
-  const generatePaymentMethodsReport = (orders: OrderReport[]): PaymentMethodReport[] => {
-    const methodMap = new Map<string, {
-      method: string;
-      icon: string;
-      color: string;
-      ordersCount: Set<string>;
-      finalTotal: number;
-    }>();
+  // Estados para mostrar/ocultar detalles
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
-    // Procesar cada orden - SOLO montos de órdenes base (NO delivery)
-    orders.forEach(order => {
-      // Obtener SOLO los pagos que NO son de delivery
-      const basePayments = order.payments.filter(payment => !payment.isDelivery);
-      
-      if (basePayments.length === 0) return; // No hay pagos base
-      
-      // Para órdenes NO delivery: tomar SOLO el método de pago más reciente (el elegido al final)
-      const latestPayment = basePayments.sort((a, b) => 
-        new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-      )[0];
-      
-      const method = latestPayment.method;
-      
-      if (!methodMap.has(method)) {
-        const methodConfig = getPaymentMethodConfig(method);
-        methodMap.set(method, {
-          method: method,
-          icon: methodConfig.icon,
-          color: methodConfig.color,
-          ordersCount: new Set(),
-          finalTotal: 0
-        });
-      }
+  // =====================================================
+  // FUNCIONES DE CARGA DE DATOS
+  // =====================================================
 
-      const methodData = methodMap.get(method)!;
-      methodData.ordersCount.add(order.id);
-      methodData.finalTotal += latestPayment.amount;  // Solo el monto del método específico
-    });
-
-    // Convertir a array de reportes
-    return Array.from(methodMap.values()).map(method => ({
-      method: method.method,
-      icon: method.icon,
-      color: method.color,
-      ordersCount: method.ordersCount.size,
-      finalTotal: method.finalTotal
-    }));
-  };
-
-  const generateDeliveryPaymentsReport = (orders: OrderReport[]): DeliveryPaymentReport[] => {
-    const methodMap = new Map<string, {
-      method: string;
-      icon: string;
-      color: string;
-      deliveryOrdersCount: Set<string>;
-      finalTotal: number;
-    }>();
-
-    // Procesar solo órdenes de delivery
-    const deliveryOrders = orders.filter(order => order.spaceType === 'DELIVERY');
-
-    deliveryOrders.forEach(order => {
-      // Obtener SOLO los pagos que SÍ son de delivery
-      const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
-      
-      if (deliveryPayments.length === 0) return; // No hay pagos de delivery
-      
-      // Tomar SOLO el pago de delivery más reciente
-      const latestDeliveryPayment = deliveryPayments.sort((a, b) => 
-        new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-      )[0];
-      
-      const method = latestDeliveryPayment.method;
-      const amount = latestDeliveryPayment.surchargeAmount || latestDeliveryPayment.amount;
-      
-      if (!methodMap.has(method)) {
-        const methodConfig = getPaymentMethodConfig(method);
-        methodMap.set(method, {
-          method: method,
-          icon: methodConfig.icon,
-          color: methodConfig.color,
-          deliveryOrdersCount: new Set(),
-          finalTotal: 0
-        });
-      }
-
-      const methodData = methodMap.get(method)!;
-      methodData.deliveryOrdersCount.add(order.id);
-      methodData.finalTotal += amount;  // Solo el monto del delivery más reciente
-    });
-
-    // Convertir a array de reportes
-    return Array.from(methodMap.values()).map(method => ({
-      method: method.method,
-      icon: method.icon,
-      color: method.color,
-      deliveryOrdersCount: method.deliveryOrdersCount.size,
-      finalTotal: method.finalTotal
-    }));
-  };
-
-  const getPaymentMethodConfig = (method: string) => {
-    const configs: Record<string, { icon: string; color: string }> = {
-      'EFECTIVO': { icon: '💵', color: '#4caf50' },
-      'TARJETA': { icon: '💳', color: '#2196f3' },
-      'TRANSFERENCIA': { icon: '🏦', color: '#ff9800' },
-      'YAPE': { icon: '📱', color: '#9c27b0' },
-      'PLIN': { icon: '📱', color: '#00bcd4' },
-      'BIM': { icon: '📱', color: '#795548' }
-    };
-    
-    return configs[method] || { icon: '💰', color: '#666' };
-  };
-
-  // Cargar datos según la pestaña activa
-  useEffect(() => {
-    loadData();
-  }, [activeTab, filters, ordersPage]);
-
-  const loadData = async () => {
-    setLoading(true);
-    setError(null);
-
+  const loadPaymentMethodsReport = async () => {
     try {
-      // Siempre cargar datos de órdenes primero (fuente de verdad)
-      const ordersResponse = await api.get('/reports/orders', {
+      const response = await api.get('/reports/payments', {
+        params: {
+          from: filters.from,
+          to: filters.to
+        }
+      });
+      setPaymentMethodsData(response.data);
+    } catch (err: any) {
+      console.error('Error loading payment methods report:', err);
+      setError('Error cargando reporte de métodos de pago');
+    }
+  };
+
+  const loadDeliveryPaymentsReport = async () => {
+    try {
+      const response = await api.get('/reports/delivery-payments', {
+        params: {
+          from: filters.from,
+          to: filters.to
+        }
+      });
+      setDeliveryPaymentsData(response.data);
+    } catch (err: any) {
+      console.error('Error loading delivery payments report:', err);
+      setError('Error cargando reporte de delivery');
+    }
+  };
+
+  const loadOrdersReport = async () => {
+    try {
+      const response = await api.get('/reports/orders', {
         params: {
           from: filters.from,
           to: filters.to,
@@ -213,56 +139,58 @@ const ReportsView: React.FC = () => {
         }
       });
       
-      const ordersData = ordersResponse.data.orders;
-      setOrdersData(ordersData);
-      setOrdersTotal(ordersResponse.data.total);
+      setOrdersData(response.data.orders);
+      setOrdersTotal(response.data.total);
+    } catch (err: any) {
+      console.error('Error loading orders report:', err);
+      setError('Error cargando reporte de órdenes');
+    }
+  };
 
-      // Generar reportes basados en los datos de órdenes
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
       switch (activeTab) {
-        case 'payments': {
-          const paymentMethodsData = generatePaymentMethodsReport(ordersData);
-          setPaymentMethodsData(paymentMethodsData);
+        case 'payments':
+          await loadPaymentMethodsReport();
           break;
-        }
-
-        case 'delivery': {
-          const deliveryPaymentsData = generateDeliveryPaymentsReport(ordersData);
-          setDeliveryPaymentsData(deliveryPaymentsData);
+        case 'delivery':
+          await loadDeliveryPaymentsReport();
           break;
-        }
-
-        case 'orders': {
-          // Los datos ya están cargados arriba
+        case 'orders':
+          await loadOrdersReport();
           break;
-        }
       }
     } catch (err: any) {
       setError(err.message);
-      console.error('Error loading reports data:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSoftDelete = async (orderId: string, orderNumber: string) => {
-    if (!window.confirm(`¿Estás seguro de que quieres eliminar la orden ${orderNumber}?`)) {
-      return;
-    }
+  // =====================================================
+  // FUNCIONES DE MANEJO DE EVENTOS
+  // =====================================================
 
-    const reason = prompt('Motivo de eliminación (opcional):') || 'Eliminado por administrador';
+  const handleTabChange = (tab: 'payments' | 'delivery' | 'orders') => {
+    setActiveTab(tab);
+    setSelectedOrders(new Set());
+    setExpandedOrders(new Set());
+  };
 
-    try {
-      const response = await api.delete(`/reports/orders/${orderId}`, {
-        data: { reason }
-      });
+  const handleFilterChange = (key: keyof ReportsFilters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
-      alert(response.data.message);
-      
-      // Recargar datos
-      loadData();
-    } catch (err: any) {
-      alert(`Error: ${err.response?.data?.message || err.message}`);
-    }
+  const handleApplyFilters = () => {
+    setOrdersPage(1);
+    loadData();
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setOrdersPage(newPage);
   };
 
   const handleSelectOrder = (orderId: string) => {
@@ -283,6 +211,25 @@ const ReportsView: React.FC = () => {
     }
   };
 
+  const handleSoftDelete = async (orderId: string, orderNumber: string) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar la orden ${orderNumber}?`)) {
+      return;
+    }
+
+    const reason = prompt('Motivo de eliminación (opcional):') || 'Eliminado por administrador';
+
+    try {
+      const response = await api.delete(`/reports/orders/${orderId}`, {
+        data: { reason }
+      });
+
+      alert(response.data.message);
+      loadData();
+    } catch (err: any) {
+      alert(`Error: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
   const handleBulkDelete = async () => {
     if (selectedOrders.size === 0) {
       alert('No hay órdenes seleccionadas para eliminar');
@@ -298,53 +245,63 @@ const ReportsView: React.FC = () => {
       return;
     }
 
-    const reason = prompt('Motivo de eliminación masiva (opcional):') || 'Eliminación masiva por administrador';
+    const reason = prompt('Motivo de eliminación (opcional):') || 'Eliminación masiva por administrador';
 
     try {
       const deletePromises = Array.from(selectedOrders).map(orderId =>
-        api.delete(`/reports/orders/${orderId}`, {
-          data: { reason }
-        })
+        api.delete(`/reports/orders/${orderId}`, { data: { reason } })
       );
 
       await Promise.all(deletePromises);
-      
-      alert(`${selectedOrders.size} órdenes eliminadas exitosamente`);
+      alert(`${selectedOrders.size} órdenes eliminadas correctamente`);
       setSelectedOrders(new Set());
-      setShowBulkDelete(false);
-      
-      // Recargar datos
       loadData();
     } catch (err: any) {
-      alert(`Error al eliminar órdenes: ${err.response?.data?.message || err.message}`);
+      alert(`Error eliminando órdenes: ${err.response?.data?.message || err.message}`);
     }
   };
 
-  const handleExport = async () => {
+  const handleExportOrders = async () => {
     try {
       const response = await api.get('/reports/export/orders', {
-        params: {
-          from: filters.from,
-          to: filters.to
-        }
+        params: filters
       });
 
-      const result = response.data;
-      
-      // Descargar archivo CSV
-      const blob = new Blob([result.csv], { type: 'text/csv' });
+      const blob = new Blob([response.data.csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.filename;
-      document.body.appendChild(a);
-      a.click();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = response.data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
     } catch (err: any) {
-      alert(`Error al exportar: ${err.response?.data?.message || err.message}`);
+      alert(`Error exportando reporte: ${err.response?.data?.message || err.message}`);
     }
   };
+
+  const toggleOrderExpansion = (orderId: string) => {
+    const newExpanded = new Set(expandedOrders);
+    if (newExpanded.has(orderId)) {
+      newExpanded.delete(orderId);
+    } else {
+      newExpanded.add(orderId);
+    }
+    setExpandedOrders(newExpanded);
+  };
+
+  // =====================================================
+  // EFECTOS
+  // =====================================================
+
+  useEffect(() => {
+    loadData();
+  }, [activeTab, ordersPage]);
+
+  // =====================================================
+  // FUNCIONES DE FORMATEO
+  // =====================================================
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-PE', {
@@ -354,117 +311,97 @@ const ReportsView: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleDateString('es-PE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (error) {
-      return dateString; // Fallback si hay error en el formato
-    }
+    return new Date(dateString).toLocaleDateString('es-PE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
+  const getStatusColor = (status: string) => {
+    const colors: { [key: string]: string } = {
+      'PENDIENTE': '#F59E0B',
+      'EN_PREPARACION': '#3B82F6',
+      'LISTO': '#10B981',
+      'PAGADO': '#059669',
+      'CANCELADO': '#EF4444'
+    };
+    return colors[status] || '#6B7280';
+  };
+
+  // =====================================================
+  // RENDERIZADO
+  // =====================================================
+
   return (
-    <div className="reports-view">
+    <div className="reports-container">
+      {/* Header */}
       <div className="reports-header">
         <h1>📊 Reportes del Sistema</h1>
-        <div className="reports-actions">
-          <button 
-            className="export-btn"
-            onClick={handleExport}
-            disabled={loading}
-          >
-            <Download size={16} />
-            Exportar CSV
-          </button>
-        </div>
+        <p>Análisis completo de ventas, métodos de pago y delivery</p>
       </div>
 
       {/* Filtros */}
       <div className="reports-filters">
         <div className="filter-group">
-          <label>
-            <Calendar size={16} />
-            Desde:
-          </label>
+          <label htmlFor="from-date">📅 Fecha Desde:</label>
           <input
+            id="from-date"
             type="date"
             value={filters.from || ''}
-            onChange={(e) => setFilters({ ...filters, from: e.target.value })}
+            onChange={(e) => handleFilterChange('from', e.target.value)}
           />
         </div>
         <div className="filter-group">
-          <label>
-            <Calendar size={16} />
-            Hasta:
-          </label>
+          <label htmlFor="to-date">📅 Fecha Hasta:</label>
           <input
+            id="to-date"
             type="date"
             value={filters.to || ''}
-            onChange={(e) => setFilters({ ...filters, to: e.target.value })}
+            onChange={(e) => handleFilterChange('to', e.target.value)}
           />
         </div>
-        
-        {/* Filtros adicionales para la pestaña de órdenes */}
         {activeTab === 'orders' && (
           <>
             <div className="filter-group">
-              <label>Estado:</label>
+              <label htmlFor="status-filter">📋 Estado:</label>
               <select
+                id="status-filter"
                 value={filters.status || ''}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
               >
                 <option value="">Todos los estados</option>
                 <option value="PENDIENTE">Pendiente</option>
                 <option value="EN_PREPARACION">En Preparación</option>
                 <option value="LISTO">Listo</option>
-                <option value="ENTREGADO">Entregado</option>
+                <option value="PAGADO">Pagado</option>
                 <option value="CANCELADO">Cancelado</option>
               </select>
             </div>
             <div className="filter-group">
-              <label>Tipo de Espacio:</label>
+              <label htmlFor="space-type-filter">🏢 Tipo de Espacio:</label>
               <select
+                id="space-type-filter"
                 value={filters.spaceType || ''}
-                onChange={(e) => setFilters({ ...filters, spaceType: e.target.value })}
+                onChange={(e) => handleFilterChange('spaceType', e.target.value)}
               >
                 <option value="">Todos los tipos</option>
                 <option value="MESA">Mesa</option>
-                <option value="BARRA">Barra</option>
                 <option value="DELIVERY">Delivery</option>
-                <option value="RESERVA">Reserva</option>
+                <option value="MOSTRADOR">Mostrador</option>
               </select>
             </div>
           </>
         )}
-        
-        <button 
-          className="apply-filters-btn"
-          onClick={loadData}
-          disabled={loading}
-        >
-          <Filter size={16} />
+        <button onClick={handleApplyFilters} className="apply-filters-btn">
+          <Filter className="icon" />
           Aplicar Filtros
         </button>
-        
-        <button 
-          className="clear-filters-btn"
-          onClick={() => {
-            setFilters({
-              from: new Date().toISOString().split('T')[0],
-              to: new Date().toISOString().split('T')[0],
-              status: '',
-              method: '',
-              spaceType: ''
-            });
-            setOrdersPage(1);
-          }}
-          disabled={loading}
-        >
-          Limpiar
+        <button onClick={loadData} className="refresh-btn">
+          <RefreshCw className="icon" />
+          Actualizar
         </button>
       </div>
 
@@ -472,21 +409,21 @@ const ReportsView: React.FC = () => {
       <div className="reports-tabs">
         <button
           className={`tab ${activeTab === 'payments' ? 'active' : ''}`}
-          onClick={() => setActiveTab('payments')}
+          onClick={() => handleTabChange('payments')}
         >
           💳 Métodos de Pago
         </button>
         <button
           className={`tab ${activeTab === 'delivery' ? 'active' : ''}`}
-          onClick={() => setActiveTab('delivery')}
+          onClick={() => handleTabChange('delivery')}
         >
-          🚚 Delivery por Método
+          🚚 Delivery
         </button>
         <button
           className={`tab ${activeTab === 'orders' ? 'active' : ''}`}
-          onClick={() => setActiveTab('orders')}
+          onClick={() => handleTabChange('orders')}
         >
-          📋 Ventas Totales
+          📋 Órdenes
         </button>
       </div>
 
@@ -494,7 +431,7 @@ const ReportsView: React.FC = () => {
       <div className="reports-content">
         {loading && (
           <div className="loading">
-            <div className="spinner"></div>
+            <RefreshCw className="spinning" />
             <p>Cargando datos...</p>
           </div>
         )}
@@ -506,101 +443,114 @@ const ReportsView: React.FC = () => {
           </div>
         )}
 
-        {!loading && !error && (
-          <>
-            {/* Pestaña Métodos de Pago */}
-            {activeTab === 'payments' && (
-              <div className="payments-tab">
-                <h2>💳 Resumen por Método de Pago</h2>
-                {paymentMethodsData.length === 0 ? (
-                  <div className="no-data">
-                    <p>📊 No hay datos de pagos para mostrar en el rango de fechas seleccionado.</p>
-                    <p>Intenta cambiar las fechas o crear algunas órdenes con pagos.</p>
-                  </div>
-                ) : (
-                  <div className="payments-grid">
-                    {paymentMethodsData.map((payment) => (
-                    <div key={payment.method} className="payment-card">
-                      <div className="payment-header">
-                        <span className="payment-icon" style={{ color: payment.color }}>
-                          {payment.icon}
-                        </span>
-                        <h3>{payment.method}</h3>
+        {/* Pestaña Métodos de Pago */}
+        {activeTab === 'payments' && !loading && !error && (
+          <div className="payments-report">
+            <div className="report-header">
+              <h2>💳 Reporte de Métodos de Pago</h2>
+              <p>Análisis de pagos por método de pago</p>
+            </div>
+            
+            {paymentMethodsData.length === 0 ? (
+              <div className="no-data">
+                <p>📊 No hay datos para el período seleccionado</p>
+              </div>
+            ) : (
+              <div className="payments-grid">
+                {paymentMethodsData.map((method) => (
+                  <div key={method.method} className="payment-method-card">
+                    <div className="method-header">
+                      <span className="method-icon" style={{ color: method.color }}>
+                        {method.icon}
+                      </span>
+                      <h3>{method.method}</h3>
+                    </div>
+                    <div className="method-stats">
+                      <div className="stat">
+                        <span className="stat-label">Órdenes:</span>
+                        <span className="stat-value">{method.ordersCount}</span>
                       </div>
-                      <div className="payment-stats">
-                        <div className="stat">
-                          <span className="stat-label">Pedidos:</span>
-                          <span className="stat-value">{payment.ordersCount}</span>
-                        </div>
-                        <div className="stat highlight">
-                          <span className="stat-label">Total Final:</span>
-                          <span className="stat-value">{formatCurrency(payment.finalTotal)}</span>
-                        </div>
+                      <div className="stat">
+                        <span className="stat-label">Total Pagado:</span>
+                        <span className="stat-value">{formatCurrency(method.finalTotal)}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pestaña Delivery */}
+        {activeTab === 'delivery' && !loading && !error && (
+          <div className="delivery-report">
+            <div className="report-header">
+              <h2>🚚 Reporte de Delivery</h2>
+              <p>Análisis de órdenes de delivery por método de pago</p>
+            </div>
+            
+            {deliveryPaymentsData.length === 0 ? (
+              <div className="no-data">
+                <p>📊 No hay datos de delivery para el período seleccionado</p>
+              </div>
+            ) : (
+              <div className="delivery-grid">
+                {deliveryPaymentsData.map((method) => (
+                  <div key={method.method} className="delivery-method-card">
+                    <div className="method-header">
+                      <span className="method-icon" style={{ color: method.color }}>
+                        {method.icon}
+                      </span>
+                      <h3>{method.method}</h3>
+                    </div>
+                    <div className="method-stats">
+                      <div className="stat">
+                        <span className="stat-label">Órdenes Delivery:</span>
+                        <span className="stat-value">{method.deliveryOrdersCount}</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-label">Total Pagado:</span>
+                        <span className="stat-value">{formatCurrency(method.totalPaid)}</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-label">Comisiones:</span>
+                        <span className="stat-value">{formatCurrency(method.deliveryFeesPaid)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pestaña Órdenes */}
+        {activeTab === 'orders' && !loading && !error && (
+          <div className="orders-report">
+            <div className="report-header">
+              <h2>📋 Reporte de Órdenes</h2>
+              <p>Lista detallada de todas las órdenes</p>
+              <div className="report-actions">
+                <button onClick={handleExportOrders} className="export-btn">
+                  <Download className="icon" />
+                  Exportar CSV
+                </button>
+                {selectedOrders.size > 0 && (
+                  <button onClick={handleBulkDelete} className="bulk-delete-btn">
+                    <Trash2 className="icon" />
+                    Eliminar Seleccionadas ({selectedOrders.size})
+                  </button>
                 )}
               </div>
-            )}
+            </div>
 
-            {/* Pestaña Delivery por Método */}
-            {activeTab === 'delivery' && (
-              <div className="delivery-tab">
-                <h2>🚚 Delivery por Método de Pago</h2>
-                <div className="delivery-grid">
-                  {deliveryPaymentsData.map((delivery) => (
-                    <div key={delivery.method} className="delivery-card">
-                      <div className="delivery-header">
-                        <span className="delivery-icon" style={{ color: delivery.color }}>
-                          {delivery.icon}
-                        </span>
-                        <h3>{delivery.method}</h3>
-                      </div>
-                      <div className="delivery-stats">
-                        <div className="stat">
-                          <span className="stat-label">Deliverys:</span>
-                          <span className="stat-value">{delivery.deliveryOrdersCount}</span>
-                        </div>
-                        <div className="stat highlight">
-                          <span className="stat-label">Total Final:</span>
-                          <span className="stat-value">{formatCurrency(delivery.finalTotal)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {ordersData.length === 0 ? (
+              <div className="no-data">
+                <p>📊 No hay órdenes para el período seleccionado</p>
               </div>
-            )}
-
-            {/* Pestaña Ventas Totales */}
-            {activeTab === 'orders' && (
-              <div className="orders-tab">
-                <div className="orders-header">
-                  <h2>📋 Ventas Totales</h2>
-                  <div className="bulk-actions">
-                    {selectedOrders.size > 0 && (
-                      <div className="bulk-actions-bar">
-                        <span className="selected-count">
-                          {selectedOrders.size} órdenes seleccionadas
-                        </span>
-                        <button
-                          className="bulk-delete-btn"
-                          onClick={handleBulkDelete}
-                        >
-                          <Trash2 size={16} />
-                          Eliminar Seleccionadas
-                        </button>
-                        <button
-                          className="clear-selection-btn"
-                          onClick={() => setSelectedOrders(new Set())}
-                        >
-                          Limpiar Selección
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+            ) : (
+              <>
                 <div className="orders-table-container">
                   <table className="orders-table">
                     <thead>
@@ -610,100 +560,103 @@ const ReportsView: React.FC = () => {
                             type="checkbox"
                             checked={selectedOrders.size === ordersData.length && ordersData.length > 0}
                             onChange={handleSelectAll}
-                            title="Seleccionar todas"
                           />
                         </th>
-                        <th>Orden</th>
+                        <th>Número</th>
                         <th>Fecha</th>
-                        <th>Espacio</th>
                         <th>Cliente</th>
+                        <th>Espacio</th>
                         <th>Estado</th>
-                        <th>Total Final</th>
+                        <th>Total</th>
                         <th>Pagado</th>
-                        <th>Fee Delivery</th>
-                        <th>Pagos</th>
                         <th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
                       {ordersData.map((order) => (
-                        <tr key={order.id} className={selectedOrders.has(order.id) ? 'selected' : ''}>
-                          <td>
-                            <input
-                              type="checkbox"
-                              checked={selectedOrders.has(order.id)}
-                              onChange={() => handleSelectOrder(order.id)}
-                              title="Seleccionar orden"
-                            />
-                          </td>
-                          <td>{order.orderNumber}</td>
-                          <td>{formatDate(order.createdAt)}</td>
-                          <td>{order.spaceCode}</td>
-                          <td>{order.customerName || '-'}</td>
-                          <td>
-                            <span className={`status-badge status-${order.status.toLowerCase()}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                          <td>{formatCurrency(order.finalTotal)}</td>
-                          <td>{formatCurrency(order.paidTotal)}</td>
-                          <td>{formatCurrency(order.deliveryFeeTotal)}</td>
-                          <td>
-                            <div className="payments-tooltip">
-                              {(() => {
-                                // Aplicar misma lógica que reportes: mostrar SOLO el pago más reciente por tipo
-                                const basePayments = order.payments.filter(payment => !payment.isDelivery);
-                                const deliveryPayments = order.payments.filter(payment => payment.isDelivery);
-                                
-                                const finalPayments: Array<{
-                                  method: string;
-                                  amount: number;
-                                  isDelivery: boolean;
-                                }> = [];
-                                
-                                // Tomar SOLO el pago más reciente para base (NO delivery)
-                                if (basePayments.length > 0) {
-                                  const latestBasePayment = basePayments.sort((a, b) => 
-                                    new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-                                  )[0];
-                                  finalPayments.push({
-                                    method: latestBasePayment.method,
-                                    amount: latestBasePayment.amount,
-                                    isDelivery: false
-                                  });
-                                }
-                                
-                                // Tomar SOLO el pago más reciente para delivery
-                                if (deliveryPayments.length > 0) {
-                                  const latestDeliveryPayment = deliveryPayments.sort((a, b) => 
-                                    new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
-                                  )[0];
-                                  finalPayments.push({
-                                    method: latestDeliveryPayment.method,
-                                    amount: latestDeliveryPayment.amount,
-                                    isDelivery: true
-                                  });
-                                }
-                                
-                                return finalPayments.map((payment, index) => (
-                                  <div key={`${payment.method}-${index}`} className="payment-item">
-                                    {payment.method}: {formatCurrency(payment.amount)}
-                                    {payment.isDelivery && ' (Delivery)'}
+                        <React.Fragment key={order.id}>
+                          <tr className={selectedOrders.has(order.id) ? 'selected' : ''}>
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={selectedOrders.has(order.id)}
+                                onChange={() => handleSelectOrder(order.id)}
+                              />
+                            </td>
+                            <td>{order.orderNumber}</td>
+                            <td>{formatDate(order.createdAt)}</td>
+                            <td>{order.customerName}</td>
+                            <td>{order.spaceCode}</td>
+                            <td>
+                              <span
+                                className="status-badge"
+                                style={{ backgroundColor: getStatusColor(order.status) }}
+                              >
+                                {order.status}
+                              </span>
+                            </td>
+                            <td>{formatCurrency(order.finalTotal)}</td>
+                            <td>{formatCurrency(order.totalPaid)}</td>
+                            <td>
+                              <div className="order-actions">
+                                <button
+                                  onClick={() => toggleOrderExpansion(order.id)}
+                                  className="expand-btn"
+                                >
+                                  {expandedOrders.has(order.id) ? <EyeOff /> : <Eye />}
+                                </button>
+                                <button
+                                  onClick={() => handleSoftDelete(order.id, order.orderNumber)}
+                                  className="delete-btn"
+                                >
+                                  <Trash2 />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {expandedOrders.has(order.id) && (
+                            <tr className="order-details">
+                              <td colSpan={9}>
+                                <div className="order-details-content">
+                                  <div className="order-info">
+                                    <h4>📋 Detalles de la Orden</h4>
+                                    <div className="info-grid">
+                                      <div className="info-item">
+                                        <span className="info-label">Tipo de Espacio:</span>
+                                        <span className="info-value">{order.spaceType}</span>
+                                      </div>
+                                      <div className="info-item">
+                                        <span className="info-label">Total Original:</span>
+                                        <span className="info-value">{formatCurrency(order.originalTotal)}</span>
+                                      </div>
+                                      <div className="info-item">
+                                        <span className="info-label">Comisión Delivery:</span>
+                                        <span className="info-value">{formatCurrency(order.deliveryFeeTotal)}</span>
+                                      </div>
+                                    </div>
                                   </div>
-                                ));
-                              })()}
-                            </div>
-                          </td>
-                          <td>
-                            <button
-                              className="delete-btn"
-                              onClick={() => handleSoftDelete(order.id, order.orderNumber)}
-                              title="Eliminar orden"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
+                                  {order.payments.length > 0 && (
+                                    <div className="payments-info">
+                                      <h4>💳 Pagos Realizados</h4>
+                                      <div className="payments-list">
+                                        {order.payments.map((payment, index) => (
+                                          <div key={`${order.id}-payment-${index}`} className="payment-item">
+                                            <span className="payment-method">{payment.method}</span>
+                                            <span className="payment-amount">{formatCurrency(payment.amount)}</span>
+                                            <span className="payment-date">{formatDate(payment.paymentDate)}</span>
+                                            {payment.isDelivery && (
+                                              <span className="delivery-badge">🚚 Delivery</span>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -712,24 +665,27 @@ const ReportsView: React.FC = () => {
                 {/* Paginación */}
                 <div className="pagination">
                   <button
-                    onClick={() => setOrdersPage(ordersPage - 1)}
-                    disabled={ordersPage === 1 || loading}
+                    onClick={() => handlePageChange(ordersPage - 1)}
+                    disabled={ordersPage === 1}
+                    className="page-btn"
                   >
-                    Anterior
+                    ← Anterior
                   </button>
-                  <span>
+                  <span className="page-info">
                     Página {ordersPage} de {Math.ceil(ordersTotal / ordersLimit)}
+                    ({ordersTotal} órdenes total)
                   </span>
                   <button
-                    onClick={() => setOrdersPage(ordersPage + 1)}
-                    disabled={ordersPage >= Math.ceil(ordersTotal / ordersLimit) || loading}
+                    onClick={() => handlePageChange(ordersPage + 1)}
+                    disabled={ordersPage >= Math.ceil(ordersTotal / ordersLimit)}
+                    className="page-btn"
                   >
-                    Siguiente
+                    Siguiente →
                   </button>
                 </div>
-              </div>
+              </>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

@@ -1,60 +1,38 @@
 /* =====================================================
-   ESTILOS PARA VISTA DE REPORTES
+   ESTILOS PARA LA PESTAÑA DE REPORTES
+   Diseño moderno, elegante y funcional
    ===================================================== */
 
-.reports-view {
-  padding: 20px;
+.reports-container {
+  padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* =====================================================
+   HEADER
+   ===================================================== */
+
 .reports-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
 }
 
 .reports-header h1 {
-  margin: 0;
-  color: #1e293b;
-  font-size: 28px;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
   font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.reports-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.export-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: #10b981;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.export-btn:hover:not(:disabled) {
-  background: #059669;
-  transform: translateY(-1px);
-}
-
-.export-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.reports-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  font-weight: 300;
 }
 
 /* =====================================================
@@ -62,89 +40,67 @@
    ===================================================== */
 
 .reports-filters {
-  display: flex;
-  gap: 20px;
-  align-items: end;
-  margin-bottom: 30px;
-  padding: 20px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
+  min-width: 150px;
 }
 
 .filter-group label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-weight: 600;
   color: #374151;
-  font-size: 14px;
+  font-size: 0.9rem;
 }
 
 .filter-group input,
 .filter-group select {
-  padding: 10px 12px;
+  padding: 0.75rem;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s ease;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: white;
 }
 
 .filter-group input:focus,
 .filter-group select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.apply-filters-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: #3b82f6;
+.apply-filters-btn,
+.refresh-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  height: fit-content;
-}
-
-.apply-filters-btn:hover:not(:disabled) {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-.clear-filters-btn {
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  gap: 0.5rem;
   height: fit-content;
 }
 
-.clear-filters-btn:hover:not(:disabled) {
-  background: #4b5563;
-  transform: translateY(-1px);
-}
-
-.clear-filters-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.apply-filters-btn:hover,
+.refresh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 /* =====================================================
@@ -153,47 +109,48 @@
 
 .reports-tabs {
   display: flex;
-  gap: 4px;
-  margin-bottom: 30px;
   background: white;
-  padding: 6px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
 }
 
 .tab {
   flex: 1;
-  padding: 16px 24px;
+  padding: 1rem 2rem;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: #6b7280;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 1rem;
 }
 
 .tab:hover {
   background: #f3f4f6;
-  color: #374151;
+  transform: translateY(-1px);
 }
 
 .tab.active {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 /* =====================================================
-   CONTENIDO DE PESTAÑAS
+   CONTENIDO
    ===================================================== */
 
 .reports-content {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
 }
 
 .loading {
@@ -201,129 +158,113 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 4rem;
   color: #6b7280;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #3b82f6;
-  border-radius: 50%;
+.spinning {
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .error {
-  padding: 40px 20px;
   text-align: center;
-  color: #dc2626;
+  padding: 2rem;
+  color: #ef4444;
+  background: #fef2f2;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
 }
 
 .error button {
-  margin-top: 16px;
-  padding: 10px 20px;
-  background: #dc2626;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #ef4444;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.no-data {
-  padding: 40px 20px;
-  text-align: center;
-  color: #6b7280;
-  background: #f9fafb;
-  border-radius: 12px;
-  margin: 20px 0;
-}
-
-.no-data p {
-  margin: 8px 0;
-  font-size: 16px;
-}
-
-.no-data p:first-child {
-  font-weight: 600;
-  color: #374151;
-}
-
 /* =====================================================
-   PESTAÑA MÉTODOS DE PAGO
+   REPORTE DE MÉTODOS DE PAGO
    ===================================================== */
 
-.payments-tab {
-  padding: 30px;
+.report-header {
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.payments-tab h2 {
-  margin: 0 0 30px 0;
-  color: #1e293b;
-  font-size: 24px;
-  font-weight: 700;
+.report-header h2 {
+  font-size: 1.8rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.report-header p {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.report-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 .payments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 1.5rem;
 }
 
-.payment-card {
-  background: #f8fafc;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.2s ease;
+.payment-method-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
 }
 
-.payment-card:hover {
-  border-color: #3b82f6;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.payment-method-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
-.payment-header {
+.method-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.payment-icon {
-  font-size: 24px;
+.method-icon {
+  font-size: 2rem;
 }
 
-.payment-header h3 {
+.method-header h3 {
+  font-size: 1.2rem;
+  color: #374151;
   margin: 0;
-  color: #1e293b;
-  font-size: 18px;
-  font-weight: 700;
 }
 
-.payment-stats {
+.method-stats {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.5rem;
 }
 
 .stat {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.stat:last-child {
-  border-bottom: none;
 }
 
 .stat-label {
@@ -332,93 +273,42 @@
 }
 
 .stat-value {
-  color: #1e293b;
+  color: #374151;
   font-weight: 700;
-}
-
-.stat.highlight .stat-value {
-  color: #10b981;
-  font-size: 16px;
+  font-size: 1.1rem;
 }
 
 /* =====================================================
-   PESTAÑA DELIVERY
+   REPORTE DE DELIVERY
    ===================================================== */
-
-.delivery-tab {
-  padding: 30px;
-}
-
-.delivery-tab h2 {
-  margin: 0 0 30px 0;
-  color: #1e293b;
-  font-size: 24px;
-  font-weight: 700;
-}
 
 .delivery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 1.5rem;
 }
 
-.delivery-card {
-  background: #fef3c7;
-  border: 2px solid #f59e0b;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.2s ease;
+.delivery-method-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid #bae6fd;
+  transition: all 0.3s ease;
 }
 
-.delivery-card:hover {
-  border-color: #d97706;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
-}
-
-.delivery-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.delivery-icon {
-  font-size: 24px;
-}
-
-.delivery-header h3 {
-  margin: 0;
-  color: #92400e;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.delivery-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.delivery-method-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
 /* =====================================================
-   PESTAÑA VENTAS TOTALES
+   REPORTE DE ÓRDENES
    ===================================================== */
-
-.orders-tab {
-  padding: 30px;
-}
-
-.orders-tab h2 {
-  margin: 0 0 30px 0;
-  color: #1e293b;
-  font-size: 24px;
-  font-weight: 700;
-}
 
 .orders-table-container {
   overflow-x: auto;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
 }
 
 .orders-table {
@@ -428,104 +318,159 @@
 }
 
 .orders-table th {
-  background: #f1f5f9;
-  padding: 16px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
   text-align: left;
-  font-weight: 700;
-  color: #1e293b;
-  border-bottom: 2px solid #cbd5e1;
-  white-space: nowrap;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .orders-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e2e8f0;
-  color: #334155;
-  white-space: nowrap;
-  font-size: 14px;
-  background: white;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
 }
 
 .orders-table tr:hover {
-  background: #f8fafc;
+  background: #f9fafb;
 }
 
-.orders-table tr:hover td {
-  background: #f8fafc;
-  color: #1e293b;
+.orders-table tr.selected {
+  background: #eff6ff;
 }
 
 .status-badge {
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.status-pendiente {
-  background: #fef3c7;
-  color: #92400e;
-  border-color: #f59e0b;
+.order-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
-.status-en_preparacion {
-  background: #dbeafe;
-  color: #1e40af;
-  border-color: #3b82f6;
+.expand-btn,
+.delete-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.status-listo {
-  background: #dcfce7;
-  color: #166534;
-  border-color: #22c55e;
+.expand-btn {
+  background: #3b82f6;
+  color: white;
 }
 
-.status-entregado {
-  background: #f0fdf4;
-  color: #15803d;
-  border-color: #16a34a;
-}
-
-.status-cancelado {
-  background: #fee2e2;
-  color: #dc2626;
-  border-color: #ef4444;
-}
-
-.payments-tooltip {
-  max-width: 200px;
-  background: #f8fafc;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.payment-item {
-  font-size: 12px;
-  color: #374151;
-  margin-bottom: 4px;
-  font-weight: 500;
-  padding: 2px 0;
+.expand-btn:hover {
+  background: #2563eb;
 }
 
 .delete-btn {
-  padding: 6px 8px;
-  background: #fee2e2;
-  color: #dc2626;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background: #ef4444;
+  color: white;
 }
 
 .delete-btn:hover {
-  background: #fecaca;
-  transform: scale(1.05);
+  background: #dc2626;
+}
+
+/* =====================================================
+   DETALLES DE ÓRDENES
+   ===================================================== */
+
+.order-details {
+  background: #f8fafc;
+}
+
+.order-details-content {
+  padding: 1.5rem;
+}
+
+.order-info,
+.payments-info {
+  margin-bottom: 1.5rem;
+}
+
+.order-info h4,
+.payments-info h4 {
+  color: #374151;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.info-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #374151;
+  font-weight: 600;
+}
+
+.payments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.payment-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.payment-method {
+  font-weight: 600;
+  color: #374151;
+  min-width: 120px;
+}
+
+.payment-amount {
+  font-weight: 700;
+  color: #059669;
+  min-width: 100px;
+}
+
+.payment-date {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.delivery-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 /* =====================================================
@@ -536,36 +481,96 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-top: 30px;
-  padding: 20px;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
 }
 
-.pagination button {
-  padding: 10px 16px;
-  background: #3b82f6;
+.page-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
   font-weight: 600;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.pagination button:hover:not(:disabled) {
-  background: #2563eb;
-  transform: translateY(-1px);
+.page-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-.pagination button:disabled {
-  background: #9ca3af;
+.page-btn:disabled {
+  background: #d1d5db;
   cursor: not-allowed;
   transform: none;
 }
 
-.pagination span {
+.page-info {
   color: #6b7280;
+  font-weight: 500;
+}
+
+/* =====================================================
+   BOTONES DE ACCIÓN
+   ===================================================== */
+
+.export-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+}
+
+.bulk-delete-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bulk-delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* =====================================================
+   SIN DATOS
+   ===================================================== */
+
+.no-data {
+  text-align: center;
+  padding: 4rem;
+  color: #6b7280;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 2px dashed #d1d5db;
+}
+
+.no-data p {
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 /* =====================================================
@@ -573,160 +578,88 @@
    ===================================================== */
 
 @media (max-width: 768px) {
-  .reports-view {
-    padding: 10px;
+  .reports-container {
+    padding: 1rem;
   }
-
-  .reports-header {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
+  
+  .reports-header h1 {
+    font-size: 2rem;
   }
-
+  
   .reports-filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
   }
   
-  .reports-filters .filter-group {
-    width: 100%;
+  .filter-group {
+    min-width: auto;
   }
-
+  
   .reports-tabs {
     flex-direction: column;
   }
-
+  
+  .tab {
+    text-align: center;
+  }
+  
   .payments-grid,
   .delivery-grid {
     grid-template-columns: 1fr;
   }
-
+  
   .orders-table-container {
-    font-size: 14px;
+    font-size: 0.8rem;
   }
-
+  
   .orders-table th,
   .orders-table td {
-    padding: 8px 6px;
+    padding: 0.5rem;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .page-btn {
+    width: 100%;
   }
 }
 
-/* Bulk Actions */
-.orders-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 16px;
+/* =====================================================
+   ANIMACIONES Y TRANSICIONES
+   ===================================================== */
+
+.reports-container * {
+  transition: all 0.3s ease;
 }
 
-.bulk-actions-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
-  animation: slideIn 0.3s ease-out;
+.icon {
+  width: 1rem;
+  height: 1rem;
 }
 
-.selected-count {
-  font-weight: 600;
-  color: #92400e;
+/* Efectos de hover profesionales */
+.payment-method-card,
+.delivery-method-card {
+  position: relative;
+  overflow: hidden;
 }
 
-.bulk-delete-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
+.payment-method-card::before,
+.delivery-method-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
-.bulk-delete-btn:hover {
-  background: #b91c1c;
-}
-
-.clear-selection-btn {
-  padding: 8px 16px;
-  background: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.clear-selection-btn:hover {
-  background: #4b5563;
-}
-
-/* Table Selection */
-.orders-table th:first-child,
-.orders-table td:first-child {
-  width: 40px;
-  text-align: center;
-}
-
-.orders-table th:first-child input,
-.orders-table td:first-child input {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.orders-table tbody tr.selected {
-  background-color: #fef3c7;
-  border-left: 3px solid #f59e0b;
-}
-
-.orders-table tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-.orders-table tbody tr.selected:hover {
-  background-color: #fef3c7;
-}
-
-/* Delete Button */
-.delete-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.delete-btn:hover {
-  background: #dc2626;
-  color: white;
-  transform: scale(1.05);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.payment-method-card:hover::before,
+.delivery-method-card:hover::before {
+  left: 100%;
 }
