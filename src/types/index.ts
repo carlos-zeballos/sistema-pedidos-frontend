@@ -131,6 +131,7 @@ export interface OrderItem {
   unitPrice?: number;
   totalPrice?: number;
   notes?: string;
+  components?: OrderItemComponent[];
   status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'PAGADO' | 'CANCELADO';
   createdAt: Date;
   updatedAt: Date;
