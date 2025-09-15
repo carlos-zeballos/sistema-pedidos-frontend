@@ -119,7 +119,7 @@ const OrdersManagement: React.FC = () => {
       case 'PENDIENTE': return '#ff9800';
       case 'EN_PREPARACION': return '#2196f3';
       case 'LISTO': return '#4caf50';
-      case 'ENTREGADO': return '#9e9e9e';
+      case 'PAGADO': return '#9e9e9e';
       case 'CANCELADO': return '#f44336';
       default: return '#666';
     }
@@ -130,7 +130,7 @@ const OrdersManagement: React.FC = () => {
       case 'PENDIENTE': return 'Pendiente';
       case 'EN_PREPARACION': return 'Preparando';
       case 'LISTO': return 'Listo';
-      case 'ENTREGADO': return 'Entregado';
+      case 'PAGADO': return 'Pagado';
       case 'CANCELADO': return 'Cancelado';
       default: return status;
     }
@@ -193,7 +193,7 @@ const OrdersManagement: React.FC = () => {
             <option value="PENDIENTE">Pendiente</option>
             <option value="EN_PREPARACION">En Preparación</option>
             <option value="LISTO">Listo</option>
-            <option value="ENTREGADO">Entregado</option>
+            <option value="PAGADO">Pagado</option>
             <option value="CANCELADO">Cancelado</option>
           </select>
 
@@ -310,7 +310,7 @@ const OrdersManagement: React.FC = () => {
                   {order.status === 'LISTO' && (
                     <button
                       className="action-btn deliver-btn"
-                      onClick={() => updateOrderStatus(order.id, 'ENTREGADO')}
+                      onClick={() => updateOrderStatus(order.id, 'PAGADO')}
                       disabled={updating === order.id}
                       title="Marcar como entregado"
                     >
@@ -330,7 +330,7 @@ const OrdersManagement: React.FC = () => {
                     </button>
                   )}
 
-                  {order.status !== 'ENTREGADO' && order.status !== 'CANCELADO' && (
+                  {order.status !== 'PAGADO' && order.status !== 'CANCELADO' && (
                     <button
                       className="action-btn cancel-btn"
                       onClick={() => updateOrderStatus(order.id, 'CANCELADO')}

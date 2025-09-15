@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardPage } from './pages/DashboardPage';
-import OrderCreation from './components/OrderCreation';
 import TestOrderCreation from './components/TestOrderCreation';
 import OrdersManagement from './components/OrdersManagement';
 import KitchenView from './components/KitchenView';
-import WaitersView from './components/WaitersView';
+import SimpleWaitersView from './components/SimpleWaitersView';
+import UltraSimpleOrderCreation from './components/UltraSimpleOrderCreation';
 import Catalog from './components/Catalog';
 import CatalogManagement from './components/CatalogManagementNew';
 import ComboManagement from './components/ComboManagement';
@@ -70,7 +70,7 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <AppShell>
-                  <OrderCreation />
+                  <UltraSimpleOrderCreation />
                 </AppShell>
               </ProtectedRoute>
             } 
@@ -115,7 +115,7 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <AppShell>
-                  <WaitersView />
+                  <SimpleWaitersView />
                 </AppShell>
               </ProtectedRoute>
             } 

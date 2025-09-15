@@ -108,7 +108,7 @@ const TestOrderCreation: React.FC = () => {
       const existingOrders = await orderService.getOrders();
       const activeOrderForSpace = existingOrders.find((order: any) =>
         order.spaceId === selectedSpace.id &&
-        ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'].includes(order.status)
+        ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'PAGADO'].includes(order.status)
       );
       if (activeOrderForSpace) {
         alert(`La mesa ${selectedSpace.name} ya tiene un pedido activo (Orden #${activeOrderForSpace.orderNumber}). No se puede crear otro pedido.`);

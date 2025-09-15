@@ -313,7 +313,7 @@ const KitchenView: React.FC = () => {
       case 'PENDIENTE': return 'orange';
       case 'EN_PREPARACION': return 'blue';
       case 'LISTO': return 'green';
-      case 'ENTREGADO': return 'gray';
+      case 'PAGADO': return 'gray';
       case 'CANCELADO': return 'red';
       default: return 'gray';
     }
@@ -324,7 +324,7 @@ const KitchenView: React.FC = () => {
       case 'PENDIENTE': return 'Pendiente';
       case 'EN_PREPARACION': return 'En Preparación';
       case 'LISTO': return 'Listo';
-      case 'ENTREGADO': return 'Entregado';
+      case 'PAGADO': return 'Pagado';
       case 'CANCELADO': return 'Cancelado';
       default: return status;
     }
@@ -363,7 +363,7 @@ const KitchenView: React.FC = () => {
   // Las órdenes pendientes se procesan automáticamente a EN_PREPARACION
   const inProgressOrders = orders.filter(order => order.status === 'EN_PREPARACION');
   const readyOrders = orders.filter(order => order.status === 'LISTO');
-  const deliveredOrders = orders.filter(order => order.status === 'ENTREGADO');
+  const deliveredOrders = orders.filter(order => order.status === 'PAGADO');
 
   return (
     <div className="kitchen-container">
@@ -769,7 +769,7 @@ const KitchenView: React.FC = () => {
 
               <div className="order-actions">
                 <button
-                  onClick={() => updateOrderStatus(order.id, 'ENTREGADO')}
+                  onClick={() => updateOrderStatus(order.id, 'PAGADO')}
                   className="btn btn-secondary"
                 >
                   Marcar como Entregado

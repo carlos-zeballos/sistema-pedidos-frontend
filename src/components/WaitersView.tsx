@@ -53,20 +53,12 @@ const WaitersView: React.FC = () => {
   const loadOrders = async () => {
     try {
       // Solo obtener órdenes activas (no pagadas ni canceladas)
-      const ordersData = await orderService.getOrders('PENDIENTE,EN_PREPARACION,LISTO,ENTREGADO');
+      const ordersData = await orderService.getOrders('PENDIENTE,EN_PREPARACION,LISTO,PAGADO');
       
-      // Filtrar órdenes pagadas (ENTREGADO con isPaid: true)
+      // Filtrar órdenes activas (no pagadas ni canceladas)
       const activeOrders = ordersData.filter((order: any) => {
-        // Si la orden está ENTREGADO pero no está pagada, mostrarla
-        if (order.status === 'ENTREGADO' && !order.isPaid) {
-          return true;
-        }
-        // Si la orden está ENTREGADO y está pagada, NO mostrarla
-        if (order.status === 'ENTREGADO' && order.isPaid) {
-          return false;
-        }
-        // Para otros estados, mostrarla normalmente
-        return true;
+        // Solo mostrar órdenes que no estén pagadas ni canceladas
+        return order.status !== 'PAGADO' && order.status !== 'CANCELADO';
       });
       
       setOrders(activeOrders);
@@ -331,8 +323,8 @@ const WaitersView: React.FC = () => {
       try {
         console.log(`💰 Marcando orden #${order.orderNumber} como pagada y liberando espacio ${order.space?.name}`);
         
-        // Cambiar estado de la orden a ENTREGADO (que incluye el pago)
-        await orderService.updateOrderStatus(order.id, 'ENTREGADO');
+        // Cambiar estado de la orden a PAGADO (que incluye el pago)
+        await orderService.updateOrderStatus(order.id, 'PAGADO');
         
         // Liberar el espacio (marcar como disponible)
         if (order.space) {
@@ -610,7 +602,7 @@ const WaitersView: React.FC = () => {
       case 'PENDIENTE': return 'orange';
       case 'EN_PREPARACION': return 'blue';
       case 'LISTO': return 'green';
-      case 'ENTREGADO': return 'purple';
+      case 'PAGADO': return 'purple';
       case 'CANCELADO': return 'red';
       default: return 'gray';
     }
@@ -621,7 +613,7 @@ const WaitersView: React.FC = () => {
       case 'PENDIENTE': return 'Pendiente';
       case 'EN_PREPARACION': return 'En Preparación';
       case 'LISTO': return 'Listo para Recoger';
-      case 'ENTREGADO': return 'Entregado';
+      case 'PAGADO': return 'Pagado';
       case 'CANCELADO': return 'Cancelado';
       default: return status;
     }
@@ -650,10 +642,10 @@ const WaitersView: React.FC = () => {
   }
 
   const activeOrders = orders.filter(order => 
-    ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'].includes(order.status)
+    ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'PAGADO'].includes(order.status)
   );
   const readyOrders = orders.filter(order => order.status === 'LISTO');
-  const deliveredOrders = orders.filter(order => order.status === 'ENTREGADO');
+  const deliveredOrders = orders.filter(order => order.status === 'PAGADO');
 
   return (
     <div className="waiters-container">
@@ -739,7 +731,7 @@ const WaitersView: React.FC = () => {
                           ${(item.totalPrice || 0).toFixed(2)}
                         </div>
                         {/* Botón para modificar combo - solo si es combo y no está listo */}
-                        {item.comboId && !['LISTO', 'ENTREGADO'].includes(order.status) && (
+                        {item.comboId && !['LISTO', 'PAGADO'].includes(order.status) && (
                           <button
                             className="modify-combo-btn"
                             onClick={() => modifyComboItem(order, item)}
@@ -785,7 +777,7 @@ const WaitersView: React.FC = () => {
 
                 <div className="order-actions">
                   <button
-                    onClick={() => updateOrderStatus(order.id, 'ENTREGADO')}
+                    onClick={() => updateOrderStatus(order.id, 'PAGADO')}
                     className="btn btn-success"
                   >
                     Recoger Pedido
@@ -867,7 +859,7 @@ const WaitersView: React.FC = () => {
               </div>
 
               <div className="order-actions">
-                {order.status === 'ENTREGADO' && (
+                {order.status === 'PAGADO' && (
                   <button
                     onClick={() => openPaymentModal(order)}
                     className="btn btn-primary"
@@ -875,7 +867,7 @@ const WaitersView: React.FC = () => {
                     Marcar como Pagado
                   </button>
                 )}
-                {['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'].includes(order.status) && (
+                {['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'PAGADO'].includes(order.status) && (
                   <button
                     onClick={() => openUpdateModal(order)}
                     className="btn btn-info"

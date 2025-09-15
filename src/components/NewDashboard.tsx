@@ -106,7 +106,7 @@ const NewDashboard: React.FC = () => {
       case 'PENDIENTE': return 'pending';
       case 'EN_PREPARACION': return 'preparing';
       case 'LISTO': return 'ready';
-      case 'ENTREGADO': return 'paid';
+      case 'PAGADO': return 'paid';
       default: return 'default';
     }
   };
@@ -116,7 +116,7 @@ const NewDashboard: React.FC = () => {
       case 'PENDIENTE': return 'PENDIENTE';
       case 'EN_PREPARACION': return 'EN PREPARACIÓN';
       case 'LISTO': return 'LISTO';
-      case 'ENTREGADO': return 'PAGADO';
+      case 'PAGADO': return 'PAGADO';
       default: return status;
     }
   };

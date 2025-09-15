@@ -236,9 +236,9 @@ export const orderService = {
     const response = await api.post('/orders/test', data);
     return response.data;
   },
-  updateOrderStatus: async (id: string, status: string, assignedTo?: string) => {
+  updateOrderStatus: async (id: string, statusData: { status: string; assignedTo?: string }) => {
     // Usar endpoint de prueba para evitar problemas de autenticación
-    const response = await api.put(`/orders/test/${id}/status`, { status, assignedTo });
+    const response = await api.put(`/orders/test/${id}/status`, statusData);
     return response.data;
   },
   updateOrderPaymentMethods: async (id: string, orderPaymentMethodId: string, deliveryPaymentMethodId?: string) => {
