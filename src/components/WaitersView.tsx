@@ -777,7 +777,7 @@ const WaitersView: React.FC = () => {
 
                 <div className="order-actions">
                   <button
-                    onClick={() => updateOrderStatus(order.id, 'PAGADO')}
+                    onClick={() => updateOrderStatus(order.id, { status: 'PAGADO' })}
                     className="btn btn-success"
                   >
                     Recoger Pedido
@@ -877,7 +877,7 @@ const WaitersView: React.FC = () => {
                 )}
                 {['PENDIENTE', 'EN_PREPARACION'].includes(order.status) && (
                   <button
-                    onClick={() => updateOrderStatus(order.id, 'CANCELADO')}
+                    onClick={() => updateOrderStatus(order.id, { status: 'CANCELADO' })}
                     className="btn btn-danger"
                   >
                     Cancelar Orden

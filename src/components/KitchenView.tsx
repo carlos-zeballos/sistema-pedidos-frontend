@@ -691,7 +691,7 @@ const KitchenView: React.FC = () => {
                 {/* Botones de Acción del Ticket */}
                 <div className="ticket-actions">
                   <button
-                    onClick={() => updateOrderStatus(order.id, getNextStatus(order.status))}
+                    onClick={() => updateOrderStatus(order.id, { status: getNextStatus(order.status) })}
                     className="ticket-btn ready-btn"
                   >
                     ✅ {getActionButtonText(order.status)}
