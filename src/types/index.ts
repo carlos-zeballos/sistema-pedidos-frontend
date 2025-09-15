@@ -125,6 +125,7 @@ export interface OrderItem {
   product?: Product;
   comboId?: string;
   combo?: Combo;
+  name?: string;
   quantity: number;
   price: number;
   notes?: string;
