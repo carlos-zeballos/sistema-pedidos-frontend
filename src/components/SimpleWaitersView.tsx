@@ -315,7 +315,7 @@ const SimpleWaitersView: React.FC = () => {
                 {order.status === 'PENDIENTE' && (
                   <button 
                     className="action-btn"
-                    onClick={() => updateOrderStatus(order.id, { status: 'EN_PREPARACION' })}
+                    onClick={() => updateOrderStatus(order.id, 'EN_PREPARACION')}
                   >
                     Enviar a Cocina
                   </button>
@@ -323,7 +323,7 @@ const SimpleWaitersView: React.FC = () => {
                 {order.status === 'LISTO' && (
                   <button 
                     className="action-btn ready"
-                    onClick={() => updateOrderStatus(order.id, { status: 'PAGADO' })}
+                    onClick={() => updateOrderStatus(order.id, 'PAGADO')}
                   >
                     Marcar como Pagado
                   </button>

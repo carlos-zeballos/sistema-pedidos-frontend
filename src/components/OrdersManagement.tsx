@@ -288,7 +288,7 @@ const OrdersManagement: React.FC = () => {
                   {order.status === 'PENDIENTE' && (
                     <button
                       className="action-btn start-btn"
-                      onClick={() => updateOrderStatus(order.id, { status: 'EN_PREPARACION' })}
+                      onClick={() => updateOrderStatus(order.id, 'EN_PREPARACION')}
                       disabled={updating === order.id}
                       title="Comenzar preparación"
                     >
@@ -299,7 +299,7 @@ const OrdersManagement: React.FC = () => {
                   {order.status === 'EN_PREPARACION' && (
                     <button
                       className="action-btn ready-btn"
-                      onClick={() => updateOrderStatus(order.id, { status: 'LISTO' })}
+                      onClick={() => updateOrderStatus(order.id, 'LISTO')}
                       disabled={updating === order.id}
                       title="Marcar como listo"
                     >
@@ -310,7 +310,7 @@ const OrdersManagement: React.FC = () => {
                   {order.status === 'LISTO' && (
                     <button
                       className="action-btn deliver-btn"
-                      onClick={() => updateOrderStatus(order.id, { status: 'PAGADO' })}
+                      onClick={() => updateOrderStatus(order.id, 'PAGADO')}
                       disabled={updating === order.id}
                       title="Marcar como entregado"
                     >
@@ -333,7 +333,7 @@ const OrdersManagement: React.FC = () => {
                   {order.status !== 'PAGADO' && order.status !== 'CANCELADO' && (
                     <button
                       className="action-btn cancel-btn"
-                      onClick={() => updateOrderStatus(order.id, { status: 'CANCELADO' })}
+                      onClick={() => updateOrderStatus(order.id, 'CANCELADO')}
                       disabled={updating === order.id}
                       title="Cancelar orden"
                     >
