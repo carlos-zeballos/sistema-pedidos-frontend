@@ -80,7 +80,7 @@ const KitchenView: React.FC = () => {
               console.log(`🔄 Cambiando orden ${order.orderNumber} de PENDIENTE a EN_PREPARACION`);
               // Cambiar automáticamente a EN_PREPARACION y guardar timestamp
               const now = new Date().toISOString();
-              await orderService.updateOrderStatus(order.id, 'EN_PREPARACION');
+              await orderService.updateOrderStatus(order.id, { status: 'EN_PREPARACION' });
               return { 
                 ...order, 
                 status: 'EN_PREPARACION',
@@ -118,9 +118,9 @@ const KitchenView: React.FC = () => {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderStatus = async (orderId: string, statusData: { status: string }) => {
     try {
-      await orderService.updateOrderStatus(orderId, newStatus as any);
+      await orderService.updateOrderStatus(orderId, statusData);
       await loadKitchenOrders(); // Recargar órdenes
     } catch (err: any) {
       console.error('Error updating order status:', err);
@@ -769,7 +769,7 @@ const KitchenView: React.FC = () => {
 
               <div className="order-actions">
                 <button
-                  onClick={() => updateOrderStatus(order.id, 'PAGADO')}
+                  onClick={() => updateOrderStatus(order.id, { status: 'PAGADO' })}
                   className="btn btn-secondary"
                 >
                   Marcar como Entregado

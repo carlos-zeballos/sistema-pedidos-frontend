@@ -73,7 +73,7 @@ const OrdersManagement: React.FC = () => {
   const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
     setUpdating(orderId);
     try {
-      await orderService.updateOrderStatus(orderId, newStatus);
+      await orderService.updateOrderStatus(orderId, { status: newStatus });
       await loadOrders();
     } catch (error: any) {
       console.error('Error updating order status:', error);

@@ -103,7 +103,7 @@ const WaitersView: React.FC = () => {
           console.log(`🔄 Cancelando orden #${order.orderNumber} y liberando espacio ${order.space.name}`);
           
           // Actualizar el estado de la orden
-          await orderService.updateOrderStatus(orderId, newStatus as any);
+          await orderService.updateOrderStatus(orderId, { status: newStatus });
           
           // Liberar el espacio (marcar como disponible)
           try {
@@ -117,12 +117,12 @@ const WaitersView: React.FC = () => {
           alert(`¡Orden #${order.orderNumber} cancelada! Espacio ${order.space.name} liberado automáticamente.`);
         } else {
           // Si no hay información del espacio, solo actualizar la orden
-          await orderService.updateOrderStatus(orderId, newStatus as any);
+          await orderService.updateOrderStatus(orderId, { status: newStatus });
           alert(`¡Orden #${orderId} cancelada!`);
         }
       } else {
         // Para otros estados, solo actualizar la orden
-        await orderService.updateOrderStatus(orderId, newStatus as any);
+        await orderService.updateOrderStatus(orderId, { status: newStatus });
       }
       
       await loadOrders(); // Recargar órdenes
@@ -324,7 +324,7 @@ const WaitersView: React.FC = () => {
         console.log(`💰 Marcando orden #${order.orderNumber} como pagada y liberando espacio ${order.space?.name}`);
         
         // Cambiar estado de la orden a PAGADO (que incluye el pago)
-        await orderService.updateOrderStatus(order.id, 'PAGADO');
+        await orderService.updateOrderStatus(order.id, { status: 'PAGADO' });
         
         // Liberar el espacio (marcar como disponible)
         if (order.space) {
