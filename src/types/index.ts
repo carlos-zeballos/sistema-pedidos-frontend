@@ -110,6 +110,7 @@ export interface Order {
   spaceId: string;
   space?: Space;
   customerName: string;
+  customerPhone?: string;
   status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'PAGADO' | 'CANCELADO';
   totalAmount: number;
   notes?: string;
