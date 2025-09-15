@@ -128,6 +128,8 @@ export interface OrderItem {
   name?: string;
   quantity: number;
   price: number;
+  unitPrice?: number;
+  totalPrice?: number;
   notes?: string;
   status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'PAGADO' | 'CANCELADO';
   createdAt: Date;
