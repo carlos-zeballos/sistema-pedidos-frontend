@@ -114,6 +114,9 @@ export interface Order {
   status: 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'PAGADO' | 'CANCELADO';
   totalAmount: number;
   notes?: string;
+  // Propiedades de delivery (opcionales para compatibilidad con código existente)
+  isDelivery?: boolean;
+  deliveryCost?: number;
   createdAt: Date;
   updatedAt: Date;
   items?: OrderItem[];
